@@ -20,7 +20,7 @@
     .btn-choice:hover { border-color: #6366f1; background-color: #f5f3ff; transform: translateY(-2px); }
     .tag-chip { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; background:#eef2ff; color:#4338ca; font-size:12px; font-weight:700; margin:4px; }
     .meter { height: 12px; border-radius: 9999px; background: #e2e8f0; overflow: hidden; }
-    .meter > div { height: 100%; border-radius: 9999px; }
+    .meter > div { display:block !important; height: 12px !important; border-radius: 9999px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     .print-only { display: none; }
     @media print {
       .no-print { display: none !important; }
@@ -323,11 +323,44 @@ const AXES = [
           return;
         }
 
-        const reportHtml = report.outerHTML;
+        const clone = report.cloneNode(true);
+        clone.querySelectorAll('.soa-gradient').forEach(el => {
+          el.style.background = 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)';
+          el.style.color = '#ffffff';
+        });
+        const colorMap = {
+          'bg-indigo-500': '#6366f1',
+          'bg-pink-500': '#ec4899',
+          'bg-sky-500': '#0ea5e9',
+          'bg-amber-500': '#f59e0b',
+          'bg-rose-500': '#f43f5e'
+        };
+        clone.querySelectorAll('.meter').forEach(el => {
+          el.style.backgroundColor = '#e2e8f0';
+          el.style.borderRadius = '9999px';
+          el.style.overflow = 'hidden';
+          el.style.height = '12px';
+        });
+        clone.querySelectorAll('.meter > div').forEach(el => {
+          let color = '#6366f1';
+          for (const [klass, hex] of Object.entries(colorMap)) {
+            if (el.classList.contains(klass)) {
+              color = hex;
+              break;
+            }
+          }
+          el.style.display = 'block';
+          el.style.height = '12px';
+          el.style.backgroundColor = color;
+          el.style.minWidth = '6px';
+          el.style.printColorAdjust = 'exact';
+          el.style.webkitPrintColorAdjust = 'exact';
+        });
+        const reportHtml = clone.outerHTML;
         const styles = `
           <style>
-            body { font-family: 'Quicksand', Arial, sans-serif; background: white; color: #334155; margin: 0; padding: 24px; }
-            .soa-gradient { background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%) !important; color: white !important; }
+            body { font-family: 'Quicksand', Arial, sans-serif; background: white; color: #334155; margin: 0; padding: 24px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .soa-gradient { background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%) !important; color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .report-card { box-shadow: none !important; border: none !important; border-radius: 0 !important; overflow: visible !important; }
             .no-print { display: none !important; }
             .tag-chip { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; background:#eef2ff; color:#4338ca; font-size:12px; font-weight:700; margin:4px; }
@@ -399,7 +432,7 @@ const AXES = [
         `;
 
         printWindow.document.open();
-        printWindow.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${printTitle}</title><link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">${styles}</head><body>${reportHtml}<script>window.onload = function(){ setTimeout(function(){ window.print(); }, 300); };<\/script></body></html>`);
+        printWindow.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${printTitle}</title><link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">${styles}</head><body>${reportHtml}<script>window.onload = function(){ setTimeout(function(){ window.focus(); window.print(); }, 300); };<\/script></body></html>`);
         printWindow.document.close();
       } finally {
         if (exportBtn) {
