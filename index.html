@@ -6,6 +6,7 @@
   <title>SOAH | Soutien à l'Observation et aux Aménagements face au Handicap</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -296,6 +297,37 @@ const AXES = [
     }
 
     function resetApp() { window.location.reload(); }
+
+    function exportReportPDF() {
+      const report = document.querySelector('#final-report .report-card');
+      if (!report) return;
+
+      const clone = report.cloneNode(true);
+      clone.style.boxShadow = 'none';
+      clone.style.border = 'none';
+      clone.style.borderRadius = '0';
+      clone.style.width = '100%';
+      clone.querySelectorAll('.no-print').forEach(el => el.remove());
+
+      const wrapper = document.createElement('div');
+      wrapper.style.padding = '24px';
+      wrapper.style.background = '#ffffff';
+      wrapper.appendChild(clone);
+
+      const pseudo = (state.data.pseudo || 'eleve').toString().trim().replace(/[^a-zA-Z0-9_-]+/g, '_');
+      const filename = `boussole_soah_${pseudo || 'eleve'}.pdf`;
+
+      const options = {
+        margin: [10, 10, 10, 10],
+        filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+      };
+
+      html2pdf().set(options).from(wrapper).save();
+    }
 
     function addMessage(sender, text, allowHtml = false) {
       const div = document.createElement('div');
@@ -762,7 +794,12 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             </div>
 
             <div class="bg-slate-900 rounded-[3rem] p-12 text-center no-print">
-              <button onclick="resetApp()" class="soa-gradient text-white px-12 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">Nouveau regard</button>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="exportReportPDF()" class="bg-white text-slate-800 px-10 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">
+                  <i class="fas fa-file-pdf mr-2"></i>Télécharger la boussole en PDF
+                </button>
+                <button onclick="resetApp()" class="soa-gradient text-white px-12 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">Nouveau regard</button>
+              </div>
             </div>
           </div>
         </div>`;
