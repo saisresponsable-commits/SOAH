@@ -502,6 +502,16 @@ const AXES = [
       );
     }
 
+    // NOTE CONCEPTUELLE : cette fonction est appelée dans les étapes du dialogue
+    // avec un "override" partiel (ex: { story: cleanInput }). L'idée est de
+    // combiner l'entrée fraîche de l'utilisateur avec les données déjà
+    // stockées dans state.data pour estimer les axes émergents.
+    // IMPORTANT : dans le flux actuel, la donnée est toujours sauvegardée
+    // dans state.data juste AVANT l'appel à cette fonction (ex: state.data.obs.story = cleanInput).
+    // Si l'ordre du flux conversationnel était modifié à l'avenir, il faudrait
+    // vérifier que la donnée pertinente est bien déjà écrite dans l'état ou
+    // fournie explicitement dans l'objet overrides pour éviter des previews
+    // incohérentes.
     function previewAxesFromPartialData(overrides = {}) {
       const combined = {
         equipment: overrides.equipment !== undefined ? overrides.equipment : state.data.equipment,
