@@ -28,6 +28,7 @@
             min-height: 450px;
         }
 
+        /* Animations de messages */
         .message-appear {
             animation: fadeInTranslate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
@@ -37,6 +38,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Composants de médiation */
         .vulgarisation-box {
             background-color: #fff1f2;
             border-left: 5px solid #fb7185;
@@ -66,7 +68,6 @@
             font-style: italic;
             color: #5b21b6;
             font-size: 0.95rem;
-            position: relative;
         }
 
         /* Pile d'énergie */
@@ -98,6 +99,25 @@
             left: 3px;
             right: 3px;
             width: calc(100% - 6px);
+        }
+
+        /* Curseur Visibilité */
+        .visibility-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            position: relative;
+            margin: 20px 0;
+        }
+        .visibility-point {
+            width: 16px;
+            height: 16px;
+            background: #6366f1;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: absolute;
+            top: -4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .level-badge {
@@ -132,10 +152,10 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased text-balance">
 
     <!-- Header -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 no-print text-balance">
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 no-print">
         <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <div class="soa-gradient p-3 rounded-[1.25rem] shadow-lg rotate-3">
@@ -157,16 +177,16 @@
     <main class="max-w-4xl mx-auto p-4 md:p-8 no-print">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-white border border-slate-100 rounded-[3rem] p-10 md:p-16 shadow-xl shadow-slate-200/50 text-center text-balance">
+        <div id="welcome-screen" class="bg-white border border-slate-100 rounded-[3rem] p-10 md:p-16 shadow-xl shadow-slate-200/50 text-center">
             <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner animate-bounce">
                 <i class="fas fa-face-smile-wink text-indigo-500 text-4xl"></i>
             </div>
             <h2 class="text-3xl font-bold mb-6 text-slate-800 tracking-tight">Bonjour, je suis SOAH</h2>
             <p class="text-slate-500 mb-4 text-xl max-w-2xl mx-auto leading-relaxed font-medium">
-                Accueillir un enfant porteur de handicap(s) dans sa classe, un sacré défi ;)
+                Accueillir un enfant porteur de handicap(s) dans sa classe, un sacré défi <i class="fas fa-arm-flex text-indigo-500"></i>
             </p>
             <p class="text-slate-400 mb-12 text-md font-medium italic">
-                Essayons ensemble de mettre des mots sur le vécu quotidien d'un élève concerné.
+                Ciblons ensemble les obstacles invisibles pour mieux accompagner son parcours.
             </p>
             
             <div class="bg-indigo-50/50 p-8 rounded-[2rem] mb-12 text-left max-w-xl mx-auto border border-indigo-100/50">
@@ -174,7 +194,7 @@
                     <i class="fas fa-fingerprint text-indigo-400"></i> Le respect de son jardin secret
                 </h3>
                 <p class="text-xs text-indigo-700/70 font-medium leading-relaxed">
-                    Pour protéger son identité, <strong>n'utilisons jamais son vrai nom</strong>. Un petit pseudonyme ou une initiale (comme "Léo" ou "A.") suffira amplement pour notre échange exploratoire.
+                    Pour protéger son identité, <strong>n'utilisons jamais son vrai nom</strong>. Un petit pseudonyme ou une initiale suffira amplement pour notre échange exploratoire.
                 </p>
             </div>
 
@@ -191,15 +211,15 @@
         <!-- Chat Area -->
         <div id="chat-interface" class="hidden flex flex-col h-full bg-white border border-slate-100 rounded-[3rem] shadow-2xl overflow-hidden mb-12">
             <div class="bg-indigo-600 text-white text-[10px] py-2 px-4 flex justify-center items-center gap-2 font-bold uppercase tracking-widest">
-                <i class="fas fa-lock text-indigo-200"></i> Médiation pédagogique anonyme
+                <i class="fas fa-eye-slash text-indigo-200"></i> Explorer l'invisible ensemble
             </div>
             
-            <div class="px-8 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-4 text-balance">
+            <div class="px-8 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-4">
                 <div class="w-12 h-12 rounded-2xl soa-gradient flex items-center justify-center text-white font-bold shadow-lg rotate-3 text-xl">S</div>
                 <div>
                     <p class="font-bold text-lg text-slate-800">SOAH</p>
                     <p id="soa-status" class="text-[11px] text-indigo-500 font-bold uppercase tracking-tighter flex items-center gap-2">
-                        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span> Échange exploratoire
+                        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span> Échange bienveillant
                     </p>
                 </div>
             </div>
@@ -226,16 +246,17 @@
     <script>
         const KNOWLEDGE_BASE = {
             vulgarisations: {
-                'Paralysie Cérébrale': "On peut imaginer que le cerveau de l'élève doit fournir un effort de pilotage conscient à chaque seconde. S'asseoir droit n'est pas automatique, c'est une performance qui peut vite grignoter le budget énergie.",
-                'IMC': "On pourrait comparer cela à un corps qui demande un effort de pilotage conscient permanent. Ce qui nous semble fluide 'grignote' sans doute une part massive de son attention.",
-                'Hémiparésie': "L'hémiparésie m'évoque souvent un déséquilibre que l'élève doit compenser sans cesse. C'est un peu comme s'il devait passer sa journée avec un sac de 5kg sur un seul bras : une fatigue de fond s'installe sans doute très vite.",
-                'Dyspraxie': "La dyspraxie ressemble parfois à une panne du pilote automatique. Tenir son crayon ou ranger son cartable pourrait demander à l'élève autant d'attention que de résoudre un problème complexe : son cerveau risque de saturer sur l'exécution pure.",
-                'TDAH': "C'est un peu comme un cerveau sans système de tri automatique. On peut supposer que chaque stimulus a la même importance que votre voix, ce qui mènerait à un épuisement métabolique et émotionnel assez rapide.",
-                'TSA': "On peut imaginer une perception du monde très intense. Un détail sonore pourrait peut-être être vécu comme une agression, occupant une part massive de l'espace mental de l'élève.",
-                'Dyslexie': "La lecture semble être un véritable marathon de déchiffrage. On peut faire l'hypothèse que l'élève s'épuise sur la forme des mots, ce qui lui laisserait peut-être trop peu de ressources pour en savourer le sens.",
-                'AVC': "Un AVC pédiatrique ou une lésion soudaine modifie brutalement la 'carte routière' du cerveau. On peut imaginer que l'élève doit sans cesse reconstruire des chemins pour des tâches qui étaient fluides, ce qui génère une fatigue de fond immense et parfois une grande frustration.",
-                'Lésion cérébrale': "Suite à une lésion ou un accident, le cerveau travaille souvent avec un 'bruit de fond' permanent. On pourrait supposer que le tri des informations et la gestion des efforts deviennent manuels là où ils étaient automatiques.",
-                'Traumatisme crânien': "Le cerveau a subi un choc qui a bousculé ses connexions. On peut faire l'hypothèse d'une batterie qui se décharge beaucoup plus vite, avec des moments de saturation sensorielle ou cognitive imprévisibles."
+                'Paralysie Cérébrale': "On pourrait imaginer que le cerveau de l'élève doit fournir un effort de pilotage conscient à chaque seconde. S'asseoir droit n'est pas automatique, c'est une performance invisible qui grignote le budget énergie.",
+                'IMC': "Cela m'évoque un corps qui demande un effort de pilotage conscient permanent. On peut supposer que chaque **spasme** ou raideur soudaine agit comme une rupture du fil de la pensée, forçant l'élève à dépenser une énergie immense pour se reconnecter sans cesse.",
+                'Hémiparésie': "L'hémiparésie m'évoque souvent un déséquilibre que l'élève doit compenser sans cesse. C'est un peu comme s'il devait passer sa journée avec un sac de 5kg sur un seul bras : une fatigue de fond s'installe souvent de manière invisible.",
+                'Dyspraxie': "C'est souvent le handicap invisible par excellence. L'élève semble 'distrait', mais c'est son pilote automatique qui est en panne. Chaque geste est une tâche nouvelle et épuisante.",
+                'Neuropathie': "On peut imaginer des messages nerveux 'bruités' (douleurs électriques, brûlures). Gérer ces signaux parasites tout en essayant d'apprendre est un effort de concentration colossal et invisible.",
+                'Myopathie': "C'est une fatigue de la fibre musculaire elle-même. On peut faire l'hypothèse d'une pile qui s'épuise non seulement par le mouvement, mais aussi par le simple maintien postural ou la respiration.",
+                'Amyotrophie Spinale': "Une grande fragilité musculaire qui demande au cerveau de compenser le manque de force par une volonté constante. La pile se décharge par le simple maintien vital.",
+                'Épilepsie': "On peut faire l'hypothèse de 'micro-orages électriques'. Même sans crise visible (absences), ces orages créent des coupures d'attention et une fatigue neurologique massive pour se reconnecter.",
+                'Spina Bifida': "L'impact sur la mobilité s'accompagne souvent de défis invisibles dans l'organisation spatiale et les fonctions exécutives. L'appareillage fait ici partie intégrante du schéma corporel.",
+                'AVC': "Suite à un AVC pédiatrique, les séquelles peuvent être très discrètes visuellement mais massives sur le plan cognitif. L'élève doit souvent reconstruire manuellement des chemins neuronaux.",
+                'Lésion cérébrale': "Le handicap invisible prédomine souvent ici : lenteur de traitement, fatigabilité extrême. On pourrait supposer que le tri des informations est devenu manuel."
             }
         };
 
@@ -255,14 +276,8 @@
         }
 
         let state = {
-            step: 'init',
-            isSimulating: false,
-            data: { 
-                pseudo: '', 
-                level: '', 
-                pathologies_detected: [], 
-                obs: { story: '', maslow: '', pain: '', equipment: '', planning: '', double_task: '', emotional: '', other: '' } 
-            }
+            step: 'init', isSimulating: false,
+            data: { pseudo: '', level: '', visibility_ratio: 50, pathologies_detected: [], suggested_pathologies: [], obs: { story: '', maslow: '', pain: '', equipment: '', planning: '', double_task: '', emotional: '', visibility: '', relays: '', other: '' } }
         };
 
         const chatEl = document.getElementById('chat-messages');
@@ -273,11 +288,9 @@
 
         function addMessage(sender, text) {
             const div = document.createElement('div');
-            div.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear text-balance`;
+            div.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
             const inner = document.createElement('div');
-            inner.className = `max-w-[85%] px-8 py-5 rounded-[2.5rem] ${
-                sender === 'user' ? 'soa-gradient text-white rounded-tr-none shadow-xl' : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none shadow-sm font-medium'
-            }`;
+            inner.className = `max-w-[85%] px-8 py-5 rounded-[2.5rem] ${sender === 'user' ? 'soa-gradient text-white rounded-tr-none shadow-xl' : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none shadow-sm font-medium'}`;
             inner.innerHTML = text;
             div.appendChild(inner);
             chatEl.appendChild(div);
@@ -291,14 +304,9 @@
             choicesEl.innerHTML = '';
             choices.forEach(choice => {
                 const btn = document.createElement('button');
-                btn.className = "bg-white border-2 border-indigo-100 text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50 px-6 py-3 rounded-full text-sm font-bold transition-all btn-soft";
+                btn.className = "bg-white border-2 border-indigo-100 text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50 px-6 py-3 rounded-full text-sm font-bold transition-all btn-soft shadow-sm";
                 btn.innerText = choice;
-                btn.onclick = () => {
-                    addMessage('user', choice);
-                    choicesEl.classList.add('hidden');
-                    inputContainer.classList.remove('hidden');
-                    callback(choice);
-                };
+                btn.onclick = () => { addMessage('user', choice); choicesEl.classList.add('hidden'); inputContainer.classList.remove('hidden'); callback(choice); };
                 choicesEl.appendChild(btn);
             });
         }
@@ -306,7 +314,7 @@
         function startAnalysis() {
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('chat-interface').classList.remove('hidden');
-            addMessage("bot", "C'est une chance de pouvoir échanger avec vous. Je suis là pour vous écouter et, si vous le voulez bien, essayer de mettre des mots sur le vécu de votre élève.<br><br>Pour commencer tout doucement, comment souhaitez-vous appeler cet élève ?");
+            addMessage("bot", "C'est une chance de pouvoir échanger avec vous. Je suis là pour vous écouter et essayer de mettre des mots sur le vécu de votre élève.<br><br>Pour commencer tout doucement, comment souhaitez-vous l'appeler ?");
             state.step = 'context';
         }
 
@@ -319,43 +327,23 @@
 
             const script = [
                 { s: 'bot', t: "Bonjour, je suis SOAH. Comment souhaitez-vous appeler cet élève ?" },
-                { s: 'user', t: "On va l'appeler Léo." },
+                { s: 'user', t: "Appelons-le Léo." },
                 { s: 'bot', t: "D'accord pour Léo. Dans quel niveau scolaire se trouve-t-il ?" },
                 { s: 'user', t: "En Primaire (10 ans)." },
-                { s: 'bot', t: "Merci. On vous a peut-être rapporté des diagnostics ou des obstacles majeurs pour <strong>Léo</strong> ?" },
-                { s: 'user', t: "Il a une hemiparezi et aussi une dyspraxie." },
-                { s: 'bot', t: "Je vois. Si je vous suis bien, on parlerait de <strong>Hémiparésie</strong> et de <strong>Dyspraxie</strong> ?" },
-                { s: 'bot', t: "<div class='reflection-card mt-3'><i class='fas fa-lightbulb text-indigo-400'></i> On peut faire l'hypothèse que lorsque ces deux défis se rencontrent, l'école demande à Léo la force mentale d'un athlète de haut niveau. On se sent parfois un peu démuni face à cela, n'est-ce pas ?</div>" },
-                { s: 'bot', t: "<div class='vulgarisation-box'><strong>Piste de lecture sur l'Hémiparésie :</strong><br>On pourrait y voir un effort de compensation constant. Rester assis droit lui demanderait un effort conscient, ce qui grignoterait son attention bien avant le début de la leçon.</div>" },
-                { s: 'bot', t: "<div class='vulgarisation-box'><strong>Piste de lecture sur la Dyspraxie :</strong><br>Cela m'évoque une panne du pilote automatique. On peut supposer que chaque geste (écrire, ranger) est une tâche nouvelle et épuisante pour lui.</div>" },
-                { s: 'bot', t: "On pourrait d'ailleurs imaginer que sa 'batterie' est déjà bien entamée. Avez-vous remarqué s'il cherche souvent des appuis ou s'il semble avoir mal quelque part ?" },
-                { s: 'user', t: "Il s'affaisse sur son bureau vers 11h. Et il a des attelles aux jambes qui semblent le gêner." },
-                { s: 'bot', t: "C'est précieux de noter cela. Les attelles maintiennent le corps mais imposent une rigidité usante. <div class='translation-bubble'>On peut supposer que son irritabilité en fin de matinée n'est pas un refus, mais le cri de son système nerveux qui sature sous le poids de l'effort physique.</div>" },
-                { s: 'bot', t: "Et concernant l'organisation ? Se perd-il parfois dans les étapes pour préparer son travail ?" },
-                { s: 'user', t: "Oui, il ne sait plus par quoi commencer devant son cartable." },
-                { s: 'bot', t: "C'est ce fameux labyrinthe mental du séquençage... Merci beaucoup pour ce partage sincère. <br><br>Je vais préparer sa boussole de compréhension, mais nous pourrons continuer à affiner ensemble juste après. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all'>Consulter la boussole de Léo</button>" }
+                { s: 'bot', t: "Qu'est-ce qui vous amène à solliciter un soutien pour Léo ? Un diagnostic a-t-il déjà été posé par des professionnels, ou naviguons-nous ensemble à partir de vos observations ?" },
+                { s: 'user', t: "Il a une IMC spastique et une dyspraxie. Il porte des attelles aux jambes, c'est visible. Mais en classe, ce qui m'interpelle c'est sa lenteur et ses brusques mouvements de bras." },
+                { s: 'bot', t: "C'est une observation riche. On voit ici ce décalage entre le <strong>visible</strong> (attelles) et l'<strong>invisible</strong> (sa fatigue et ses spasmes). <div class='reflection-card mt-3'><i class='fas fa-eye-slash text-indigo-400'></i> On peut faire l'hypothèse que ses mouvements brusques sont des 'parasites' musculaires qui brisent net sa concentration. Un sacré défi <i class='fas fa-arm-flex text-indigo-500'></i> quotidien.</div>" },
+                { s: 'bot', t: "<div class='vulgarisation-box'><strong>Piste de lecture sur l'IMC :</strong><br>On peut supposer que chaque **spasme** ou raideur force Léo à un effort de 'reconnexion' neurologique immédiat. Il dépense une pile d'énergie immense pour simplement maintenir le fil de la leçon.</div>" },
+                { s: 'bot', t: "Remarquez-vous s'il cherche souvent des appuis physiques ou s'il semble avoir mal quelque part ?" },
+                { s: 'user', t: "Oui, il finit par s'avachir vers 11h. Et il a des neuropathies périphériques qui semblent le faire souffrir." },
+                { s: 'bot', t: "C'est précieux. Les neuropathies créent des sensations 'bruitées' (brûlures, électricité). <div class='translation-bubble'>L'élève doit écouter son cours à travers un brouillard sensoriel permanent. Son irritabilité en fin de matinée pourrait être le signal d'alarme d'un système nerveux à saturation.</div>" },
+                { s: 'bot', t: "Enfin, Léo bénéficie-t-il déjà d'aides extérieures (Pôle intégration, service d'aide, PMS...) ?" },
+                { s: 'user', t: "Il a une aide du Pôle territorial deux fois par semaine." },
+                { s: 'bot', t: "Merci beaucoup pour ce partage. Je prépare sa boussole de compréhension. Nous pourrons affiner juste après. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all text-balance'>Consulter la boussole de Léo</button>" }
             ];
 
-            for (const item of script) {
-                await new Promise(r => setTimeout(r, 1600));
-                addMessage(item.s, item.t);
-            }
-
-            state.data = {
-                pseudo: "Léo",
-                level: "Primaire",
-                pathologies_detected: ["Hémiparésie", "Dyspraxie"],
-                obs: {
-                    story: "Élève volontaire mais épuisement rapide.",
-                    maslow: "Signes de fatigue de fond dès le matin (socle fragile).",
-                    equipment: "Attelles et fatigue posturale marquée.",
-                    pain: "Hypothèse de douleur sourde chronique liée à la spasticité.",
-                    planning: "Difficulté de séquençage et saturation du schéma mental.",
-                    double_task: "Conflit apparent entre l'exécution du geste et le sens.",
-                    emotional: "Pics d'irritabilité liés à la surcharge nerveuse.",
-                    other: "Léo déploie une énergie herculéenne pour compenser ses fragilités."
-                }
-            };
+            for (const item of script) { await new Promise(r => setTimeout(r, 1500)); addMessage(item.s, item.t); }
+            state.data = { pseudo: "Léo", level: "Primaire", visibility_ratio: 30, pathologies_detected: ["IMC", "Dyspraxie", "Neuropathie"], obs: { story: "IMC spastique. Neuropathies.", maslow: "Fatigue marquée à 11h.", equipment: "Attelles (visibles).", pain: "Neuropathies (douleur invisible).", planning: "Séquençage mental très coûteux.", relays: "Aide du Pôle territorial (2x/semaine).", other: "Léo lutte contre ses propres réflexes musculaires." } };
         }
 
         function handleInput() {
@@ -363,12 +351,8 @@
             if (!val || state.isSimulating) return;
             addMessage('user', val);
             inputEl.value = '';
-            
-            if (state.step === 'qa_mode') {
-                setTimeout(() => processQA(val), 600);
-            } else {
-                setTimeout(() => processStep(val), 600);
-            }
+            if (state.step === 'qa_mode') setTimeout(() => processQA(val), 600);
+            else setTimeout(() => processStep(val), 600);
         }
 
         function processStep(input) {
@@ -376,69 +360,54 @@
             switch(state.step) {
                 case 'context':
                     state.data.pseudo = input.split(',')[0];
-                    addMessage("bot", `D'accord. Pour que je puisse mieux imaginer sa réalité scolaire, dans quel niveau <strong>${state.data.pseudo}</strong> se trouve-t-il ?`);
+                    addMessage("bot", `D'accord. Pour que je puisse mieux imaginer sa réalité scolaire, dans quel niveau scolaire <strong>${state.data.pseudo}</strong> se trouve-t-il ?`);
                     showChoices(['Maternelle', 'Primaire', 'Secondaire'], (choice) => {
                         state.data.level = choice;
-                        addMessage("bot", `C'est noté. Racontez-moi un peu votre quotidien avec ${state.data.pseudo}... Qu'est-ce qui vous interpelle le plus chez cet élève en ce moment ?`);
-                        state.step = 'story';
+                        addMessage("bot", `C'est noté. Qu'est-ce qui vous amène à solliciter un soutien pour <strong>${state.data.pseudo}</strong> ? Un diagnostic a-t-il déjà été posé par des professionnels, ou explorons-nous ensemble vos observations de terrain ?`);
+                        state.step = 'story_diagnostic';
                     });
                     break;
-                case 'story':
+                case 'story_diagnostic':
                     state.data.obs.story = input;
-                    const m = findMatches(input);
-                    if (m.exact.length > 0 || m.suggested.length > 0) {
-                        handlePathologyDetection(input, m);
-                    } else {
-                        addMessage("bot", `Je perçois bien le défi. On a l'impression d'un vrai puzzle pédagogique. On vous a peut-être rapporté des diagnostics ou l'origine d'un trouble (accident, AVC, trouble inné) pour éclairer tout cela ?`);
-                        state.step = 'pathology_direct';
-                    }
+                    addMessage("bot", `Je perçois bien le défi. On peut se demander : dans ce que vous observez, qu'est-ce qui est <strong>visible</strong> pour tous (appareillage, gestes), et qu'est-ce qui vous semble être une difficulté <strong>invisible</strong> (douleurs, fatigue, spasmes internes) ?`);
+                    state.step = 'visibility_question';
                     break;
-                case 'pathology_direct':
-                    const m2 = findMatches(input);
-                    handlePathologyDetection(input, m2);
+                case 'visibility_question':
+                    state.data.obs.visibility = input;
+                    const m = findMatches(state.data.obs.story + " " + input);
+                    handlePathologyDetection(input, m);
                     break;
                 case 'confirm_pathology':
-                    if (inputLower.includes('oui') || inputLower.includes('ok')) {
-                        state.data.pathologies_detected = [...new Set([...state.data.pathologies_detected, ...state.data.suggested_pathologies])];
-                    }
+                    if (inputLower.includes('oui') || inputLower.includes('ok')) state.data.pathologies_detected = [...new Set([...state.data.pathologies_detected, ...state.data.suggested_pathologies])];
                     handlePathologyInsights();
                     break;
                 case 'obs_next':
                     state.data.obs.maslow = input;
-                    addMessage("bot", `C'est précieux. On pourrait d'ailleurs se demander si son <strong>appareillage</strong> (attelles, corset) ou une <strong>douleur sourde</strong> ne rajoutent pas une couche de fatigue ?`);
-                    state.step = 'obs_pain';
+                    addMessage("bot", `C'est précieux. Sentez-vous que ${state.data.pseudo} doit gérer des **mouvements involontaires (spasmes, raideurs)** ou des sensations de **douleurs électriques** qui interrompent son attention ?`);
+                    state.step = 'obs_spasms';
                     break;
-                case 'obs_pain':
-                    state.data.obs.pain = input;
-                    addMessage("bot", "Parlons de la <strong>planification</strong> : comment gère-t-il l'organisation de son matériel ? On peut se demander s'il se perd parfois dans les étapes ?");
+                case 'obs_spasms':
+                    state.data.obs.spasms = input;
+                    addMessage("bot", "Parlons de la **planification** : comment gère-t-il l'organisation de son matériel ? On se demande parfois s'il se perd dans les étapes invisibles d'une tâche ?");
                     state.step = 'obs_planning';
                     break;
                 case 'obs_planning':
                     state.data.obs.planning = input;
-                    addMessage("bot", "Et concernant la <strong>Double Tâche</strong> : sentez-vous que le fait de faire un geste bloque parfois son accès à la réflexion ?");
-                    state.step = 'obs_double_task';
+                    addMessage("bot", "Enfin, bénéficie-t-il déjà d'**aides extérieures** (Pôle intégration, service d'aide, PMS...) qui pourraient être des relais suite à notre échange ?");
+                    state.step = 'obs_relays';
                     break;
-                case 'obs_double_task':
-                    state.data.obs.double_task = input;
-                    addMessage("bot", "Enfin, comment gère-t-il cela <strong>émotionnellement</strong> ? Semble-t-il peut-être plus fragile lors des moments de groupe ?");
-                    state.step = 'obs_social';
-                    break;
-                case 'obs_social':
-                    state.data.obs.emotional = input;
-                    addMessage("bot", "Merci infiniment. Je prépare sa boussole de compréhension. Nous pourrons continuer à échanger juste après. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all'>Consulter la boussole</button>");
+                case 'obs_relays':
+                    state.data.obs.relays = input;
+                    addMessage("bot", "Merci infiniment. Je prépare sa boussole de compréhension. Nous pourrons affiner juste après. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all text-balance'>Consulter la boussole</button>");
                     state.step = 'qa_mode';
                     break;
             }
         }
 
         function processQA(input) {
-            addMessage("bot", "C'est une précision importante. Je l'intègre immédiatement à ma réflexion. On peut supposer que ce détail pèse aussi dans son budget énergie. <br><br>Souhaitez-vous que je mette à jour la boussole ci-dessous avec cette information ?");
+            addMessage("bot", "C'est une précision importante. Je l'intègre à ma réflexion. Souhaitez-vous que je mette à jour la boussole ci-dessous ?");
             showChoices(['Mettre à jour la boussole', 'Continuer à discuter'], (c) => {
-                if (c === 'Mettre à jour la boussole') {
-                    state.data.obs.other += " | " + input;
-                    generateReport();
-                    document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' });
-                }
+                if (c === 'Mettre à jour la boussole') { state.data.obs.other += " | " + input; generateReport(); document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' }); }
             });
         }
 
@@ -446,168 +415,100 @@
             state.data.pathologies_detected = matches.exact;
             if (matches.suggested.length > 0) {
                 state.data.suggested_pathologies = matches.suggested;
-                addMessage("bot", `Pour être certaine de bien vous suivre, vouliez-vous parler de <strong>${matches.suggested.join(' et ')}</strong> ?`);
+                addMessage("bot", `Pour être certaine de vous suivre, vouliez-vous parler de <strong>${matches.suggested.join(' et ')}</strong> ?`);
                 state.step = 'confirm_pathology';
-            } else {
-                handlePathologyInsights();
-            }
+            } else handlePathologyInsights();
         }
 
         function handlePathologyInsights() {
             let txt = "";
-            state.data.pathologies_detected.forEach(k => {
-                if (KNOWLEDGE_BASE.vulgarisations[k]) {
-                    txt += `<div class="vulgarisation-box"><strong>Piste de lecture sur ${k} :</strong><br>${KNOWLEDGE_BASE.vulgarisations[k]}</div>`;
-                }
-            });
+            state.data.pathologies_detected.forEach(k => { if (KNOWLEDGE_BASE.vulgarisations[k]) txt += `<div class="vulgarisation-box"><strong>Piste de lecture sur ${k} :</strong><br>${KNOWLEDGE_BASE.vulgarisations[k]}</div>`; });
             if (txt) addMessage("bot", txt);
-            
-            setTimeout(() => {
-                addMessage("bot", `On pourrait explorer ses <strong>besoins physiologiques</strong>. Avez-vous parfois l'impression que ${state.data.pseudo} arrive avec une fatigue déjà marquée le matin ?`);
-                state.step = 'obs_next';
-            }, 1000);
+            setTimeout(() => { addMessage("bot", `On pourrait explorer ses **besoins physiologiques**. Avez-vous parfois l'impression que ${state.data.pseudo} arrive avec une fatigue déjà marquée le matin ?`); state.step = 'obs_next'; }, 1000);
         }
 
         function findMatches(input) {
             let exact = [], suggested = [];
-            Object.keys(KNOWLEDGE_BASE.vulgarisations).forEach(key => {
-                if (input.toLowerCase().includes(key.toLowerCase())) exact.push(key);
-            });
+            Object.keys(KNOWLEDGE_BASE.vulgarisations).forEach(key => { if (input.toLowerCase().includes(key.toLowerCase())) exact.push(key); });
             const words = input.split(/[\s,.;/]+/).filter(w => w.length > 2);
             words.forEach(word => {
-                let best = null, min = 3;
                 Object.keys(KNOWLEDGE_BASE.vulgarisations).forEach(key => {
                     const d = getLevenshteinDistance(word.toLowerCase(), key.toLowerCase());
-                    if (d > 0 && d < min && !exact.includes(key)) { min = d; best = key; }
+                    if (d > 0 && d < 3 && !exact.includes(key)) suggested.push(key);
                 });
-                if (best) suggested.push(best);
             });
             return { exact: [...new Set(exact)], suggested: [...new Set(suggested)] };
         }
 
-        function showFinalReport() {
-            document.getElementById('final-report').classList.remove('hidden');
-            generateReport();
-            setTimeout(() => {
-                document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' });
-                addMessage("bot", "Cette boussole est une première base de réflexion. <strong>Souhaitez-vous approfondir un point ou ai-je oublié un détail de votre quotidien avec lui ?</strong> Je suis là.");
-                state.step = 'qa_mode';
-            }, 100);
-        }
+        function showFinalReport() { generateReport(); document.getElementById('final-report').classList.remove('hidden'); document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' }); addMessage("bot", "Cette boussole est une première base. Souhaitez-vous approfondir un point ou ai-je oublié un détail important ?"); }
 
         function generateReport() {
             const d = state.data;
-            
-            let energyRemaining = 100;
-            if (d.obs.maslow.length > 5) energyRemaining -= 20;
-            if (d.obs.pain.length > 5) energyRemaining -= 15;
-            if (d.obs.planning.length > 5) energyRemaining -= 20;
-            if (d.obs.double_task.length > 5) energyRemaining -= 20;
-            if (d.obs.emotional.length > 5) energyRemaining -= 15;
-            energyRemaining = Math.max(10, energyRemaining);
-
-            const getBatteryColor = (lvl) => {
-                if (lvl <= 30) return '#ef4444';
-                if (lvl <= 60) return '#f59e0b';
-                return '#10b981';
-            };
+            let energy = 100;
+            if (d.obs.maslow.length > 5) energy -= 20;
+            if (d.obs.pain.length > 5) energy -= 15;
+            if (d.obs.planning.length > 5) energy -= 20;
+            energy = Math.max(10, energy);
+            const color = energy <= 30 ? '#ef4444' : energy <= 60 ? '#f59e0b' : '#10b981';
 
             const reportHtml = `
                 <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden report-card fade-in text-balance">
                     <div class="soa-gradient text-white p-12 md:p-16">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 text-balance">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                             <div>
-                                <h2 class="text-4xl font-bold tracking-tight">Boussole de Compréhension</h2>
-                                <p class="mt-4 text-xl font-medium opacity-90 italic">
-                                    "Objectiver l'effort invisible de <strong>${d.pseudo}</strong>."
-                                </p>
-                                <span class="level-badge ${d.level === 'Maternelle' ? 'level-maternelle' : d.level === 'Primaire' ? 'level-primaire' : 'level-secondaire'}">${d.level}</span>
+                                <h2 class="text-4xl font-bold tracking-tight text-balance">Boussole de Compréhension</h2>
+                                <p class="mt-4 text-xl font-medium opacity-90 italic">"Objectiver l'effort invisible de <strong>${d.pseudo}</strong>."</p>
+                                <span class="level-badge ${d.level === 'Maternelle' ? 'level-maternelle' : 'level-primaire'}">${d.level}</span>
                             </div>
-                            <div class="bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-center">
-                                Soutien & Médiation face au Handicap
-                            </div>
+                            <div class="bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-center text-balance">Soutien & Médiation face au Handicap</div>
                         </div>
                     </div>
 
                     <div class="p-8 md:p-16 space-y-20">
-                        
-                        <!-- Pile d'Énergie -->
-                        <div class="flex flex-col md:flex-row items-center gap-12 bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner text-balance">
-                            <div class="flex-shrink-0 text-center">
-                                <div class="battery-container">
-                                    <div class="battery-fill" style="height: ${energyRemaining}%; background-color: ${getBatteryColor(energyRemaining)}"></div>
-                                </div>
-                                <p class="mt-4 font-bold text-slate-700 text-sm">Budget Énergie</p>
-                                <p class="text-[10px] text-slate-400 uppercase font-black">Fin de matinée</p>
+                        <div class="grid md:grid-cols-2 gap-12 items-center bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner">
+                            <div class="text-center">
+                                <div class="battery-container"><div class="battery-fill" style="height: ${energy}%; background-color: ${color}"></div></div>
+                                <p class="font-bold text-slate-700 text-sm mt-4 text-balance text-balance text-balance">Budget Énergie</p>
                             </div>
-                            <div class="flex-1 space-y-6">
-                                <h3 class="text-xl font-bold text-slate-800 tracking-tight">L'érosion des ressources</h3>
-                                <p class="text-sm text-slate-600 leading-relaxed">
-                                    Pour <strong>${d.pseudo}</strong>, la pile se vide par la **base**. Là où un élève ordinaire dépense 5% d'énergie pour rester stable, lui en dépense peut-être 40%. Ce qu'il reste pour l'apprentissage est un reliquat fragile que nous devons protéger.
-                                </p>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-red-400"></div> Posture / Maslow
-                                    </div>
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div> Séquençage
-                                    </div>
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div> Double Tâche
-                                    </div>
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-pink-400"></div> Émotionnel
-                                    </div>
-                                </div>
+                            <div class="space-y-4 text-balance text-balance">
+                                <h3 class="text-xl font-bold text-balance text-balance">Le poids de l'invisible</h3>
+                                <div class="flex justify-between text-[10px] font-black uppercase text-slate-400"><span>Invisible</span><span>Visible</span></div>
+                                <div class="visibility-bar"><div class="visibility-point" style="left: ${d.visibility_ratio}%"></div></div>
+                                <p class="text-xs text-slate-600 leading-relaxed italic text-balance">"Plus le handicap est invisible, plus le coût de **compensation** est épuisant."</p>
                             </div>
                         </div>
 
-                        <!-- Impacts & Pistes -->
                         <div class="space-y-12">
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-3">
-                                <i class="fas fa-magnifying-glass text-indigo-400"></i> Impacts concrets & Pistes de réflexion
-                            </h3>
-                            
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-3 text-balance"><i class="fas fa-magnifying-glass text-indigo-400"></i> Impacts & Réflexions</h3>
                             <div class="grid md:grid-cols-2 gap-10">
                                 <div class="space-y-4">
-                                    <div class="bg-white p-8 rounded-[2rem] shadow-md border border-slate-50 transition-all hover:shadow-xl">
-                                        <p class="text-[10px] font-black text-indigo-500 uppercase mb-2">Physiologie & Douleur</p>
-                                        <p class="text-sm font-bold text-slate-700 mb-4 italic">"${d.obs.maslow}"</p>
-                                        <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl">
-                                            <strong>Impact concret :</strong> L'élève peut paraître agité ou distrait alors qu'il cherche simplement à fuir une douleur sourde ou un inconfort physique.
-                                        </div>
+                                    <div class="bg-white p-8 rounded-[2rem] shadow-md border transition-all hover:shadow-xl">
+                                        <p class="text-[10px] font-black text-indigo-500 uppercase mb-2 text-balance">Physiologie & Spasmes</p>
+                                        <p class="text-sm font-bold text-slate-700 mb-4 italic text-balance">"${d.obs.pain || d.obs.maslow}"</p>
+                                        <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl text-balance"><strong>Impact concret :</strong> Les spasmes musculaires ou douleurs brisent net le fil de la pensée. L'élève doit dépenser une pile d'énergie pour simplement se 'reconnecter' à ce que vous dites.</div>
                                     </div>
-                                    <p class="px-4 text-[11px] text-slate-400 italic">
-                                        <i class="fas fa-lightbulb mr-1"></i> Et si on intégrait des "micros-pauses posturales" avant que la fatigue n'explose ?
-                                    </p>
+                                    <p class="px-4 text-[11px] text-slate-400 italic"><i class="fas fa-lightbulb mr-1 text-amber-400"></i> Et si on autorisait des pauses sensorielles courtes avant que la fatigue n'explose ?</p>
                                 </div>
-
                                 <div class="space-y-4">
-                                    <div class="bg-white p-8 rounded-[2rem] shadow-md border border-slate-50 transition-all hover:shadow-xl">
-                                        <p class="text-[10px] font-black text-pink-500 uppercase mb-2">Double Tâche & Planification</p>
-                                        <p class="text-sm font-bold text-slate-700 mb-4 italic">"${d.obs.planning}"</p>
-                                        <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl">
-                                            <strong>Impact concret :</strong> Le simple fait de "préparer son banc" peut saturer son schéma mental, ne lui laissant plus d'accès à la consigne.
-                                        </div>
+                                    <div class="bg-white p-8 rounded-[2rem] shadow-md border transition-all hover:shadow-xl">
+                                        <p class="text-[10px] font-black text-pink-500 uppercase mb-2">Séquençage & Planification</p>
+                                        <p class="text-sm font-bold text-slate-700 mb-4 italic text-balance">"${d.obs.planning}"</p>
+                                        <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl text-balance"><strong>Impact concret :</strong> L'organisation mentale des étapes est invisible. Son 'désordre' apparent est souvent une saturation du schéma mental.</div>
                                     </div>
-                                    <p class="px-4 text-[11px] text-slate-400 italic">
-                                        <i class="fas fa-lightbulb mr-1"></i> Pourrait-on limiter le nombre d'étapes pour libérer son cerveau ?
-                                    </p>
+                                    <p class="px-4 text-[11px] text-slate-400 italic"><i class="fas fa-lightbulb mr-1 text-amber-400"></i> Pourrait-on utiliser des pictogrammes pour décharger sa mémoire de travail ?</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-slate-900 rounded-[3rem] p-12 text-center space-y-6 no-print">
-                            <h3 class="text-indigo-400 font-bold uppercase text-xs tracking-[0.3em]">Médiation Pédagogique</h3>
-                            <p class="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto italic">
-                                "Chaque comportement qui nous interpelle est sans doute la réponse de son cerveau à une contrainte invisible."
-                            </p>
-                            <div class="pt-6">
-                                <button onclick="window.print()" class="soa-gradient text-white px-12 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">
-                                    <i class="fas fa-print mr-3"></i> Imprimer la boussole
-                                </button>
+                        <div class="bg-indigo-50 p-10 rounded-[2.5rem] border border-indigo-100">
+                            <h3 class="text-sm font-bold text-indigo-900 uppercase tracking-widest flex items-center gap-3 mb-6 text-balance text-balance text-balance text-balance"><i class="fas fa-network-wired text-indigo-400"></i> Réseau & Partenaires</h3>
+                            <div class="grid md:grid-cols-2 gap-8 items-start text-balance text-balance text-balance">
+                                <div><p class="text-xs font-bold text-indigo-400 uppercase mb-2">Relais identifiés</p><p class="text-sm text-slate-700 font-medium bg-white p-4 rounded-xl border border-indigo-50">${d.obs.relays || 'Aucun relais renseigné.'}</p></div>
+                                <div class="text-[11px] text-indigo-600 leading-relaxed italic text-balance">"N'hésitez pas à partager cette boussole avec ces partenaires pour tester de nouvelles pistes."</div>
                             </div>
                         </div>
+
+                        <div class="bg-slate-900 rounded-[3rem] p-12 text-center no-print"><button onclick="window.print()" class="soa-gradient text-white px-12 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all text-balance"><i class="fas fa-print mr-3"></i> Imprimer la boussole</button></div>
                     </div>
                 </div>
                 <div class="flex justify-center mt-12 no-print pb-20">
