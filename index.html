@@ -210,18 +210,20 @@ Comment souhaitez-vous appeler votre élève ?`;
       }
     };
 
-    const AXES = [
-      'fatigue / coût énergétique',
-      'douleur / inconfort',
-      'effort cognitif caché',
-      'variabilité des performances',
-      'environnement scolaire',
-      'vécu subjectif',
-      'temporalité de la journée',
-      'stratégies de compensation',
-      'charge scolaire cumulée',
-      'autonomie paradoxale / besoin d’aide humaine'
-    ];
+    // Liste conceptuelle des axes pédagogiques possibles.
+// Les axes réellement affichés dans le rapport sont filtrés dynamiquement via getActiveAxes().
+const AXES = [
+  'fatigue / coût énergétique',
+  'douleur / inconfort',
+  'effort cognitif caché',
+  'variabilité des performances',
+  'environnement scolaire',
+  'vécu subjectif',
+  'temporalité de la journée',
+  'stratégies de compensation',
+  'charge scolaire cumulée',
+  'autonomie paradoxale / besoin d’aide humaine'
+];
 
     const MARKERS = {
       fatigue: ['fatigue', 'fatigué', 'épuisé', 'épuisement', 'à bout', 'essoufflé', 'vide', 'lessivé'],
@@ -439,23 +441,63 @@ Comment souhaitez-vous appeler votre élève ?`;
       };
     }
 
-    function getActiveAxes() {
-      const m = state.analysis.markers || {};
+    function getActiveAxesFromMarkers(markers = {}, energyScore = 75, matchedPathology = null, equipment = '') {
       const axes = [];
       const addAxis = (label) => { if (!axes.includes(label)) axes.push(label); };
 
-      if (m.fatigue || m.posture || m.mobility || m.writing || state.analysis.energyScore < 65) addAxis('fatigue / coût énergétique');
-      if (m.pain) addAxis('douleur / inconfort');
-      if (m.planning || m.compensation || state.analysis.matchedPathology?.mechanisms?.includes('effort cognitif caché') || state.analysis.matchedPathology?.mechanisms?.includes('double tâche coûteuse')) addAxis('effort cognitif caché');
-      if (m.temporality || state.analysis.matchedPathology?.mechanisms?.includes('variabilité')) addAxis('variabilité des performances');
-      if (m.mobility || m.posture || state.data.equipment) addAxis('environnement scolaire');
-      if (m.irritability || m.social) addAxis('vécu subjectif');
-      if (m.temporality) addAxis('temporalité de la journée');
-      if (m.compensation) addAxis('stratégies de compensation');
-      if (state.analysis.invisibleLoads?.some(load => load.value >= 55)) addAxis('charge scolaire cumulée');
-      if (m.autonomy) addAxis('autonomie paradoxale / besoin d’aide humaine');
+      if (markers.fatigue || markers.posture || markers.mobility || markers.writing || energyScore < 65) addAxis('fatigue / coût énergétique');
+      if (markers.pain) addAxis('douleur / inconfort');
+      if (markers.planning || markers.compensation || matchedPathology?.mechanisms?.includes('effort cognitif caché') || matchedPathology?.mechanisms?.includes('double tâche coûteuse')) addAxis('effort cognitif caché');
+      if (markers.temporality || matchedPathology?.mechanisms?.includes('variabilité')) addAxis('variabilité des performances');
+      if (markers.mobility || markers.posture || equipment) addAxis('environnement scolaire');
+      if (markers.irritability || markers.social || markers.compensation || markers.autonomy) addAxis('vécu subjectif');
+      if (markers.temporality) addAxis('temporalité de la journée');
+      if (markers.compensation) addAxis('stratégies de compensation');
+      if (markers.autonomy) addAxis('autonomie paradoxale / besoin d’aide humaine');
+      const previewLoads = computeInvisibleLoads(markers);
+      if (previewLoads?.some(load => load.value >= 55)) addAxis('charge scolaire cumulée');
 
       return axes.length ? axes : ['fatigue / coût énergétique'];
+    }
+
+    function getActiveAxes() {
+      return getActiveAxesFromMarkers(
+        state.analysis.markers || {},
+        state.analysis.energyScore || 75,
+        state.analysis.matchedPathology || null,
+        state.data.equipment || ''
+      );
+    }
+
+    function previewAxesFromPartialData(overrides = {}) {
+      const combined = {
+        equipment: overrides.equipment !== undefined ? overrides.equipment : state.data.equipment,
+        diagnosis: overrides.diagnosis !== undefined ? overrides.diagnosis : state.data.diagnosis,
+        story: overrides.story !== undefined ? overrides.story : state.data.obs.story,
+        time: overrides.time !== undefined ? overrides.time : state.data.obs.time,
+        compensation: overrides.compensation !== undefined ? overrides.compensation : state.data.obs.compensation,
+        charges: overrides.charges !== undefined ? overrides.charges : state.data.obs.charges,
+        situations: overrides.situations !== undefined ? overrides.situations : state.data.obs.situations
+      };
+
+      const allText = [combined.equipment, combined.diagnosis, combined.story, combined.time, combined.compensation, combined.charges, combined.situations]
+        .filter(Boolean)
+        .join(' | ')
+        .toLowerCase();
+
+      const markers = {};
+      Object.entries(MARKERS).forEach(([key, words]) => {
+        markers[key] = hasKeyword(allText, words);
+      });
+
+      const matchedPathology = detectPathology(combined.diagnosis || '');
+      const energyScore = computeResourceBudgetFromMarkers(markers);
+      return getActiveAxesFromMarkers(markers, energyScore, matchedPathology, combined.equipment || '');
+    }
+
+    function buildAxesPreviewMessage(axes, intro = 'Je repère déjà') {
+      const shown = axes.slice(0, 3);
+      return `<div class="space-y-2"><p>${intro} <strong>${shown.join('</strong>, <strong>')}</strong>.</p><p class="text-sm text-slate-500">Je vais en explorer une ou deux avec vous pour éviter de conclure trop vite.</p></div>`;
     }
 
     function computeResourceBudget() { return state.analysis.energyScore || 75; }
@@ -516,9 +558,13 @@ Comment souhaitez-vous appeler votre élève ?`;
           // On analyse ici l'entrée brute pour repérer immédiatement des signaux saillants dans la formulation spontanée de l'enseignant.
           const quick = detectQuickMarkers(input);
 
+          const previewAxes = previewAxesFromPartialData({ story: cleanInput });
+
           if (quick.fatigue || quick.irr) {
+            addMessage('bot', buildAxesPreviewMessage(previewAxes, 'Je repère déjà'), true);
             addMessage('bot', `Vous décrivez quelque chose d\'important. Quand un comportement change comme cela, il est souvent utile de regarder la <strong>temporalité</strong> : voyez-vous une différence entre le début de journée et la fin de matinée ou l’après-midi ?`, true);
           } else {
+            addMessage('bot', buildAxesPreviewMessage(previewAxes, 'À ce stade, deux ou trois dimensions commencent déjà à apparaître :'), true);
             addMessage('bot', `Merci pour cette première observation. Pour comprendre ce qui se joue vraiment, regardons d’abord <strong>le moment où cela apparaît</strong> : est-ce plutôt en début de journée, après certaines activités, ou quand la fatigue s’installe ?`, true);
           }
 
@@ -530,6 +576,8 @@ Comment souhaitez-vous appeler votre élève ?`;
         case 'temporal':
           state.data.obs.time = cleanInput;
 
+          const temporalAxes = previewAxesFromPartialData({ time: cleanInput });
+          addMessage('bot', buildAxesPreviewMessage(temporalAxes, 'Avec ce que vous ajoutez, je vois plus nettement'), true);
           addMessage('bot', `D'accord. Une autre question aide souvent à comprendre le coût invisible : avez-vous l'impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
 
           offerSkipChoices();
@@ -539,6 +587,8 @@ Comment souhaitez-vous appeler votre élève ?`;
         case 'compensation':
           state.data.obs.compensation = cleanInput;
 
+          const compensationAxes = previewAxesFromPartialData({ compensation: cleanInput });
+          addMessage('bot', buildAxesPreviewMessage(compensationAxes, 'Votre description fait maintenant ressortir'), true);
           addMessage('bot', `Merci. Essayons maintenant d’identifier <strong>où cela se voit le plus</strong> dans la journée scolaire. Dans quelles situations cela apparaît-il surtout ?
 
 Écriture, déplacements, installation, manipulation du matériel, écoute + action en même temps, récréation, travail de groupe…`, true);
@@ -550,7 +600,9 @@ Comment souhaitez-vous appeler votre élève ?`;
         case 'situations':
           state.data.obs.situations = cleanInput;
 
-          addMessage('bot', `On commence à voir apparaître plusieurs contraintes possibles. Pour aller plus loin : quand cela devient difficile, qu’est‑ce qui vous semble le plus lourd pour ${state.data.pseudo} ?
+          const situationAxes = previewAxesFromPartialData({ situations: cleanInput });
+          addMessage('bot', buildAxesPreviewMessage(situationAxes, 'À partir des situations que vous citez, je retiens surtout'), true);
+          addMessage('bot', `On commence à voir apparaître plusieurs contraintes possibles (plusieurs coûts semblent s’additionner). Pour aller plus loin : quand cela devient difficile, qu’est‑ce qui vous semble le plus lourd pour ${state.data.pseudo} ?
 
 • le geste moteur
 • l'organisation
