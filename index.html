@@ -280,7 +280,8 @@ const AXES = [
         accommodations: [],
         surchargeScore: 0,
         energyScore: 0,
-        invisibleLoads: []
+        invisibleLoads: [],
+        previewAxes: []
       }
     };
 
@@ -500,6 +501,21 @@ const AXES = [
       return `<div class="space-y-2"><p>${intro} <strong>${shown.join('</strong>, <strong>')}</strong>.</p><p class="text-sm text-slate-500">Je vais en explorer une ou deux avec vous pour éviter de conclure trop vite.</p></div>`;
     }
 
+    function getNewAxes(previousAxes = [], nextAxes = []) {
+      return nextAxes.filter(axis => !previousAxes.includes(axis));
+    }
+
+    function maybeShowAxesPreview(nextAxes, intro = 'Je repère déjà') {
+      const previousAxes = state.analysis.previewAxes || [];
+      const newAxes = getNewAxes(previousAxes, nextAxes);
+      const axesToShow = newAxes.length ? newAxes : [];
+
+      state.analysis.previewAxes = nextAxes;
+
+      if (!axesToShow.length) return;
+      addMessage('bot', buildAxesPreviewMessage(axesToShow, intro), true);
+    }
+
     function computeResourceBudget() { return state.analysis.energyScore || 75; }
 
     function processStep(input) {
@@ -561,10 +577,10 @@ const AXES = [
           const previewAxes = previewAxesFromPartialData({ story: cleanInput });
 
           if (quick.fatigue || quick.irr) {
-            addMessage('bot', buildAxesPreviewMessage(previewAxes, 'Je repère déjà'), true);
+            maybeShowAxesPreview(previewAxes, 'Je repère déjà');
             addMessage('bot', `Vous décrivez quelque chose d\'important. Quand un comportement change comme cela, il est souvent utile de regarder la <strong>temporalité</strong> : voyez-vous une différence entre le début de journée et la fin de matinée ou l’après-midi ?`, true);
           } else {
-            addMessage('bot', buildAxesPreviewMessage(previewAxes, 'À ce stade, deux ou trois dimensions commencent déjà à apparaître :'), true);
+            maybeShowAxesPreview(previewAxes, 'À ce stade, deux ou trois dimensions commencent déjà à apparaître :');
             addMessage('bot', `Merci pour cette première observation. Pour comprendre ce qui se joue vraiment, regardons d’abord <strong>le moment où cela apparaît</strong> : est-ce plutôt en début de journée, après certaines activités, ou quand la fatigue s’installe ?`, true);
           }
 
@@ -573,22 +589,23 @@ const AXES = [
           break;
         }
 
-        case 'temporal':
+        case 'temporal': {
           state.data.obs.time = cleanInput;
 
           const temporalAxes = previewAxesFromPartialData({ time: cleanInput });
-          addMessage('bot', buildAxesPreviewMessage(temporalAxes, 'Avec ce que vous ajoutez, je vois plus nettement'), true);
+          maybeShowAxesPreview(temporalAxes, 'Avec ce que vous ajoutez, je vois plus nettement');
           addMessage('bot', `D'accord. Une autre question aide souvent à comprendre le coût invisible : avez-vous l'impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
 
           offerSkipChoices();
           state.step = 'compensation';
           break;
+        }
 
-        case 'compensation':
+        case 'compensation': {
           state.data.obs.compensation = cleanInput;
 
           const compensationAxes = previewAxesFromPartialData({ compensation: cleanInput });
-          addMessage('bot', buildAxesPreviewMessage(compensationAxes, 'Votre description fait maintenant ressortir'), true);
+          maybeShowAxesPreview(compensationAxes, 'Votre description fait maintenant ressortir');
           addMessage('bot', `Merci. Essayons maintenant d’identifier <strong>où cela se voit le plus</strong> dans la journée scolaire. Dans quelles situations cela apparaît-il surtout ?
 
 Écriture, déplacements, installation, manipulation du matériel, écoute + action en même temps, récréation, travail de groupe…`, true);
@@ -596,12 +613,13 @@ const AXES = [
           offerSkipChoices();
           state.step = 'situations';
           break;
+        }
 
-        case 'situations':
+        case 'situations': {
           state.data.obs.situations = cleanInput;
 
           const situationAxes = previewAxesFromPartialData({ situations: cleanInput });
-          addMessage('bot', buildAxesPreviewMessage(situationAxes, 'À partir des situations que vous citez, je retiens surtout'), true);
+          maybeShowAxesPreview(situationAxes, 'À partir des situations que vous citez, je retiens surtout');
           addMessage('bot', `On commence à voir apparaître plusieurs contraintes possibles (plusieurs coûts semblent s’additionner). Pour aller plus loin : quand cela devient difficile, qu’est‑ce qui vous semble le plus lourd pour ${state.data.pseudo} ?
 
 • le geste moteur
@@ -609,11 +627,12 @@ const AXES = [
 • la gestion de l'attention
 • la fatigue physique
 • le regard des autres
-• ou le fait de vouloir rester autonome ?`);
+• ou le fait de vouloir rester autonome ?`, true);
 
           offerSkipChoices();
           state.step = 'charges';
           break;
+        }
 
         case 'charges':
           state.data.obs.charges = cleanInput;
