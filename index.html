@@ -66,6 +66,7 @@
             font-style: italic;
             color: #5b21b6;
             font-size: 0.95rem;
+            position: relative;
         }
 
         /* Pile d'énergie */
@@ -208,7 +209,7 @@
             <div id="input-ui" class="p-6 md:p-8 border-t border-slate-50 bg-white">
                 <div id="input-container" class="flex gap-4">
                     <input type="text" id="user-input" placeholder="Partagez vos impressions avec moi..." 
-                           class="flex-1 px-8 py-5 rounded-[2rem] bg-slate-50 border-none focus:ring-2 focus:ring-indigo-300 transition-all text-sm outline-none font-medium text-slate-600">
+                           class="flex-1 px-8 py-5 rounded-[2rem] bg-slate-50 border-none focus:ring-2 focus:ring-indigo-300 transition-all text-sm outline-none font-medium text-slate-600 placeholder:text-slate-400">
                     <button id="send-btn" class="soa-gradient text-white w-16 rounded-[1.5rem] hover:opacity-90 transition-all flex items-center justify-center shadow-lg">
                         <i class="fas fa-paper-plane text-xl"></i>
                     </button>
@@ -229,9 +230,12 @@
                 'IMC': "On pourrait comparer cela à un corps qui demande un effort de pilotage conscient permanent. Ce qui nous semble fluide 'grignote' sans doute une part massive de son attention.",
                 'Hémiparésie': "L'hémiparésie m'évoque souvent un déséquilibre que l'élève doit compenser sans cesse. C'est un peu comme s'il devait passer sa journée avec un sac de 5kg sur un seul bras : une fatigue de fond s'installe sans doute très vite.",
                 'Dyspraxie': "La dyspraxie ressemble parfois à une panne du pilote automatique. Tenir son crayon ou ranger son cartable pourrait demander à l'élève autant d'attention que de résoudre un problème complexe : son cerveau risque de saturer sur l'exécution pure.",
-                'TDAH': "C'est un peu comme un cerveau sans système de tri automatique. On peut supposer que chaque stimulus a la même importance que votre voix, ce qui mènerait à un épuisement métabolique assez rapide.",
+                'TDAH': "C'est un peu comme un cerveau sans système de tri automatique. On peut supposer que chaque stimulus a la même importance que votre voix, ce qui mènerait à un épuisement métabolique et émotionnel assez rapide.",
                 'TSA': "On peut imaginer une perception du monde très intense. Un détail sonore pourrait peut-être être vécu comme une agression, occupant une part massive de l'espace mental de l'élève.",
-                'Dyslexie': "La lecture semble être un véritable marathon de déchiffrage. On peut faire l'hypothèse que l'élève s'épuise sur la forme des mots, ce qui lui laisserait peut-être trop peu de ressources pour en savourer le sens."
+                'Dyslexie': "La lecture semble être un véritable marathon de déchiffrage. On peut faire l'hypothèse que l'élève s'épuise sur la forme des mots, ce qui lui laisserait peut-être trop peu de ressources pour en savourer le sens.",
+                'AVC': "Un AVC pédiatrique ou une lésion soudaine modifie brutalement la 'carte routière' du cerveau. On peut imaginer que l'élève doit sans cesse reconstruire des chemins pour des tâches qui étaient fluides, ce qui génère une fatigue de fond immense et parfois une grande frustration.",
+                'Lésion cérébrale': "Suite à une lésion ou un accident, le cerveau travaille souvent avec un 'bruit de fond' permanent. On pourrait supposer que le tri des informations et la gestion des efforts deviennent manuels là où ils étaient automatiques.",
+                'Traumatisme crânien': "Le cerveau a subi un choc qui a bousculé ses connexions. On peut faire l'hypothèse d'une batterie qui se décharge beaucoup plus vite, avec des moments de saturation sensorielle ou cognitive imprévisibles."
             }
         };
 
@@ -269,7 +273,7 @@
 
         function addMessage(sender, text) {
             const div = document.createElement('div');
-            div.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+            div.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear text-balance`;
             const inner = document.createElement('div');
             inner.className = `max-w-[85%] px-8 py-5 rounded-[2.5rem] ${
                 sender === 'user' ? 'soa-gradient text-white rounded-tr-none shadow-xl' : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none shadow-sm font-medium'
@@ -333,7 +337,7 @@
             ];
 
             for (const item of script) {
-                await new Promise(r => setTimeout(r, 1400));
+                await new Promise(r => setTimeout(r, 1600));
                 addMessage(item.s, item.t);
             }
 
@@ -385,7 +389,7 @@
                     if (m.exact.length > 0 || m.suggested.length > 0) {
                         handlePathologyDetection(input, m);
                     } else {
-                        addMessage("bot", `Je perçois bien le défi. On vous a peut-être rapporté des diagnostics ou des obstacles majeurs pour éclairer tout cela ?`);
+                        addMessage("bot", `Je perçois bien le défi. On a l'impression d'un vrai puzzle pédagogique. On vous a peut-être rapporté des diagnostics ou l'origine d'un trouble (accident, AVC, trouble inné) pour éclairer tout cela ?`);
                         state.step = 'pathology_direct';
                     }
                     break;
@@ -428,7 +432,7 @@
         }
 
         function processQA(input) {
-            addMessage("bot", "C'est une précision importante. Je l'intègre immédiatement à ma réflexion. <br><br>Souhaitez-vous que je mette à jour la boussole ci-dessous avec cette information ?");
+            addMessage("bot", "C'est une précision importante. Je l'intègre immédiatement à ma réflexion. On peut supposer que ce détail pèse aussi dans son budget énergie. <br><br>Souhaitez-vous que je mette à jour la boussole ci-dessous avec cette information ?");
             showChoices(['Mettre à jour la boussole', 'Continuer à discuter'], (c) => {
                 if (c === 'Mettre à jour la boussole') {
                     state.data.obs.other += " | " + input;
@@ -442,7 +446,7 @@
             state.data.pathologies_detected = matches.exact;
             if (matches.suggested.length > 0) {
                 state.data.suggested_pathologies = matches.suggested;
-                addMessage("bot", `Pour être certaine de bien vous suivre, quand vous dites cela, vouliez-vous parler de <strong>${matches.suggested.join(' et ')}</strong> ?`);
+                addMessage("bot", `Pour être certaine de bien vous suivre, vouliez-vous parler de <strong>${matches.suggested.join(' et ')}</strong> ?`);
                 state.step = 'confirm_pathology';
             } else {
                 handlePathologyInsights();
@@ -494,7 +498,6 @@
         function generateReport() {
             const d = state.data;
             
-            // Calcul de la pile d'énergie
             let energyRemaining = 100;
             if (d.obs.maslow.length > 5) energyRemaining -= 20;
             if (d.obs.pain.length > 5) energyRemaining -= 15;
@@ -510,7 +513,7 @@
             };
 
             const reportHtml = `
-                <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden report-card fade-in">
+                <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden report-card fade-in text-balance">
                     <div class="soa-gradient text-white p-12 md:p-16">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 text-balance">
                             <div>
@@ -571,7 +574,7 @@
                                         <p class="text-[10px] font-black text-indigo-500 uppercase mb-2">Physiologie & Douleur</p>
                                         <p class="text-sm font-bold text-slate-700 mb-4 italic">"${d.obs.maslow}"</p>
                                         <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl">
-                                            <strong>Impact concret :</strong> L'élève peut paraître agité alors qu'il cherche simplement à fuir une douleur sourde ou un inconfort physique.
+                                            <strong>Impact concret :</strong> L'élève peut paraître agité ou distrait alors qu'il cherche simplement à fuir une douleur sourde ou un inconfort physique.
                                         </div>
                                     </div>
                                     <p class="px-4 text-[11px] text-slate-400 italic">
