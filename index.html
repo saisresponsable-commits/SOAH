@@ -439,6 +439,25 @@ Comment souhaitez-vous appeler votre élève ?`;
       };
     }
 
+    function getActiveAxes() {
+      const m = state.analysis.markers || {};
+      const axes = [];
+      const addAxis = (label) => { if (!axes.includes(label)) axes.push(label); };
+
+      if (m.fatigue || m.posture || m.mobility || m.writing || state.analysis.energyScore < 65) addAxis('fatigue / coût énergétique');
+      if (m.pain) addAxis('douleur / inconfort');
+      if (m.planning || m.compensation || state.analysis.matchedPathology?.mechanisms?.includes('effort cognitif caché') || state.analysis.matchedPathology?.mechanisms?.includes('double tâche coûteuse')) addAxis('effort cognitif caché');
+      if (m.temporality || state.analysis.matchedPathology?.mechanisms?.includes('variabilité')) addAxis('variabilité des performances');
+      if (m.mobility || m.posture || state.data.equipment) addAxis('environnement scolaire');
+      if (m.irritability || m.social) addAxis('vécu subjectif');
+      if (m.temporality) addAxis('temporalité de la journée');
+      if (m.compensation) addAxis('stratégies de compensation');
+      if (state.analysis.invisibleLoads?.some(load => load.value >= 55)) addAxis('charge scolaire cumulée');
+      if (m.autonomy) addAxis('autonomie paradoxale / besoin d’aide humaine');
+
+      return axes.length ? axes : ['fatigue / coût énergétique'];
+    }
+
     function computeResourceBudget() { return state.analysis.energyScore || 75; }
 
     function processStep(input) {
@@ -522,7 +541,7 @@ Comment souhaitez-vous appeler votre élève ?`;
 
           addMessage('bot', `Merci. Essayons maintenant d’identifier <strong>où cela se voit le plus</strong> dans la journée scolaire. Dans quelles situations cela apparaît-il surtout ?
 
-Écriture, déplacements, installation, manipulation du matériel, écoute + action en même temps, récréation, travail de groupe…`);
+Écriture, déplacements, installation, manipulation du matériel, écoute + action en même temps, récréation, travail de groupe…`, true);
 
           offerSkipChoices();
           state.step = 'situations';
@@ -574,6 +593,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
       const budget = computeResourceBudget();
       const doubleRegard = buildDoubleRegard();
       const markerNames = markerLabelMap();
+      const activeAxes = getActiveAxes();
       const activeMarkers = Object.entries(state.analysis.markers).filter(([, value]) => value).map(([key]) => markerNames[key]);
 
       const pathologyBlock = state.analysis.matchedPathology
@@ -625,7 +645,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             <div class="grid md:grid-cols-2 gap-10">
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Axes pédagogiques mobilisés</p>
-                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${AXES.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>
+                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${activeAxes.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>
               </div>
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Mécanismes fonctionnels possibles</p>
@@ -685,40 +705,47 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
       chatInterface.classList.add('flex', 'flex-col');
       document.getElementById('input-ui').classList.add('hidden');
       document.getElementById('soa-status').innerHTML = '<span class="w-1.5 h-1.5 bg-pink-400 rounded-full animate-pulse"></span> Simulation guidée approfondie';
+      clearChoices();
+      chatEl.innerHTML = '';
 
       const script = [
-        { s: 'bot', html: true, t: '<div class="space-y-3"><p>Bonjour, je suis SOAH.</p><p>Je vous propose une simulation plus proche d\'un véritable échange de médiation pédagogique : pas pour coller une étiquette à l\'élève, mais pour aider l\'enseignant à relire autrement ce qu\'il observe.</p><p class="text-sm italic text-slate-500">L\'enjeu n\'est pas de conclure trop vite, mais de faire émerger un <strong>"Ah... c\'est peut-être donc cela qu\'il vit"</strong>.</p></div>' },
-        { s: 'bot', t: 'Comment souhaitez-vous appeler votre élève ?' },
+        { s: 'bot', html: true, t: '<div class="space-y-3"><p>Bonjour, je suis SOAH.</p><p>Je vous propose une simulation fidèle à un échange réel de médiation pédagogique. L’objectif n’est pas de poser une étiquette médicale, mais d’aider l’enseignant à relire autrement ce qu’il observe.</p><p class="text-sm italic text-slate-500">La discussion suit le même cadre que le vrai chat : anonymat, prudence, possibilité de vulgarisation seulement avec accord explicite, puis exploration progressive des contraintes invisibles.</p></div>' },
+        { s: 'bot', t: 'Avant de commencer, pour préserver le secret médical, je vous propose d’utiliser un pseudonyme pour désigner l’élève pendant l’échange. Comment souhaitez-vous l’appeler ?' },
         { s: 'user', t: 'On va l’appeler Léo.' },
-        { s: 'bot', t: 'Très bien. Dans quel niveau scolaire se trouve Léo ?' },
+        { s: 'bot', t: 'Merci. Dans quel niveau scolaire se trouve Léo ?' },
         { s: 'user', t: 'Il a 10 ans, il est en primaire.' },
-        { s: 'bot', t: 'Merci. Utilise-t-il un appareillage ou des aides techniques qui structurent déjà sa journée scolaire ?' },
+        { s: 'bot', t: 'D’accord. Léo utilise-t-il un appareillage ou des aides techniques particulières qui structurent déjà sa journée scolaire ?' },
         { s: 'user', t: 'Oui, il est en fauteuil roulant électrique.' },
-        { s: 'bot', html: true, t: '<div class="space-y-2"><p>C\'est un repère important.</p><p class="text-sm text-slate-600">L\'appareillage ne dit pas tout de l\'élève, mais il renseigne déjà sur le <strong>coût physique</strong>, les <strong>transitions</strong> et la manière dont l\'environnement scolaire peut soutenir ou au contraire entamer ses ressources.</p></div>' },
-        { s: 'bot', t: 'Un diagnostic a-t-il été posé par les professionnels de santé ?' },
+        { s: 'bot', html: true, t: '<div class="space-y-2"><p>C’est un repère important.</p><p class="text-sm text-slate-600">L’appareillage ne dit pas tout de l’élève, mais il renseigne déjà sur le <strong>coût physique</strong>, les <strong>transitions</strong> et la manière dont l’environnement scolaire peut soutenir ou au contraire entamer ses ressources.</p></div>' },
+        { s: 'bot', t: 'Un diagnostic a-t-il déjà été posé par des professionnels, ou souhaitez-vous rester uniquement sur les observations du quotidien scolaire ?' },
         { s: 'user', t: 'Oui. Il présente une myopathie de Duchenne.' },
-        { s: 'bot', html: true, t: '<div class="space-y-3"><p>Merci. Je reste bien dans une lecture pédagogique, mais ce diagnostic me donne un point d\'appui pour vulgariser certaines contraintes possibles.</p><div class="bg-violet-50 border border-violet-200 rounded-2xl p-4"><p class="text-xs uppercase tracking-widest font-black text-violet-700 mb-2">Point d\'appui de vulgarisation</p><p><strong>Myopathie de Duchenne</strong></p><p class="text-sm text-slate-600 mt-2">On peut notamment penser à une <strong>fatigabilité importante</strong>, à un <strong>coût postural élevé</strong> et à des tâches motrices qui deviennent beaucoup plus coûteuses au fil de la journée.</p></div></div>' },
-        { s: 'bot', t: 'Dans le quotidien scolaire, qu’est-ce qui vous interpelle le plus chez Léo ?' },
+        { s: 'bot', t: 'Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que la myopathie de Duchenne peut impliquer dans le quotidien scolaire de Léo ?' },
+        { s: 'user', t: 'Oui, volontiers.' },
+        { s: 'bot', html: true, t: '<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d’appui de vulgarisation</p><p><strong>Myopathie de Duchenne</strong> — Neuromusculaire génétique</p><p class="text-sm italic text-slate-600">Le coût postural et la fatigabilité peuvent majorer rapidement les difficultés d’écriture, de maintien et de participation prolongée.</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">Dans cette pathologie, la force musculaire diminue progressivement. Des actions qui paraissent simples, comme tenir son buste, respirer avec aisance, se stabiliser ou écrire, peuvent déjà mobiliser une grande partie de l’énergie disponible. La difficulté n’est donc pas seulement la tâche scolaire elle-même, mais tout ce qu’il faut déjà dépenser pour être présent et disponible.</div><p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>' },
+        { s: 'bot', t: 'Dans le quotidien scolaire, qu’est-ce qui vous interpelle le plus chez Léo ? Qu’est-ce qui vous semble coûteux pour lui ?' },
         { s: 'user', t: 'Il peut très bien commencer sa matinée, puis en fin de matinée il refuse d’écrire, s’agace vite, et semble parfois ne plus rien vouloir faire.' },
-        { s: 'bot', html: true, t: '<div class="space-y-3"><p>C\'est typiquement le genre de situation où le regard de l\'adulte peut basculer très vite vers <em>"il ne veut plus"</em>.</p><p>Mais votre description invite déjà à une autre hypothèse : non pas un manque de volonté, mais peut-être un <strong>épuisement progressif</strong>.</p></div>' },
-        { s: 'bot', t: 'Voyez-vous une différence nette selon le moment de la journée, ou après certains temps comme la cour, un déplacement, un changement de local ?' },
+        { s: 'bot', html: true, t: '<div class="space-y-3"><p>C’est typiquement le genre de situation où le regard de l’adulte peut basculer très vite vers <em>"il ne veut plus"</em>.</p><p>Mais votre description invite déjà à une autre hypothèse : non pas un manque de volonté, mais peut-être un <strong>épuisement progressif</strong>.</p></div>' },
+        { s: 'bot', t: 'Quand un comportement change comme cela, il est souvent utile de regarder la temporalité. Voyez-vous une différence entre le début de journée et la fin de matinée, ou après certains temps comme la cour, un déplacement, un changement de local ?' },
         { s: 'user', t: 'Oui, clairement. Le matin ça va mieux. Après la récréation ou quand il a déjà beaucoup bougé, il est plus lent, plus tendu, et parfois essoufflé.' },
-        { s: 'bot', html: true, t: '<div class="space-y-3"><p>Voilà un indice très précieux.</p><p class="text-sm text-slate-600">La difficulté n\'est donc pas seulement liée à la tâche scolaire elle-même. Elle semble aussi dépendre de ce qui a déjà été dépensé avant : déplacements, maintien du corps, gestion de l\'environnement, transitions.</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4"><p class="text-xs uppercase tracking-widest font-black text-indigo-700 mb-2">Axe temporalité</p><p class="text-sm text-slate-700">Une compétence présente à 8h30 peut devenir très difficile à 11h00, non parce qu\'elle a disparu, mais parce que le coût pour y accéder a explosé.</p></div></div>' },
-        { s: 'bot', t: 'Avez-vous parfois l’impression que Léo fait beaucoup d’efforts pour tenir, pour paraître disponible, ou pour éviter de montrer que cela devient trop difficile ?' },
+        { s: 'bot', html: true, t: '<div class="space-y-3"><p>Voilà un indice très précieux.</p><p class="text-sm text-slate-600">La difficulté n’est donc pas seulement liée à la tâche scolaire elle-même. Elle semble aussi dépendre de ce qui a déjà été dépensé avant : déplacements, maintien du corps, gestion de l’environnement, transitions.</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4"><p class="text-xs uppercase tracking-widest font-black text-indigo-700 mb-2">Axe temporalité</p><p class="text-sm text-slate-700">Une compétence présente à 8h30 peut devenir très difficile à 11h00, non parce qu’elle a disparu, mais parce que le coût pour y accéder a explosé.</p></div></div>' },
+        { s: 'bot', t: 'Avez-vous l’impression que Léo fait beaucoup d’efforts pour tenir, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que cela devient trop difficile ?' },
         { s: 'user', t: 'Oui. Il se fige énormément. Il serre son stylo, tend tout son haut du corps, et on sent qu’il s’accroche. Puis d’un coup il lâche ou s’énerve.' },
         { s: 'bot', html: true, t: '<div class="space-y-3"><p>Ce que vous décrivez évoque très bien une <strong>stratégie de compensation</strong>.</p><p class="text-sm text-slate-600">Autrement dit : Léo ne montre pas seulement une difficulté. Il met aussi en place tout un travail caché pour continuer malgré elle. Et ce travail invisible peut lui coûter énormément.</p></div>' },
-        { s: 'bot', html: true, t: '<div class="grid md:grid-cols-2 bg-indigo-50 rounded-3xl overflow-hidden border border-indigo-100"><div class="p-6 border-r border-indigo-100 text-sm font-bold text-indigo-900">Ce que l’enseignant peut voir : refus, lenteur, irritabilité.</div><div class="p-6 bg-white text-sm text-slate-700 italic">Ce que l’élève peut vivre : accumulation de fatigue, sur-effort postural, saturation après avoir trop compensé.</div></div>' },
         { s: 'bot', t: 'Dans quelles situations cela se voit-il le plus ? Écriture, installation, déplacements, manipulation du matériel, écoute en même temps qu’une action ?' },
         { s: 'user', t: 'Surtout dans l’écriture, pour s’installer correctement, et après les déplacements. Quand il faut écouter et écrire en même temps, c’est encore pire.' },
         { s: 'bot', html: true, t: '<div class="space-y-3"><p>On commence à voir se dessiner plusieurs charges qui s’additionnent :</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1"><li>une <strong>charge motrice</strong> pour écrire et maintenir la posture,</li><li>une <strong>charge de transition</strong> liée aux déplacements,</li><li>une <strong>double tâche</strong> quand il faut écouter et agir en même temps.</li></ul><p>Ce n’est donc pas une seule difficulté isolée, mais une somme de coûts.</p></div>' },
-        { s: 'bot', t: 'Quand cela se dégrade, que pensez-vous spontanément ? Qu’il n’a plus envie, qu’il s’oppose, qu’il décroche, ou plutôt qu’il n’a plus assez de ressources ?' },
-        { s: 'user', t: 'Honnêtement, avant j’aurais dit qu’il décrochait ou qu’il se démotivait. Maintenant je me dis surtout qu’il arrive à saturation.' },
-        { s: 'bot', html: true, t: '<div class="space-y-3"><p><strong>Voilà le cœur du travail de SOAH.</strong></p><p>Passer d\'une lecture centrée sur le comportement visible à une lecture centrée sur le coût invisible.</p><p class="text-sm italic text-slate-500">Ce basculement n\'excuse pas tout, mais il change profondément la manière d\'accompagner l\'élève.</p></div>' },
+        { s: 'bot', t: 'Quand cela devient difficile, qu’est-ce qui vous semble le plus lourd pour Léo : le geste moteur, l’organisation, la fatigue physique, le regard des autres, ou le fait de vouloir rester autonome ?' },
+        { s: 'user', t: 'Le geste moteur, la fatigue physique et le fait de vouloir tenir seul le plus longtemps possible.' },
+        { s: 'bot', html: true, t: '<div class="space-y-3"><p>C’est un point très important.</p><p class="text-sm text-slate-600">Parfois, un élève peut paraître autonome, mais cette autonomie a un coût énorme. Il ne s’agit pas seulement de savoir s’il peut faire seul, mais de regarder <strong>ce que cela lui coûte pour y arriver</strong>.</p></div>' },
+        { s: 'bot', html: true, t: '<div class="grid md:grid-cols-2 bg-indigo-50 rounded-3xl overflow-hidden border border-indigo-100"><div class="p-6 border-r border-indigo-100 text-sm font-bold text-indigo-900">Ce que l’enseignant peut voir : refus, lenteur, irritabilité, volonté de faire seul.</div><div class="p-6 bg-white text-sm text-slate-700 italic">Ce que l’élève peut vivre : accumulation de fatigue, sur-effort postural, saturation après compensation, autonomie coûteuse.</div></div>' },
+        { s: 'bot', t: 'Si je reformule ce qui ressort de votre observation : certaines situations scolaires semblent très coûteuses pour Léo, la fatigue s’accumule au fil de la journée, et il semble parfois devoir compenser beaucoup pour rester disponible. Est-ce que cette lecture vous parle ?' },
+        { s: 'user', t: 'Oui, complètement. C’est beaucoup plus juste que ce que j’aurais dit au départ.' },
+        { s: 'bot', html: true, t: '<div class="space-y-3"><p><strong>Voilà le cœur du travail de SOAH.</strong></p><p>Passer d’une lecture centrée sur le comportement visible à une lecture centrée sur le coût invisible.</p><p class="text-sm italic text-slate-500">Ce basculement n’excuse pas tout, mais il change profondément la manière d’accompagner l’élève.</p></div>' },
         { s: 'bot', t: 'Je peux maintenant vous proposer une boussole plus complète, avec une synthèse des mécanismes possibles, les situations scolaires à surveiller, la carte des charges invisibles et des pistes d’aménagement à explorer.' }
       ];
 
       for (const item of script) {
-        await new Promise(r => setTimeout(r, item.html ? 1700 : 1300));
+        await new Promise(r => setTimeout(r, item.html ? 1650 : 1250));
         addMessage(item.s, item.t, !!item.html);
       }
 
@@ -728,13 +755,14 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
         equipment: 'Fauteuil roulant électrique',
         diagnosis: 'Myopathie de Duchenne',
         knownDiagnosis: true,
+        pathologyPermissionAsked: true,
         pathologyPermissionGranted: true,
         obs: {
           story: 'Il peut très bien commencer sa matinée, puis en fin de matinée il refuse d’écrire, s’agace vite, et semble parfois ne plus rien vouloir faire.',
           time: 'Le matin ça va mieux. Après la récréation ou quand il a déjà beaucoup bougé, il est plus lent, plus tendu, et parfois essoufflé.',
           compensation: 'Il se fige énormément. Il serre son stylo, tend tout son haut du corps, et on sent qu’il s’accroche. Puis d’un coup il lâche ou s’énerve.',
           situations: 'Écriture, installation, déplacements, et écouter tout en écrivant.',
-          charges: 'Le geste moteur, le maintien du corps, les transitions et la double tâche.'
+          charges: 'Le geste moteur, la fatigue physique, les transitions, la double tâche et le fait de vouloir tenir seul le plus longtemps possible.'
         }
       };
       runAnalysis();
