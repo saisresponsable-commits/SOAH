@@ -298,35 +298,74 @@ const AXES = [
 
     function resetApp() { window.location.reload(); }
 
-    function exportReportPDF() {
+    async function exportReportPDF() {
       const report = document.querySelector('#final-report .report-card');
-      if (!report) return;
+      const exportBtn = document.getElementById('export-pdf-btn');
+      if (!report || !window.html2pdf) return;
 
-      const clone = report.cloneNode(true);
-      clone.style.boxShadow = 'none';
-      clone.style.border = 'none';
-      clone.style.borderRadius = '0';
-      clone.style.width = '100%';
-      clone.querySelectorAll('.no-print').forEach(el => el.remove());
+      const originalBtnHtml = exportBtn ? exportBtn.innerHTML : '';
+      if (exportBtn) {
+        exportBtn.disabled = true;
+        exportBtn.classList.add('opacity-70', 'cursor-not-allowed');
+        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Génération du PDF...';
+      }
 
-      const wrapper = document.createElement('div');
-      wrapper.style.padding = '24px';
-      wrapper.style.background = '#ffffff';
-      wrapper.appendChild(clone);
+      try {
+        const clone = report.cloneNode(true);
+        clone.style.boxShadow = 'none';
+        clone.style.border = 'none';
+        clone.style.borderRadius = '0';
+        clone.style.width = '100%';
+        clone.querySelectorAll('.no-print').forEach(el => el.remove());
 
-      const pseudo = (state.data.pseudo || 'eleve').toString().trim().replace(/[^a-zA-Z0-9_-]+/g, '_');
-      const filename = `boussole_soah_${pseudo || 'eleve'}.pdf`;
+        // Stabilise les styles pour l’export PDF : gradients et jauges en inline.
+        clone.querySelectorAll('.soa-gradient').forEach(el => {
+          el.style.background = 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)';
+          el.style.color = '#ffffff';
+        });
 
-      const options = {
-        margin: [10, 10, 10, 10],
-        filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }
-      };
+        const colorMap = {
+          'bg-indigo-500': '#6366f1',
+          'bg-pink-500': '#ec4899',
+          'bg-sky-500': '#0ea5e9',
+          'bg-amber-500': '#f59e0b',
+          'bg-rose-500': '#f43f5e'
+        };
 
-      html2pdf().set(options).from(wrapper).save();
+        clone.querySelectorAll('.meter > div').forEach(el => {
+          for (const [klass, color] of Object.entries(colorMap)) {
+            if (el.classList.contains(klass)) {
+              el.style.backgroundColor = color;
+              break;
+            }
+          }
+        });
+
+        const wrapper = document.createElement('div');
+        wrapper.style.padding = '24px';
+        wrapper.style.background = '#ffffff';
+        wrapper.appendChild(clone);
+
+        const pseudo = (state.data.pseudo || 'eleve').toString().trim().replace(/[^a-zA-Z0-9_-]+/g, '_');
+        const filename = `boussole_soah_${pseudo || 'eleve'}.pdf`;
+
+        const options = {
+          margin: [10, 10, 10, 10],
+          filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] }
+        };
+
+        await html2pdf().set(options).from(wrapper).save();
+      } finally {
+        if (exportBtn) {
+          exportBtn.disabled = false;
+          exportBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+          exportBtn.innerHTML = originalBtnHtml;
+        }
+      }
     }
 
     function addMessage(sender, text, allowHtml = false) {
@@ -805,7 +844,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 
             <div class="bg-slate-900 rounded-[3rem] p-12 text-center no-print">
               <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="exportReportPDF()" class="bg-white text-slate-800 px-10 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">
+                <button id="export-pdf-btn" onclick="exportReportPDF()" class="bg-white text-slate-800 px-10 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">
                   <i class="fas fa-file-pdf mr-2"></i>Télécharger la boussole en PDF
                 </button>
                 <button onclick="resetApp()" class="soa-gradient text-white px-12 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">Nouveau regard</button>
