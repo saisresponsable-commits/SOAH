@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOAH | Soutien à l'Observation et aux Aménagements face au Handicap</title>
     
-    <!-- Scripts et polices externes -->
+    <!-- Bibliothèques externes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -29,31 +29,30 @@
         }
 
         .message-appear {
-            animation: fadeInTranslate 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: fadeInTranslate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         @keyframes fadeInTranslate {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .vulgarisation-box {
             background-color: #fff1f2;
-            border-left: 6px solid #fb7185;
-            padding: 1.5rem;
+            border-left: 5px solid #fb7185;
+            padding: 1.25rem;
             margin: 1rem 0;
-            border-radius: 1.5rem;
+            border-radius: 1.25rem;
             font-size: 0.95rem;
             line-height: 1.6;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
         }
 
         .reflection-card {
             background-color: #f0f9ff;
-            border-left: 6px solid #38bdf8;
-            padding: 1.25rem;
+            border-left: 5px solid #38bdf8;
+            padding: 1rem;
             margin: 0.75rem 0;
-            border-radius: 1.25rem;
+            border-radius: 1rem;
             font-size: 0.9rem;
             font-weight: 500;
         }
@@ -62,11 +61,42 @@
             background-color: #f5f3ff;
             border: 1px dashed #8b5cf6;
             padding: 1rem;
-            margin-top: 0.5rem;
-            border-radius: 1rem;
+            margin: 1rem 0;
+            border-radius: 1.25rem;
             font-style: italic;
             color: #5b21b6;
             font-size: 0.95rem;
+        }
+
+        /* Pile d'énergie */
+        .battery-container {
+            width: 70px;
+            height: 140px;
+            border: 4px solid #334155;
+            border-radius: 12px;
+            position: relative;
+            padding: 3px;
+            margin: 0 auto;
+        }
+        .battery-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 25%;
+            width: 50%;
+            height: 6px;
+            background: #334155;
+            border-radius: 3px 3px 0 0;
+        }
+        .battery-fill {
+            width: 100%;
+            border-radius: 4px;
+            transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s;
+            position: absolute;
+            bottom: 3px;
+            left: 3px;
+            right: 3px;
+            width: calc(100% - 6px);
         }
 
         .level-badge {
@@ -95,36 +125,30 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
 
-        .btn-soft {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-soft:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.2);
-        }
-        
+        .btn-soft { transition: all 0.3s ease; }
+        .btn-soft:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.2); }
         .fade-in { animation: fadeIn 0.8s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="antialiased text-balance">
+<body class="antialiased">
 
     <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-10 no-print">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center text-balance">
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 no-print text-balance">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <div class="soa-gradient p-3 rounded-[1.25rem] shadow-lg rotate-3">
                     <i class="fas fa-face-smile-wink text-white text-xl"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-2xl tracking-tight text-slate-800">SOAH</h1>
-                    <p class="text-[10px] md:text-[11px] text-slate-400 font-bold uppercase tracking-widest leading-tight">
+                    <p class="hidden md:block text-[11px] text-slate-400 font-bold uppercase tracking-widest leading-tight">
                         Soutien à l'Observation & aux Aménagements face au Handicap
                     </p>
                 </div>
             </div>
             <button onclick="window.location.reload()" class="text-xs font-bold text-slate-400 hover:text-indigo-500 transition-colors flex items-center gap-2 px-4 py-2 rounded-full hover:bg-slate-50">
-                <i class="fas fa-seedling"></i> <span>Nouvel échange</span>
+                <i class="fas fa-seedling"></i> <span>Nouveau regard</span>
             </button>
         </div>
     </header>
@@ -134,7 +158,7 @@
         <!-- Welcome Screen -->
         <div id="welcome-screen" class="bg-white border border-slate-100 rounded-[3rem] p-10 md:p-16 shadow-xl shadow-slate-200/50 text-center text-balance">
             <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner animate-bounce">
-                <i class="fas fa-child-reaching text-indigo-500 text-4xl"></i>
+                <i class="fas fa-face-smile-wink text-indigo-500 text-4xl"></i>
             </div>
             <h2 class="text-3xl font-bold mb-6 text-slate-800 tracking-tight">Bonjour, je suis SOAH</h2>
             <p class="text-slate-500 mb-4 text-xl max-w-2xl mx-auto leading-relaxed font-medium">
@@ -166,7 +190,7 @@
         <!-- Chat Area -->
         <div id="chat-interface" class="hidden flex flex-col h-full bg-white border border-slate-100 rounded-[3rem] shadow-2xl overflow-hidden mb-12">
             <div class="bg-indigo-600 text-white text-[10px] py-2 px-4 flex justify-center items-center gap-2 font-bold uppercase tracking-widest">
-                <i class="fas fa-lock text-indigo-200"></i> Médiation pédagogique & Échange exploratoire
+                <i class="fas fa-lock text-indigo-200"></i> Médiation pédagogique anonyme
             </div>
             
             <div class="px-8 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-4 text-balance">
@@ -174,7 +198,7 @@
                 <div>
                     <p class="font-bold text-lg text-slate-800">SOAH</p>
                     <p id="soa-status" class="text-[11px] text-indigo-500 font-bold uppercase tracking-tighter flex items-center gap-2">
-                        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span> Recherche de sens ensemble
+                        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span> Échange exploratoire
                     </p>
                 </div>
             </div>
@@ -183,7 +207,7 @@
 
             <div id="input-ui" class="p-6 md:p-8 border-t border-slate-50 bg-white">
                 <div id="input-container" class="flex gap-4">
-                    <input type="text" id="user-input" placeholder="Partagez vos impressions ou observations ici..." 
+                    <input type="text" id="user-input" placeholder="Partagez vos impressions avec moi..." 
                            class="flex-1 px-8 py-5 rounded-[2rem] bg-slate-50 border-none focus:ring-2 focus:ring-indigo-300 transition-all text-sm outline-none font-medium text-slate-600">
                     <button id="send-btn" class="soa-gradient text-white w-16 rounded-[1.5rem] hover:opacity-90 transition-all flex items-center justify-center shadow-lg">
                         <i class="fas fa-paper-plane text-xl"></i>
@@ -201,10 +225,11 @@
     <script>
         const KNOWLEDGE_BASE = {
             vulgarisations: {
-                'IMC': "Dans le cadre d'une Paralysie Cérébrale, on pourrait imaginer que le cerveau de l'élève doit fournir un effort de pilotage conscient à chaque seconde. S'asseoir droit ne semble pas être automatique, mais plutôt une performance qui peut vite grignoter le budget énergie.",
-                'Hémiparésie': "L'hémiparésie m'évoque souvent un déséquilibre que l'élève doit compenser sans cesse. C'est un peu comme s'il devait passer sa journée avec un sac de 5kg sur un seul bras : une fatigue de fond s'installe sans doute bien avant le début des leçons.",
+                'Paralysie Cérébrale': "On peut imaginer que le cerveau de l'élève doit fournir un effort de pilotage conscient à chaque seconde. S'asseoir droit n'est pas automatique, c'est une performance qui peut vite grignoter le budget énergie.",
+                'IMC': "On pourrait comparer cela à un corps qui demande un effort de pilotage conscient permanent. Ce qui nous semble fluide 'grignote' sans doute une part massive de son attention.",
+                'Hémiparésie': "L'hémiparésie m'évoque souvent un déséquilibre que l'élève doit compenser sans cesse. C'est un peu comme s'il devait passer sa journée avec un sac de 5kg sur un seul bras : une fatigue de fond s'installe sans doute très vite.",
                 'Dyspraxie': "La dyspraxie ressemble parfois à une panne du pilote automatique. Tenir son crayon ou ranger son cartable pourrait demander à l'élève autant d'attention que de résoudre un problème complexe : son cerveau risque de saturer sur l'exécution pure.",
-                'TDAH': "C'est un peu comme un cerveau sans système de tri automatique. On peut supposer que chaque stimulus a la même importance que votre voix, ce qui mènerait à un épuisement métabolique et émotionnel assez rapide.",
+                'TDAH': "C'est un peu comme un cerveau sans système de tri automatique. On peut supposer que chaque stimulus a la même importance que votre voix, ce qui mènerait à un épuisement métabolique assez rapide.",
                 'TSA': "On peut imaginer une perception du monde très intense. Un détail sonore pourrait peut-être être vécu comme une agression, occupant une part massive de l'espace mental de l'élève.",
                 'Dyslexie': "La lecture semble être un véritable marathon de déchiffrage. On peut faire l'hypothèse que l'élève s'épuise sur la forme des mots, ce qui lui laisserait peut-être trop peu de ressources pour en savourer le sens."
             }
@@ -232,7 +257,7 @@
                 pseudo: '', 
                 level: '', 
                 pathologies_detected: [], 
-                obs: { maslow: '', pain: '', planning: '', double_task: '', emotional: '', other: '' } 
+                obs: { story: '', maslow: '', pain: '', equipment: '', planning: '', double_task: '', emotional: '', other: '' } 
             }
         };
 
@@ -277,7 +302,7 @@
         function startAnalysis() {
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('chat-interface').classList.remove('hidden');
-            addMessage("bot", "C'est une chance de pouvoir échanger avec vous. Je suis là pour vous écouter et, si vous le voulez bien, essayer de mettre des mots sur le vécu de votre élève.<br><br>Pour commencer, comment souhaitez-vous appeler cet élève ?");
+            addMessage("bot", "C'est une chance de pouvoir échanger avec vous. Je suis là pour vous écouter et, si vous le voulez bien, essayer de mettre des mots sur le vécu de votre élève.<br><br>Pour commencer tout doucement, comment souhaitez-vous appeler cet élève ?");
             state.step = 'context';
         }
 
@@ -295,19 +320,16 @@
                 { s: 'user', t: "En Primaire (10 ans)." },
                 { s: 'bot', t: "Merci. On vous a peut-être rapporté des diagnostics ou des obstacles majeurs pour <strong>Léo</strong> ?" },
                 { s: 'user', t: "Il a une hemiparezi et aussi une dyspraxie." },
-                { s: 'bot', t: "Je vois. Si je vous suis bien, on parlerait de <strong>Hémiparésie</strong> et de <strong>Dyspraxie</strong> ? <div class='reflection-card mt-3'><i class='fas fa-lightbulb text-indigo-400'></i> On peut faire l'hypothèse que lorsque ces deux défis se croisent, l'école demande la force mentale d'un athlète de haut niveau.</div>" },
-                { s: 'user', t: "Oui, c'est exactement ça." },
-                { s: 'bot', t: "Seriez-vous d'accord pour que je vous propose un éclairage sur ce que ces deux termes pourraient impliquer pour son quotidien ?" },
-                { s: 'user', t: "Oui, je veux bien, car je sens qu'il y a un décalage entre ce qu'il peut faire et ce qu'il produit." },
-                { s: 'bot', t: "<div class='vulgarisation-box'><strong>Piste de réflexion sur l'Hémiparésie :</strong><br>On pourrait y voir un effort de compensation asymétrique constant. Rester assis droit lui demanderait un effort conscient, ce qui 'grignoterait' sans doute son attention.</div><div class='vulgarisation-box'><strong>Piste de réflexion sur la Dyspraxie :</strong><br>Cela m'évoque une panne du pilote automatique. On peut supposer que chaque geste (écrire, ranger) est une tâche nouvelle et épuisante.</div>" },
-                { s: 'bot', t: "Parlons de ses <strong>besoins fondamentaux (Maslow)</strong>. Avez-vous parfois l'impression que Léo arrive déjà avec peu d'énergie, ou qu'il exprime un certain inconfort physique (fatigue, assise instable) dès le début de journée ?" },
-                { s: 'user', t: "Il semble souvent fatigué dès 8h30. Et il bouge sans cesse sur sa chaise." },
-                { s: 'bot', t: "C'est une observation clé. On pourrait se demander si la base de sa pyramide ne vacille pas déjà. Si son corps lutte, il lui est peut-être difficile d'accéder aux apprentissages. <br><br>Remarquez-vous aussi des pics d'irritabilité ou de refus après avoir beaucoup écrit ? (Ce qui m'évoquerait une possible douleur virulente)." },
-                { s: 'user', t: "Oui, après l'écriture, il devient très nerveux et refuse parfois de ranger son matériel." },
-                { s: 'bot', t: "<div class='translation-bubble'>On peut faire l'hypothèse qu'à ce moment-là, son budget énergie est totalement épuisé. Le refus de ranger ne serait peut-être pas de la désobéissance, mais l'impossibilité de <strong>planifier</strong> une étape de plus quand le corps dit 'stop'. Qu'en pensez-vous ?</div>" },
-                { s: 'bot', t: "<strong>Avons-nous fait le tour de vos premières impressions ? Voyez-vous d'autres petits détails (social, sensoriel) qui vous interpellent ?</strong>" },
-                { s: 'user', t: "Il a besoin de beaucoup de silence à la récréation, il s'isole souvent." },
-                { s: 'bot', t: "Cela pourrait être sa recharge indispensable face au bruit. Merci beaucoup pour ce partage. Je vais essayer de synthétiser ces pistes de compréhension pour Léo. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all'>Consulter la boussole de Léo</button>" }
+                { s: 'bot', t: "Je vois. Si je vous suis bien, on parlerait de <strong>Hémiparésie</strong> et de <strong>Dyspraxie</strong> ?" },
+                { s: 'bot', t: "<div class='reflection-card mt-3'><i class='fas fa-lightbulb text-indigo-400'></i> On peut faire l'hypothèse que lorsque ces deux défis se rencontrent, l'école demande à Léo la force mentale d'un athlète de haut niveau. On se sent parfois un peu démuni face à cela, n'est-ce pas ?</div>" },
+                { s: 'bot', t: "<div class='vulgarisation-box'><strong>Piste de lecture sur l'Hémiparésie :</strong><br>On pourrait y voir un effort de compensation constant. Rester assis droit lui demanderait un effort conscient, ce qui grignoterait son attention bien avant le début de la leçon.</div>" },
+                { s: 'bot', t: "<div class='vulgarisation-box'><strong>Piste de lecture sur la Dyspraxie :</strong><br>Cela m'évoque une panne du pilote automatique. On peut supposer que chaque geste (écrire, ranger) est une tâche nouvelle et épuisante pour lui.</div>" },
+                { s: 'bot', t: "On pourrait d'ailleurs imaginer que sa 'batterie' est déjà bien entamée. Avez-vous remarqué s'il cherche souvent des appuis ou s'il semble avoir mal quelque part ?" },
+                { s: 'user', t: "Il s'affaisse sur son bureau vers 11h. Et il a des attelles aux jambes qui semblent le gêner." },
+                { s: 'bot', t: "C'est précieux de noter cela. Les attelles maintiennent le corps mais imposent une rigidité usante. <div class='translation-bubble'>On peut supposer que son irritabilité en fin de matinée n'est pas un refus, mais le cri de son système nerveux qui sature sous le poids de l'effort physique.</div>" },
+                { s: 'bot', t: "Et concernant l'organisation ? Se perd-il parfois dans les étapes pour préparer son travail ?" },
+                { s: 'user', t: "Oui, il ne sait plus par quoi commencer devant son cartable." },
+                { s: 'bot', t: "C'est ce fameux labyrinthe mental du séquençage... Merci beaucoup pour ce partage sincère. <br><br>Je vais préparer sa boussole de compréhension, mais nous pourrons continuer à affiner ensemble juste après. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all'>Consulter la boussole de Léo</button>" }
             ];
 
             for (const item of script) {
@@ -320,12 +342,14 @@
                 level: "Primaire",
                 pathologies_detected: ["Hémiparésie", "Dyspraxie"],
                 obs: {
+                    story: "Élève volontaire mais épuisement rapide.",
                     maslow: "Signes de fatigue de fond dès le matin (socle fragile).",
-                    pain: "Hypothèse de douleur sourde chronique, devenant virulente lors des efforts d'écriture.",
-                    planning: "Séquençage des tâches d'organisation perçu comme complexe et saturant.",
-                    double_task: "Conflit apparent entre l'exécution du geste et la compréhension du sens.",
-                    emotional: "Pics d'irritabilité liés à la surcharge et besoin d'isolement sensoriel.",
-                    other: "Léo semble déployer une énergie herculéenne pour compenser ses fragilités invisibles."
+                    equipment: "Attelles et fatigue posturale marquée.",
+                    pain: "Hypothèse de douleur sourde chronique liée à la spasticité.",
+                    planning: "Difficulté de séquençage et saturation du schéma mental.",
+                    double_task: "Conflit apparent entre l'exécution du geste et le sens.",
+                    emotional: "Pics d'irritabilité liés à la surcharge nerveuse.",
+                    other: "Léo déploie une énergie herculéenne pour compenser ses fragilités."
                 }
             };
         }
@@ -335,7 +359,12 @@
             if (!val || state.isSimulating) return;
             addMessage('user', val);
             inputEl.value = '';
-            setTimeout(() => processStep(val), 600);
+            
+            if (state.step === 'qa_mode') {
+                setTimeout(() => processQA(val), 600);
+            } else {
+                setTimeout(() => processStep(val), 600);
+            }
         }
 
         function processStep(input) {
@@ -343,76 +372,96 @@
             switch(state.step) {
                 case 'context':
                     state.data.pseudo = input.split(',')[0];
-                    addMessage("bot", `D'accord. Pour mieux comprendre son environnement, dans quel niveau scolaire <strong>${state.data.pseudo}</strong> se trouve-t-il ?`);
+                    addMessage("bot", `D'accord. Pour que je puisse mieux imaginer sa réalité scolaire, dans quel niveau <strong>${state.data.pseudo}</strong> se trouve-t-il ?`);
                     showChoices(['Maternelle', 'Primaire', 'Secondaire'], (choice) => {
                         state.data.level = choice;
-                        addMessage("bot", `Merci. Quels sont les diagnostics ou les obstacles majeurs que vous avez remarqués pour cet élève ?`);
-                        state.step = 'pathology';
+                        addMessage("bot", `C'est noté. Racontez-moi un peu votre quotidien avec ${state.data.pseudo}... Qu'est-ce qui vous interpelle le plus chez cet élève en ce moment ?`);
+                        state.step = 'story';
                     });
                     break;
-                case 'pathology':
+                case 'story':
+                    state.data.obs.story = input;
                     const m = findMatches(input);
-                    state.data.pathologies_detected = m.exact;
-                    if (m.suggested.length > 0) {
-                        state.data.suggested_pathologies = m.suggested;
-                        const listSug = m.suggested.join(' et ');
-                        addMessage("bot", `Pour être certaine de bien vous suivre, vouliez-vous parler de <strong>${listSug}</strong> ?`);
-                        state.step = 'confirm_spelling';
+                    if (m.exact.length > 0 || m.suggested.length > 0) {
+                        handlePathologyDetection(input, m);
                     } else {
-                        handlePathologyDeepDive(input, m.exact);
+                        addMessage("bot", `Je perçois bien le défi. On vous a peut-être rapporté des diagnostics ou des obstacles majeurs pour éclairer tout cela ?`);
+                        state.step = 'pathology_direct';
                     }
                     break;
-                case 'confirm_spelling':
+                case 'pathology_direct':
+                    const m2 = findMatches(input);
+                    handlePathologyDetection(input, m2);
+                    break;
+                case 'confirm_pathology':
                     if (inputLower.includes('oui') || inputLower.includes('ok')) {
                         state.data.pathologies_detected = [...new Set([...state.data.pathologies_detected, ...state.data.suggested_pathologies])];
-                        handlePathologyDeepDive("", state.data.pathologies_detected);
-                    } else {
-                        handlePathologyDeepDive(input, state.data.pathologies_detected);
                     }
+                    handlePathologyInsights();
                     break;
-                case 'pathology_explanation_confirm':
-                    if (inputLower.includes('oui') || inputLower.includes('ok')) {
-                        let txt = "";
-                        state.data.pathologies_detected.forEach(k => {
-                            if (KNOWLEDGE_BASE.vulgarisations[k]) {
-                                txt += `<div class="vulgarisation-box"><strong>Piste de lecture sur ${k} :</strong><br>${KNOWLEDGE_BASE.vulgarisations[k]}</div>`;
-                            }
-                        });
-                        addMessage("bot", txt);
-                    }
-                    addMessage("bot", `On pourrait commencer notre exploration par ses <strong>besoins physiologiques (Maslow)</strong>. Sentez-vous que ${state.data.pseudo} arrive avec une fatigue déjà marquée, ou qu'il exprime un certain inconfort physique (douleur sourde, assise instable) ?`);
-                    state.step = 'obs_maslow';
-                    break;
-                case 'obs_maslow':
+                case 'obs_next':
                     state.data.obs.maslow = input;
-                    addMessage("bot", "C'est une observation précieuse. Concernant la <strong>douleur</strong>, remarquez-vous parfois des pics d'irritabilité ou de retrait après un effort soutenu (ce qu'on pourrait appeler une douleur virulente) ?");
+                    addMessage("bot", `C'est précieux. On pourrait d'ailleurs se demander si son <strong>appareillage</strong> (attelles, corset) ou une <strong>douleur sourde</strong> ne rajoutent pas une couche de fatigue ?`);
                     state.step = 'obs_pain';
                     break;
                 case 'obs_pain':
                     state.data.obs.pain = input;
-                    addMessage("bot", "Je comprends. Parlons de la <strong>planification</strong> : comment gère-t-il l'organisation de ses gestes ou de son matériel ? On peut se demander s'il se perd parfois dans les étapes ?");
+                    addMessage("bot", "Parlons de la <strong>planification</strong> : comment gère-t-il l'organisation de son matériel ? On peut se demander s'il se perd parfois dans les étapes ?");
                     state.step = 'obs_planning';
                     break;
                 case 'obs_planning':
                     state.data.obs.planning = input;
-                    addMessage("bot", "D'accord. Et concernant la <strong>Double Tâche</strong> : sentez-vous que le fait de faire un geste bloque parfois son accès à la réflexion ?");
+                    addMessage("bot", "Et concernant la <strong>Double Tâche</strong> : sentez-vous que le fait de faire un geste bloque parfois son accès à la réflexion ?");
                     state.step = 'obs_double_task';
                     break;
                 case 'obs_double_task':
                     state.data.obs.double_task = input;
-                    addMessage("bot", "Enfin, comment gère-t-il cela <strong>émotionnellement</strong> ? Semble-t-il peut-être plus fragile lors des moments de groupe ou de fatigue ?");
+                    addMessage("bot", "Enfin, comment gère-t-il cela <strong>émotionnellement</strong> ? Semble-t-il peut-être plus fragile lors des moments de groupe ?");
                     state.step = 'obs_social';
                     break;
                 case 'obs_social':
                     state.data.obs.emotional = input;
-                    addMessage("bot", "Merci. <br><br><strong>Avons-nous fait le tour de vos observations ? Voyez-vous un autre détail (rythme, fatigue invisible) que vous aimeriez partager ?</strong>");
-                    state.step = 'obs_open';
-                    break;
-                case 'obs_open':
-                    state.data.obs.other = input;
-                    addMessage("bot", "Merci infiniment pour ce partage sincère. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all'>Consulter la boussole de compréhension</button>");
+                    addMessage("bot", "Merci infiniment. Je prépare sa boussole de compréhension. Nous pourrons continuer à échanger juste après. <br><br><button onclick='showFinalReport()' class='soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all'>Consulter la boussole</button>");
+                    state.step = 'qa_mode';
                     break;
             }
+        }
+
+        function processQA(input) {
+            addMessage("bot", "C'est une précision importante. Je l'intègre immédiatement à ma réflexion. <br><br>Souhaitez-vous que je mette à jour la boussole ci-dessous avec cette information ?");
+            showChoices(['Mettre à jour la boussole', 'Continuer à discuter'], (c) => {
+                if (c === 'Mettre à jour la boussole') {
+                    state.data.obs.other += " | " + input;
+                    generateReport();
+                    document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
+
+        function handlePathologyDetection(input, matches) {
+            state.data.pathologies_detected = matches.exact;
+            if (matches.suggested.length > 0) {
+                state.data.suggested_pathologies = matches.suggested;
+                addMessage("bot", `Pour être certaine de bien vous suivre, quand vous dites cela, vouliez-vous parler de <strong>${matches.suggested.join(' et ')}</strong> ?`);
+                state.step = 'confirm_pathology';
+            } else {
+                handlePathologyInsights();
+            }
+        }
+
+        function handlePathologyInsights() {
+            let txt = "";
+            state.data.pathologies_detected.forEach(k => {
+                if (KNOWLEDGE_BASE.vulgarisations[k]) {
+                    txt += `<div class="vulgarisation-box"><strong>Piste de lecture sur ${k} :</strong><br>${KNOWLEDGE_BASE.vulgarisations[k]}</div>`;
+                }
+            });
+            if (txt) addMessage("bot", txt);
+            
+            setTimeout(() => {
+                addMessage("bot", `On pourrait explorer ses <strong>besoins physiologiques</strong>. Avez-vous parfois l'impression que ${state.data.pseudo} arrive avec une fatigue déjà marquée le matin ?`);
+                state.step = 'obs_next';
+            }, 1000);
         }
 
         function findMatches(input) {
@@ -432,110 +481,130 @@
             return { exact: [...new Set(exact)], suggested: [...new Set(suggested)] };
         }
 
-        function handlePathologyDeepDive(raw, detected) {
-            if (detected.length > 0) {
-                const label = detected.join(' + ');
-                if (detected.length > 1) {
-                    addMessage("bot", `J'ai noté ces défis croisés : <strong>${label}</strong>. <div class='reflection-card mt-3'>Sachez que dans un profil complexe, on pourrait supposer que les difficultés se multiplient plutôt que de s'additionner.</div>`);
-                } else {
-                    addMessage("bot", `J'ai bien noté pour le profil de <strong>${detected[0]}</strong>.`);
-                }
-                addMessage("bot", "Souhaitez-vous que je vous propose un éclairage sur ce que cela pourrait changer pour son quotidien d'élève ?");
-                state.step = 'pathology_explanation_confirm';
-            } else {
-                state.data.pathologies_detected = [raw || "un profil singulier"];
-                addMessage("bot", "C'est enregistré. Même sans terme technique, vos observations de terrain sont notre meilleure base pour explorer ensemble.");
-                setTimeout(() => {
-                    addMessage("bot", `On pourrait commencer notre exploration par ses <strong>besoins physiologiques (Maslow)</strong>. Sentez-vous que ${state.data.pseudo} arrive avec une fatigue marquée, ou qu'il exprime un certain inconfort physique ?`);
-                    state.step = 'obs_maslow';
-                }, 1000);
-            }
-        }
-
         function showFinalReport() {
             document.getElementById('final-report').classList.remove('hidden');
             generateReport();
             setTimeout(() => {
                 document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' });
+                addMessage("bot", "Cette boussole est une première base de réflexion. <strong>Souhaitez-vous approfondir un point ou ai-je oublié un détail de votre quotidien avec lui ?</strong> Je suis là.");
+                state.step = 'qa_mode';
             }, 100);
         }
 
         function generateReport() {
             const d = state.data;
-            const getIndice = (v) => v >= 3 ? { bg: 'bg-rose-50', text: 'text-rose-700', label: 'Point de vigilance' } : { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Zone de stabilité' };
             
+            // Calcul de la pile d'énergie
+            let energyRemaining = 100;
+            if (d.obs.maslow.length > 5) energyRemaining -= 20;
+            if (d.obs.pain.length > 5) energyRemaining -= 15;
+            if (d.obs.planning.length > 5) energyRemaining -= 20;
+            if (d.obs.double_task.length > 5) energyRemaining -= 20;
+            if (d.obs.emotional.length > 5) energyRemaining -= 15;
+            energyRemaining = Math.max(10, energyRemaining);
+
+            const getBatteryColor = (lvl) => {
+                if (lvl <= 30) return '#ef4444';
+                if (lvl <= 60) return '#f59e0b';
+                return '#10b981';
+            };
+
             const reportHtml = `
                 <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden report-card fade-in">
                     <div class="soa-gradient text-white p-12 md:p-16">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 text-balance">
                             <div>
                                 <h2 class="text-4xl font-bold tracking-tight">Boussole de Compréhension</h2>
-                                <p class="mt-4 text-xl font-medium opacity-90">Pour l'élève : <strong>${d.pseudo}</strong> <span class="level-badge ${d.level === 'Maternelle' ? 'level-maternelle' : d.level === 'Primaire' ? 'level-primaire' : 'level-secondaire'}">${d.level}</span></p>
+                                <p class="mt-4 text-xl font-medium opacity-90 italic">
+                                    "Objectiver l'effort invisible de <strong>${d.pseudo}</strong>."
+                                </p>
+                                <span class="level-badge ${d.level === 'Maternelle' ? 'level-maternelle' : d.level === 'Primaire' ? 'level-primaire' : 'level-secondaire'}">${d.level}</span>
                             </div>
                             <div class="bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-center">
-                                Soutien & Médiation face au Handicap • FWB
+                                Soutien & Médiation face au Handicap
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-8 md:p-16 space-y-16">
-                        <div class="bg-indigo-50/30 p-10 rounded-[2.5rem] border border-indigo-100/50 relative shadow-inner">
-                            <i class="fas fa-quote-left text-indigo-100 text-8xl absolute -top-10 -left-6 z-0 opacity-50"></i>
-                            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-6 relative z-10">Mon regard de partenaire</h3>
-                            <p class="text-xl text-slate-700 italic font-medium relative z-10 leading-relaxed">
-                                "Pour <strong>${d.pseudo}</strong>, réussir une journée scolaire semble demander une énergie de marathonien neurologique. Ce document propose des pistes pour comprendre ses ruptures invisibles et l'aider à participer avec fierté."
-                            </p>
+                    <div class="p-8 md:p-16 space-y-20">
+                        
+                        <!-- Pile d'Énergie -->
+                        <div class="flex flex-col md:flex-row items-center gap-12 bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner text-balance">
+                            <div class="flex-shrink-0 text-center">
+                                <div class="battery-container">
+                                    <div class="battery-fill" style="height: ${energyRemaining}%; background-color: ${getBatteryColor(energyRemaining)}"></div>
+                                </div>
+                                <p class="mt-4 font-bold text-slate-700 text-sm">Budget Énergie</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-black">Fin de matinée</p>
+                            </div>
+                            <div class="flex-1 space-y-6">
+                                <h3 class="text-xl font-bold text-slate-800 tracking-tight">L'érosion des ressources</h3>
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Pour <strong>${d.pseudo}</strong>, la pile se vide par la **base**. Là où un élève ordinaire dépense 5% d'énergie pour rester stable, lui en dépense peut-être 40%. Ce qu'il reste pour l'apprentissage est un reliquat fragile que nous devons protéger.
+                                </p>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-red-400"></div> Posture / Maslow
+                                    </div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div> Séquençage
+                                    </div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div> Double Tâche
+                                    </div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-pink-400"></div> Émotionnel
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- Impacts & Pistes -->
                         <div class="space-y-12">
                             <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-3">
-                                <i class="fas fa-hand-holding-heart text-indigo-400"></i> Pistes d'éclairage sur vos observations
+                                <i class="fas fa-magnifying-glass text-indigo-400"></i> Impacts concrets & Pistes de réflexion
                             </h3>
-                            <div class="grid md:grid-cols-2 gap-10 text-balance">
-                                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-50 transition-all hover:shadow-md">
-                                    <p class="text-xs font-bold text-slate-400 uppercase mb-4">Socle & Besoins (Maslow)</p>
-                                    <p class="text-sm text-slate-600 leading-relaxed mb-6 font-medium italic">"${d.obs.maslow}" | "${d.obs.pain}"</p>
-                                    <p class="text-[11px] text-indigo-500 font-bold bg-indigo-50 p-4 rounded-xl">Lecture possible : Si le socle (énergie, absence de douleur) est fragile, le cerveau ne peut pas apprendre.</p>
+                            
+                            <div class="grid md:grid-cols-2 gap-10">
+                                <div class="space-y-4">
+                                    <div class="bg-white p-8 rounded-[2rem] shadow-md border border-slate-50 transition-all hover:shadow-xl">
+                                        <p class="text-[10px] font-black text-indigo-500 uppercase mb-2">Physiologie & Douleur</p>
+                                        <p class="text-sm font-bold text-slate-700 mb-4 italic">"${d.obs.maslow}"</p>
+                                        <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl">
+                                            <strong>Impact concret :</strong> L'élève peut paraître agité alors qu'il cherche simplement à fuir une douleur sourde ou un inconfort physique.
+                                        </div>
+                                    </div>
+                                    <p class="px-4 text-[11px] text-slate-400 italic">
+                                        <i class="fas fa-lightbulb mr-1"></i> Et si on intégrait des "micros-pauses posturales" avant que la fatigue n'explose ?
+                                    </p>
                                 </div>
-                                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-50 transition-all hover:shadow-md">
-                                    <p class="text-xs font-bold text-slate-400 uppercase mb-4">Planification & Schéma Mental</p>
-                                    <p class="text-sm text-slate-600 leading-relaxed mb-6 font-medium italic">"${d.obs.planning}"</p>
-                                    <p class="text-[11px] text-pink-500 font-bold bg-pink-50 p-4 rounded-xl">Lecture possible : Hiérarchiser les étapes d'une tâche semble être un labyrinthe épuisant pour lui.</p>
-                                </div>
-                                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-50 transition-all hover:shadow-md">
-                                    <p class="text-xs font-bold text-slate-400 uppercase mb-4">La Double Tâche Systémique</p>
-                                    <p class="text-sm text-slate-600 leading-relaxed mb-6 font-medium italic">"${d.obs.double_task}"</p>
-                                    <p class="text-[11px] text-amber-500 font-bold bg-amber-50 p-4 rounded-xl">Lecture possible : Piloter le geste et la pensée simultanément pourrait être une mission épuisante.</p>
-                                </div>
-                                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-50 transition-all hover:shadow-md">
-                                    <p class="text-xs font-bold text-slate-400 uppercase mb-4">Social & Émotionnel</p>
-                                    <p class="text-sm text-slate-600 leading-relaxed mb-6 font-medium italic">"${d.obs.emotional}"</p>
-                                    <p class="text-[11px] text-emerald-500 font-bold bg-emerald-50 p-4 rounded-xl">Lecture possible : Ses réactions pourraient être des signaux de saturation nerveuse.</p>
+
+                                <div class="space-y-4">
+                                    <div class="bg-white p-8 rounded-[2rem] shadow-md border border-slate-50 transition-all hover:shadow-xl">
+                                        <p class="text-[10px] font-black text-pink-500 uppercase mb-2">Double Tâche & Planification</p>
+                                        <p class="text-sm font-bold text-slate-700 mb-4 italic">"${d.obs.planning}"</p>
+                                        <div class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl">
+                                            <strong>Impact concret :</strong> Le simple fait de "préparer son banc" peut saturer son schéma mental, ne lui laissant plus d'accès à la consigne.
+                                        </div>
+                                    </div>
+                                    <p class="px-4 text-[11px] text-slate-400 italic">
+                                        <i class="fas fa-lightbulb mr-1"></i> Pourrait-on limiter le nombre d'étapes pour libérer son cerveau ?
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            ${Object.entries({posture: 3, planning: 3, dual: 3, pain: 3}).map(([k, v]) => {
-                                const m = getIndice(v);
-                                const labels = {posture:'Budget Corps', planning:'Planification', dual:'Double Tâche', pain:'Confort/Douleur'};
-                                return `
-                                    <div class="${m.bg} p-8 rounded-[2.5rem] text-center border border-white">
-                                        <p class="text-[11px] font-bold uppercase mb-4 ${m.text}">${labels[k]}</p>
-                                        <span class="text-xs font-bold ${m.text}">${m.label}</span>
-                                    </div>
-                                `;
-                            }).join('')}
+                        <div class="bg-slate-900 rounded-[3rem] p-12 text-center space-y-6 no-print">
+                            <h3 class="text-indigo-400 font-bold uppercase text-xs tracking-[0.3em]">Médiation Pédagogique</h3>
+                            <p class="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto italic">
+                                "Chaque comportement qui nous interpelle est sans doute la réponse de son cerveau à une contrainte invisible."
+                            </p>
+                            <div class="pt-6">
+                                <button onclick="window.print()" class="soa-gradient text-white px-12 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">
+                                    <i class="fas fa-print mr-3"></i> Imprimer la boussole
+                                </button>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="bg-slate-50 p-12 flex flex-col md:flex-row justify-between items-center gap-8 no-print border-t border-slate-100 text-center md:text-left">
-                        <button onclick="window.print()" class="soa-gradient text-white px-12 py-5 rounded-[2rem] font-bold shadow-xl hover:opacity-90 transition-all">
-                            <i class="fas fa-print mr-3"></i> Partager cette boussole
-                        </button>
-                        <p class="text-[11px] text-slate-400 max-w-xs font-medium italic leading-relaxed">
-                            Ce document anonymisé est un support pour l'équipe éducative. Il aide à relier les comportements aux contraintes fonctionnelles.
-                        </p>
                     </div>
                 </div>
                 <div class="flex justify-center mt-12 no-print pb-20">
