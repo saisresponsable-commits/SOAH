@@ -316,9 +316,9 @@ const AXES = [
         clone.style.border = 'none';
         clone.style.borderRadius = '0';
         clone.style.width = '100%';
+        clone.style.maxWidth = '100%';
         clone.querySelectorAll('.no-print').forEach(el => el.remove());
 
-        // Stabilise les styles pour l’export PDF : gradients et jauges en inline.
         clone.querySelectorAll('.soa-gradient').forEach(el => {
           el.style.background = 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)';
           el.style.color = '#ffffff';
@@ -333,32 +333,65 @@ const AXES = [
         };
 
         clone.querySelectorAll('.meter > div').forEach(el => {
+          let applied = false;
           for (const [klass, color] of Object.entries(colorMap)) {
             if (el.classList.contains(klass)) {
               el.style.backgroundColor = color;
+              applied = true;
               break;
             }
+          }
+          if (!applied && !el.style.backgroundColor) {
+            el.style.backgroundColor = '#6366f1';
           }
         });
 
         const wrapper = document.createElement('div');
         wrapper.style.padding = '24px';
         wrapper.style.background = '#ffffff';
+        wrapper.style.width = '900px';
+        wrapper.style.maxWidth = '900px';
+        wrapper.style.boxSizing = 'border-box';
         wrapper.appendChild(clone);
 
-        const pseudo = (state.data.pseudo || 'eleve').toString().trim().replace(/[^a-zA-Z0-9_-]+/g, '_');
-        const filename = `boussole_soah_${pseudo || 'eleve'}.pdf`;
+        let tempMount = null;
+        try {
+          tempMount = document.createElement('div');
+          tempMount.style.position = 'fixed';
+          tempMount.style.left = '-10000px';
+          tempMount.style.top = '0';
+          tempMount.style.width = '900px';
+          tempMount.style.background = '#ffffff';
+          tempMount.style.zIndex = '-1';
+          tempMount.appendChild(wrapper);
+          document.body.appendChild(tempMount);
 
-        const options = {
-          margin: [10, 10, 10, 10],
-          filename,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'] }
-        };
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-        await html2pdf().set(options).from(wrapper).save();
+          const pseudo = (state.data.pseudo || 'eleve').toString().trim().replace(/[^a-zA-Z0-9_-]+/g, '_');
+          const filename = `boussole_soah_${pseudo || 'eleve'}.pdf`;
+
+          const options = {
+            margin: [10, 10, 10, 10],
+            filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+              scale: 2,
+              useCORS: true,
+              backgroundColor: '#ffffff',
+              logging: false,
+              windowWidth: 900
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
+          };
+
+          await html2pdf().set(options).from(wrapper).save();
+        } finally {
+          if (tempMount && tempMount.parentNode) {
+            tempMount.parentNode.removeChild(tempMount);
+          }
+        }
       } finally {
         if (exportBtn) {
           exportBtn.disabled = false;
