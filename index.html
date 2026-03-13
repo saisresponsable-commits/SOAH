@@ -595,9 +595,42 @@ const MARKERS = {
     }
 
     function getPronouns() {
-      return state.data.gender === 'f'
-        ? { subject: 'elle', object: 'la', article: 'l’élève' }
-        : { subject: 'il', object: 'le', article: 'l’élève' };
+      if (state.data.gender === 'f') {
+        return {
+          subject: 'elle',
+          object: 'la',
+          possessive: 'sa',
+          article: 'l’élève',
+          tired: 'fatiguée',
+          concerned: 'concernée'
+        };
+      }
+
+      if (state.data.gender === 'm') {
+        return {
+          subject: 'il',
+          object: 'le',
+          possessive: 'son',
+          article: 'l’élève',
+          tired: 'fatigué',
+          concerned: 'concerné'
+        };
+      }
+
+      return {
+        subject: "l'élève",
+        object: "l'élève",
+        possessive: 'son',
+        article: "l'élève",
+        tired: 'fatigué·e',
+        concerned: 'concerné·e'
+      };
+    }
+
+    function subjectLabel(capitalize = false) {
+      const subject = getPronouns().subject;
+      if (!capitalize) return subject;
+      return subject.charAt(0).toUpperCase() + subject.slice(1);
     }
 
     function detectPathology(text) {
@@ -765,12 +798,12 @@ const MARKERS = {
     function buildDoubleRegard() {
       const rows = [];
       const m = state.analysis.markers;
-      if (m.irritability) rows.push(['On voit : refus, irritabilité ou décrochage', 'Il est possible que l’élève soit en surcharge ou en fin de ressources.']);
+      if (m.irritability) rows.push(['On voit : refus, irritabilité ou décrochage', `${subjectLabel(true)} est peut-être en surcharge ou en fin de ressources.`]);
       if (m.slowness || m.writing) rows.push(['On voit : lenteur ou écriture laborieuse', 'L’activité peut demander un pilotage moteur conscient très coûteux.']);
       if (m.temporality) rows.push(['On voit : réussite variable selon le moment', 'La performance peut fluctuer avec l’accumulation de fatigue au fil de la journée.']);
-      if (m.compensation) rows.push(['On voit : immobilité ou concentration extrême', 'L’élève peut surcompenser pour tenir, au prix d’un épuisement rapide.']);
-      if (m.autonomy) rows.push(['On voit : élève très autonome ou refusant l’aide', 'L’autonomie peut être réelle, mais parfois acquise au prix d’un sur-effort invisible.']);
-      if (!rows.length) rows.push(['On voit : des difficultés irrégulières', 'Il peut exister des contraintes invisibles qui ne sont pas immédiatement lisibles depuis l’extérieur.']);
+      if (m.compensation) rows.push(['On voit : immobilité ou concentration extrême', `${subjectLabel(true)} peut surcompenser pour tenir, au prix d’un épuisement rapide.`]);
+      if (m.autonomy) rows.push(['On voit : élève très autonome ou refusant l’aide', `L’autonomie peut être réelle, mais parfois acquise au prix d’un sur-effort invisible pour ${getPronouns().object}.`]);
+      if (!rows.length) rows.push(['On voit : des difficultés irrégulières', `Des contraintes invisibles peuvent exister sans être immédiatement lisibles de l’extérieur pour ${getPronouns().object}.`]);
       return rows.slice(0, 5);
     }
 
@@ -994,7 +1027,7 @@ const MARKERS = {
           if (granted && matched) {
             addMessage('bot', `<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d'appui de vulgarisation</p><p><strong>${matched.name}</strong> — ${matched.family}</p><p class="text-sm italic text-slate-600">${matched.pedagogicalWarning}</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">${matched.documentation}</div><p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>`, true);
           } else {
-            addMessage('bot', `D'accord. Je reste donc strictement centré sur les observations scolaires et leurs conséquences possibles dans la journée de ${state.data.pseudo}.`);
+            addMessage('bot', `D'accord. Je reste donc strictement centré sur les observations scolaires et leurs conséquences possibles dans sa journée.`);
           }
           addMessage('bot', `Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
           offerSkipChoices();
@@ -1094,7 +1127,7 @@ const MARKERS = {
 
 • certaines situations scolaires semblent plus coûteuses
 • la fatigue ou l'accumulation au fil de la journée joue probablement un rôle
-• ${getPronouns().article} semble parfois devoir <strong>compenser</strong> pour tenir
+• ${subjectLabel(true)} semble parfois devoir <strong>compenser</strong> pour tenir
 
 C'est souvent dans cette accumulation de petites contraintes que se construit la difficulté visible.`, true);
 
@@ -1148,6 +1181,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
     }
 
     function generateReport() {
+      const p = getPronouns();
       const budget = computeResourceBudget();
       const doubleRegard = buildDoubleRegard();
       const markerNames = markerLabelMap();
@@ -1167,7 +1201,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
         <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden report-card">
           <div class="soa-gradient text-white p-12">
             <h2 class="text-4xl font-bold tracking-tight">Boussole de compréhension</h2>
-            <p class="mt-4 text-xl opacity-90 italic">Ce que l'on voit n'est pas toujours le vrai coût payé par ${state.data.gender === 'f' ? 'elle' : state.data.gender === 'm' ? 'lui' : 'l’élève'} pour participer.</p>
+            <p class="mt-4 text-xl opacity-90 italic">Ce que l'on voit n'est pas toujours le vrai coût payé par ${p.object} pour participer.</p>
           </div>
 
           <div class="p-8 md:p-16 space-y-10">
@@ -1190,12 +1224,12 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
                 </div>
               </div>
               <div>
-                <p class="text-sm font-black uppercase tracking-widest text-slate-700 mb-4">Énergie que l’élève peut encore mobiliser pour la tâche scolaire</p>
+                <p class="text-sm font-black uppercase tracking-widest text-slate-700 mb-4">Énergie que ${p.subject} peut encore mobiliser pour la tâche scolaire</p>
                 <div class="meter mb-3"><div class="bg-rose-500" style="width:${budget}%"></div></div>
-                <p class="text-sm text-slate-600">SOAH estime qu’il resterait environ <strong>${budget}% d’énergie que l’élève peut encore mobiliser pour la tâche scolaire</strong>, au regard des contraintes décrites.</p>
+                <p class="text-sm text-slate-600">SOAH estime qu’il resterait environ <strong>${budget}% d’énergie que ${p.subject} peut encore mobiliser pour la tâche scolaire</strong>, au regard des contraintes décrites.</p>
                 <p class="text-xs text-slate-500 mt-2">Cette estimation n’est pas une mesure médicale. Elle est construite à partir des indices repérés dans l’échange : ${scoreExplanation.length ? scoreExplanation.join(', ') : 'peu d’indices suffisamment précis à ce stade'}.</p>
-                <p class="text-xs text-slate-500 mt-2">Plus ces indices s’accumulent, plus SOAH considère qu’une partie importante de l’énergie de l’élève est déjà utilisée avant même d’entrer pleinement dans la tâche scolaire.</p>
-                <p class="text-xs text-slate-500 mt-3">Indice de surcharge estimé : <strong>${state.analysis.surchargeScore}%</strong>. Plus cet indice est élevé, plus l’élève risque d’utiliser une grande partie de son énergie simplement pour participer aux activités scolaires.</p>
+                <p class="text-xs text-slate-500 mt-2">Plus ces indices s’accumulent, plus SOAH considère qu’une partie importante de l’énergie de ${p.object} est déjà utilisée avant même d’entrer pleinement dans la tâche scolaire.</p>
+                <p class="text-xs text-slate-500 mt-3">Indice de surcharge estimé : <strong>${state.analysis.surchargeScore}%</strong>. Plus cet indice est élevé, plus ${p.subject} risque d’utiliser une grande partie de son énergie simplement pour participer aux activités scolaires.</p>
               </div>
             </div>
 
@@ -1221,7 +1255,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 
             <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
               <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-2">Carte des charges invisibles</p>
-              <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur l’élève dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite.</p>
+              <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur ${p.object} dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite.</p>
               <div class="space-y-5">${state.analysis.invisibleLoads.map(c => `<div><div class="flex justify-between text-xs font-bold text-slate-600 uppercase mb-2"><span>${c.label}</span><span>${c.text}</span></div><div class="meter"><div class="${c.color}" style="width:${c.value}%"></div></div><p class="text-xs text-slate-500 mt-2">${(loadReasons[c.label] && loadReasons[c.label].length) ? `Ce niveau est retenu notamment à partir de : ${loadReasons[c.label].join(', ')}.` : 'Ce niveau reste provisoire car peu d’indices spécifiques ont été relevés pour cette charge.'}</p></div>`).join('')}</div>
             </div>
 
@@ -1299,7 +1333,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
         { s: 'bot', t: 'Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que la myopathie de Duchenne peut impliquer dans le quotidien scolaire de Léo ?' },
         { s: 'user', t: 'Oui, volontiers.' },
         { s: 'bot', html: true, t: '<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d’appui de vulgarisation</p><p><strong>Myopathie de Duchenne</strong> — Neuromusculaire génétique</p><p class="text-sm italic text-slate-600">Le coût postural et la fatigabilité peuvent majorer rapidement les difficultés d’écriture, de maintien et de participation prolongée.</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">Dans cette pathologie, la force musculaire diminue progressivement. Des actions qui paraissent simples, comme tenir son buste, respirer avec aisance, se stabiliser ou écrire, peuvent déjà mobiliser une grande partie de l’énergie disponible. La difficulté n’est donc pas seulement la tâche scolaire elle-même, mais tout ce qu’il faut déjà dépenser pour être présent et disponible.</div><p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>' },
-        { s: 'bot', t: 'Dans le quotidien scolaire, qu’est-ce qui vous interpelle le plus chez Léo ? Qu’est-ce qui vous semble coûteux pour ${getPronouns().subject} ?' },
+        { s: 'bot', t: 'Dans le quotidien scolaire, qu’est-ce qui vous interpelle le plus chez Léo ? Qu’est-ce qui vous semble le plus coûteux pour lui ?' },
         { s: 'user', t: 'Il peut très bien commencer sa matinée, puis en fin de matinée il refuse d’écrire, s’agace vite, et semble parfois ne plus rien vouloir faire.' },
         { s: 'bot', html: true, t: '<div class="space-y-3"><p>C’est typiquement le genre de situation où le regard de l’adulte peut basculer très vite vers <em>"il ne veut plus"</em>.</p><p>Mais votre description invite déjà à une autre hypothèse : non pas un manque de volonté, mais peut-être un <strong>épuisement progressif</strong>.</p></div>' },
         { s: 'bot', t: 'Quand un comportement change comme cela, il est souvent utile de regarder la temporalité. Voyez-vous une différence entre le début de journée et la fin de matinée, ou après certains temps comme la cour, un déplacement, un changement de local ?' },
@@ -1370,3 +1404,6 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
   </script>
 </body>
 </html>
+
+</html>
+
