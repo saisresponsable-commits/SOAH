@@ -327,7 +327,10 @@ const MARKERS = {
     async function exportReportPDF() {
       const report = document.querySelector('#final-report .report-card');
       const exportBtn = document.getElementById('export-pdf-btn');
-      if (!report) return;
+      if (!report) {
+        alert("La boussole n'est pas encore disponible. Ouvrez d'abord le rapport avant de lancer l'export PDF.");
+        return;
+      }
 
       const originalBtnHtml = exportBtn ? exportBtn.innerHTML : '';
       if (exportBtn) {
@@ -460,6 +463,9 @@ const MARKERS = {
         printWindow.document.open();
         printWindow.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${printTitle}</title><link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">${styles}</head><body>${reportHtml}<script>window.onload = function(){ setTimeout(function(){ window.focus(); window.print(); }, 300); };<\/script></body></html>`);
         printWindow.document.close();
+      } catch (error) {
+        console.error('Erreur export PDF :', error);
+        alert("L'export PDF n'a pas pu être lancé correctement. Vérifiez que les pop-ups ne sont pas bloqués puis réessayez.");
       } finally {
         if (exportBtn) {
           exportBtn.disabled = false;
@@ -686,6 +692,40 @@ const MARKERS = {
       const subject = getPronouns().subject;
       if (!capitalize) return subject;
       return subject.charAt(0).toUpperCase() + subject.slice(1);
+    }
+
+    function getGenderAgreement() {
+      if (state.data.gender === 'f') {
+        return {
+          solicited: 'sollicitée',
+          concerned: 'concernée',
+          available: 'disponible',
+          tired: 'fatiguée'
+        };
+      }
+      if (state.data.gender === 'm') {
+        return {
+          solicited: 'sollicité',
+          concerned: 'concerné',
+          available: 'disponible',
+          tired: 'fatigué'
+        };
+      }
+      return {
+        solicited: 'sollicité·e',
+        concerned: 'concerné·e',
+        available: 'disponible',
+        tired: 'fatigué·e'
+      };
+    }
+
+    function mechanismToReportSentence(mechanism) {
+      const p = getPronouns();
+      return `${subjectLabel(true)} pourrait présenter ${mechanism}. Cela peut peser sur la manière dont ${p.subject} entre dans la tâche, s'y maintient et y reste ${getGenderAgreement().available}.`;
+    }
+
+    function situationToReportSentence(situation) {
+      return `${subjectLabel(true)} semble particulièrement ${getGenderAgreement().concerned} dans les moments suivants : ${situation}.`;
     }
 
     function detectGenderFromPseudo(pseudo = '') {
@@ -1361,6 +1401,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 
     function generateReport() {
       const p = getPronouns();
+      const g = getGenderAgreement();
       const budget = computeResourceBudget();
       const doubleRegard = buildDoubleRegard();
       const markerNames = markerLabelMap();
@@ -1412,6 +1453,10 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
                 <p class="text-xs text-slate-500 mt-2">Cette estimation n’est pas une mesure médicale. Elle est construite à partir des indices repérés dans l’échange : ${scoreExplanation.length ? scoreExplanation.join(', ') : 'peu d’indices suffisamment précis à ce stade'}.</p>
                 <p class="text-xs text-slate-500 mt-2">Plus ces indices s’accumulent, plus SOAH considère qu’une partie importante de l’énergie de ${p.object} est déjà utilisée avant même d’entrer pleinement dans la tâche scolaire.</p>
                 <p class="text-xs text-slate-500 mt-3">Indice de surcharge estimé : <strong>${state.analysis.surchargeScore}%</strong>. Plus cet indice est élevé, plus ${p.subject} risque d’utiliser une grande partie de son énergie simplement pour participer aux activités scolaires.</p>
+                <div class="mt-4 bg-rose-50 border border-rose-200 rounded-2xl p-4">
+                  <p class="text-[11px] font-black uppercase tracking-widest text-rose-700 mb-1">Repère méthodologique</p>
+                  <p class="text-xs text-slate-600">Cet indice est indicatif. Il repose sur des marqueurs repérés automatiquement dans l’échange et sur des pondérations fixes. Deux descriptions différentes peuvent donc produire un niveau proche, même si l’une contient plus de détails que l’autre. Il sert à visualiser une tendance pédagogique, pas à quantifier précisément la situation.</p>
+                </div>
               </div>
             </div>
 
@@ -1431,7 +1476,8 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
               </div>
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Mécanismes fonctionnels possibles</p>
-                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.inferredMechanisms.length ? state.analysis.inferredMechanisms.map(m => `<li>${escapeHtml(m)}</li>`).join('') : '<li>Aucun mécanisme saillant n’a été dégagé automatiquement.</li>'}</ul>
+                <p class="text-xs text-slate-500 mb-4">Dans la situation décrite, voici ce que SOAH retient plus spécifiquement pour ${p.object}.</p>
+                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.inferredMechanisms.length ? state.analysis.inferredMechanisms.map(m => `<li>${escapeHtml(mechanismToReportSentence(m))}</li>`).join('') : `<li>Aucun mécanisme saillant n’a été dégagé automatiquement pour ${p.object}.</li>`}</ul>
               </div>
             </div>
 
@@ -1449,7 +1495,8 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             <div class="grid md:grid-cols-2 gap-10">
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Situations scolaires à surveiller</p>
-                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.situations.length ? state.analysis.situations.map(s => `<li>${escapeHtml(s)}</li>`).join('') : '<li>À préciser : situations de classe ou de transition les plus coûteuses.</li>'}</ul>
+                <p class="text-xs text-slate-500 mb-4">Les situations ci-dessous semblent être celles où ${p.subject} pourrait être le plus rapidement ${g.solicited}.</p>
+                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.situations.length ? state.analysis.situations.map(s => `<li>${escapeHtml(situationToReportSentence(s))}</li>`).join('') : `<li>À préciser : situations de classe ou de transition où ${p.subject} paraît le plus ${g.concerned}.</li>`}</ul>
               </div>
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Observation de départ</p>
@@ -1464,7 +1511,8 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 
             <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-8">
               <p class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-4">Pistes d'aménagement à explorer</p>
-              <div class="space-y-4">${state.analysis.accommodations.length ? state.analysis.accommodations.map(item => `<div class="bg-white border border-emerald-100 rounded-2xl p-5"><p class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-2">${escapeHtml(item.type)}</p><p class="font-bold text-slate-800">${escapeHtml(item.title)}</p><p class="text-sm text-slate-600 mt-2">${escapeHtml(item.description)}</p></div>`).join('') : '<p class="text-sm text-slate-600">Aucune recommandation n’a été générée automatiquement. Une analyse plus guidée peut être nécessaire.</p>'}</div>
+              <p class="text-xs text-slate-600 mb-4">Ces ajustements sont à explorer pour aider ${p.object} à participer sans que tout repose sur la compensation, la fatigue ou le sur-effort.</p>
+              <div class="space-y-4">${state.analysis.accommodations.length ? state.analysis.accommodations.map(item => `<div class="bg-white border border-emerald-100 rounded-2xl p-5"><p class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-2">${escapeHtml(item.type)}</p><p class="font-bold text-slate-800">${escapeHtml(item.title)}</p><p class="text-sm text-slate-600 mt-2">${escapeHtml(item.description)}</p></div>`).join('') : `<p class="text-sm text-slate-600">Aucune recommandation n’a été générée automatiquement pour ${p.object}. Une analyse plus guidée peut être nécessaire.</p>`}</div>
             </div>
 
             <div class="bg-sky-50 border border-sky-200 rounded-3xl p-8">
@@ -1586,6 +1634,5 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
   </script>
 </body>
 </html>
-
 
 
