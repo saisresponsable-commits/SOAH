@@ -211,7 +211,70 @@ Comment souhaitez-vous appeler votre élève ?`;
       }
     };
 
-    // Liste conceptuelle des axes pédagogiques possibles.
+    const PATHOLOGY_IMPACT_DB = {
+  'myopathie de duchenne': {
+    shortDefinition: 'Maladie neuromusculaire évolutive qui réduit progressivement la force musculaire.',
+    dailyImpact: ['fatigue physique importante', 'coût élevé pour tenir la posture', 'déplacements et gestes plus coûteux'],
+    schoolImpact: ['écriture fatigante', 'endurance réduite dans les tâches longues', 'accumulation rapide de fatigue dans la journée']
+  },
+  'paralysie cérébrale': {
+    shortDefinition: 'Atteinte neurologique précoce qui peut toucher le tonus, la posture et la coordination.',
+    dailyImpact: ['mouvements moins fluides', 'posture ou équilibre coûteux', 'double tâche plus difficile'],
+    schoolImpact: ['geste scolaire ralenti', 'installation et transitions plus longues', 'effort plus important pour écrire ou manipuler']
+  },
+  'imc': {
+    shortDefinition: 'Atteinte motrice d’origine cérébrale pouvant modifier le tonus, la coordination et l’endurance.',
+    dailyImpact: ['coût moteur élevé', 'variabilité selon la fatigue', 'contrôle corporel plus exigeant'],
+    schoolImpact: ['écriture ou manipulation plus lentes', 'fatigue qui augmente au fil de la journée', 'besoin d’environnement plus ajusté']
+  },
+  'amyotrophie spinale': {
+    shortDefinition: 'Maladie neuromusculaire entraînant une faiblesse musculaire et une endurance réduite.',
+    dailyImpact: ['maintien du corps coûteux', 'fatigabilité importante', 'gestes du quotidien plus exigeants'],
+    schoolImpact: ['coût postural élevé en classe', 'manipulation du matériel plus difficile', 'besoin d’économie d’énergie']
+  },
+  'ataxie de friedreich': {
+    shortDefinition: 'Maladie neurologique qui altère progressivement l’équilibre et la coordination.',
+    dailyImpact: ['équilibre fragile', 'gestes moins précis', 'déplacements plus coûteux'],
+    schoolImpact: ['transitions délicates', 'motricité fine ralentie', 'fatigue liée à la coordination']
+  },
+  'sclérose en plaques': {
+    shortDefinition: 'Maladie neurologique inflammatoire pouvant entraîner une forte variabilité du fonctionnement.',
+    dailyImpact: ['fatigue fluctuante', 'jours avec ressources très variables', 'effort imprévisible selon le moment'],
+    schoolImpact: ['performance variable dans la journée', 'décalage entre potentiel et disponibilité réelle', 'besoin de modulation du rythme']
+  },
+  'maladie de charcot-marie-tooth': {
+    shortDefinition: 'Neuropathie périphérique héréditaire touchant la force et la sensibilité, surtout aux extrémités.',
+    dailyImpact: ['marche plus fatigante', 'équilibre parfois fragile', 'gestes fins plus coûteux'],
+    schoolImpact: ['déplacements et manipulations à surveiller', 'fatigue motrice discrète mais réelle', 'endurance scolaire diminuée']
+  },
+  'leucodystrophie': {
+    shortDefinition: 'Maladie neurologique évolutive pouvant modifier progressivement le fonctionnement moteur et cognitif.',
+    dailyImpact: ['variabilité importante', 'évolution possible des capacités', 'besoin de réajustements réguliers'],
+    schoolImpact: ['ce qui était possible hier peut devenir coûteux', 'adaptations à réévaluer', 'vigilance sur la fatigue et les transitions']
+  },
+  'traumatisme crânien': {
+    shortDefinition: 'Atteinte neurologique acquise pouvant laisser des difficultés invisibles malgré une apparence préservée.',
+    dailyImpact: ['fatigue cognitive forte', 'coût élevé de l’organisation', 'décalage entre apparence et effort réel'],
+    schoolImpact: ['consignes plus coûteuses à traiter', 'enchaînement des tâches plus fatigant', 'besoin de ralentir et structurer']
+  },
+  'spina bifida': {
+    shortDefinition: 'Malformation neurologique pouvant entraîner des conséquences motrices et fonctionnelles variables.',
+    dailyImpact: ['déplacements coûteux', 'gestion corporelle plus exigeante', 'installation plus longue'],
+    schoolImpact: ['énergie déjà mobilisée avant la tâche scolaire', 'importance de l’environnement matériel', 'fatigue liée aux transitions']
+  },
+  'dystonie': {
+    shortDefinition: 'Trouble du mouvement où des contractions involontaires perturbent le geste volontaire.',
+    dailyImpact: ['mouvements parasites', 'coût postural élevé', 'grande variabilité du geste'],
+    schoolImpact: ['écriture ou manipulation très coûteuses', 'geste intentionnel perturbé', 'fatigue rapide lors des tâches fines']
+  },
+  'syndrome de rett': {
+    shortDefinition: 'Trouble neurologique du développement où l’expression motrice peut être très limitée malgré des intentions présentes.',
+    dailyImpact: ['difficulté à montrer ce qui est compris', 'effort moteur important', 'variabilité dans l’expression'],
+    schoolImpact: ['écart entre compréhension et production visible', 'besoin d’interprétation prudente', 'importance des médiations adaptées']
+  }
+};
+
+// Liste conceptuelle des axes pédagogiques possibles.
 // Les axes réellement affichés dans le rapport sont filtrés dynamiquement via getActiveAxes().
 const AXES = [
   'fatigue / coût énergétique',
@@ -271,7 +334,7 @@ const AXES = [
         knownDiagnosis: false,
         pathologyPermissionAsked: false,
         pathologyPermissionGranted: false,
-        obs: { story: '', time: '', compensation: '', charges: '', situations: '' }
+        obs: { story: '', time: '', compensation: '', charges: '', situations: '', pain: '', environment: '', social: '' }
       },
       analysis: {
         markers: {},
@@ -499,6 +562,26 @@ const AXES = [
       return null;
     }
 
+    function getPathologyImpact(pathologyName = '') {
+      const key = (pathologyName || '').toLowerCase().trim();
+      return PATHOLOGY_IMPACT_DB[key] || null;
+    }
+
+    function buildScoreExplanation() {
+      const m = state.analysis.markers || {};
+      const explanations = [];
+      if (m.fatigue) explanations.push('fatigue ou fatigabilité mentionnée');
+      if (m.temporality) explanations.push('variabilité au fil de la journée');
+      if (m.posture) explanations.push('coût postural ou effort pour tenir le corps');
+      if (m.mobility) explanations.push('déplacements ou transitions coûteux');
+      if (m.writing) explanations.push('charge liée à l’écriture ou au geste fin');
+      if (m.compensation) explanations.push('stratégies de compensation pour tenir');
+      if (m.autonomy) explanations.push('autonomie apparente pouvant coûter cher');
+      if (m.pain) explanations.push('signes de douleur ou d’inconfort');
+      if (m.social) explanations.push('poids du regard des autres ou du groupe');
+      return explanations;
+    }
+
     function hasKeyword(text, keywords) {
       const low = text.toLowerCase();
       return keywords.some(k => low.includes(k));
@@ -674,6 +757,58 @@ const AXES = [
 
     function computeResourceBudget() { return state.analysis.energyScore || 75; }
 
+    function getMissingExplorationAreas() {
+      const missing = [];
+      if (!state.data.obs.pain) missing.push('douleur / inconfort');
+      if (!state.data.obs.environment) missing.push('environnement scolaire');
+      if (!state.data.obs.social) missing.push('vécu social / regard des autres');
+      return missing;
+    }
+
+    function shouldOfferDeeperExploration() {
+      const missing = getMissingExplorationAreas();
+      const filledCount = [state.data.obs.story, state.data.obs.time, state.data.obs.compensation, state.data.obs.situations, state.data.obs.charges].filter(Boolean).length;
+      return filledCount >= 3 && missing.length > 0;
+    }
+
+    function renderContinueOptions(missing) {
+      const labels = missing.slice(0, 3).map(item => `<li>${escapeHtml(item)}</li>`).join('');
+      return `<div class="space-y-3"><p>Nous pouvons déjà produire une boussole, mais certains angles restent encore peu explorés.</p><p class="text-sm text-slate-600">Si vous le souhaitez, nous pouvons approfondir avant la synthèse, par exemple sur :</p><ul class="list-disc pl-5 text-sm space-y-1">${labels}</ul><div class="flex flex-wrap gap-2 pt-2"><button onclick="continueDeeper('oui')" class="btn-choice">Poursuivre l'échange</button><button onclick="continueDeeper('non')" class="btn-choice">Aller à la boussole</button></div></div>`;
+    }
+
+    function continueDeeper(choice) {
+      addMessage('user', choice === 'oui' ? 'Poursuivre l’échange' : 'Aller à la boussole');
+      processStep(choice);
+    }
+
+    function askNextDeeperQuestion() {
+      const missing = getMissingExplorationAreas();
+      const next = missing[0];
+      if (!next) {
+        addMessage('bot', `<div class="space-y-3"><p>Merci. Nous avons maintenant une vision plus complète.</p><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
+        state.step = 'done';
+        return;
+      }
+
+      if (next === 'douleur / inconfort') {
+        addMessage('bot', `Avant de conclure, avez-vous remarqué des signes de douleur ou d’inconfort chez ${state.data.pseudo} ? Par exemple des grimaces, une posture d’évitement, un refus de certains gestes ou une gêne difficile à verbaliser ?`);
+        offerSkipChoices();
+        state.step = 'deep_pain';
+        return;
+      }
+      if (next === 'environnement scolaire') {
+        addMessage('bot', `J’aimerais encore explorer l’environnement scolaire : y a-t-il des éléments du cadre qui semblent coûter cher à ${state.data.pseudo} ? Par exemple les déplacements, l’installation, le bruit, l’espace, le mobilier, les changements de local ?`);
+        offerSkipChoices();
+        state.step = 'deep_environment';
+        return;
+      }
+      if (next === 'vécu social / regard des autres') {
+        addMessage('bot', `Dernier point possible : le vécu social. Avez-vous l’impression que le regard des autres, le groupe, la récréation ou le fait d’être aidé devant les pairs pèse sur ${state.data.pseudo} ?`);
+        offerSkipChoices();
+        state.step = 'deep_social';
+      }
+    }
+
     function processStep(input) {
       const cleanInput = sanitizeStepInput(input);
       switch (state.step) {
@@ -803,9 +938,43 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 
           runAnalysis();
 
-          addMessage('bot', `<div class="space-y-3"><p>Si vous le souhaitez, je peux maintenant transformer cet échange en une <strong>boussole de compréhension</strong> qui mettra en évidence :</p><ul class="list-disc pl-5 text-sm space-y-1"><li>les mécanismes fonctionnels possibles</li><li>les situations scolaires sensibles</li><li>la carte des charges invisibles</li><li>des pistes d'ajustement pédagogique</li></ul><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
+          if (shouldOfferDeeperExploration()) {
+            addMessage('bot', renderContinueOptions(getMissingExplorationAreas()), true);
+            state.step = 'deeper_choice';
+          } else {
+            addMessage('bot', `<div class="space-y-3"><p>Si vous le souhaitez, je peux maintenant transformer cet échange en une <strong>boussole de compréhension</strong> qui mettra en évidence :</p><ul class="list-disc pl-5 text-sm space-y-1"><li>les mécanismes fonctionnels possibles</li><li>les situations scolaires sensibles</li><li>la carte des charges invisibles</li><li>des pistes d'ajustement pédagogique</li></ul><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
+            state.step = 'done';
+          }
+          break;
 
-          state.step = 'done';
+        case 'deeper_choice': {
+          const low = cleanInput.toLowerCase();
+          const wantsMore = ['oui', 'poursuivre', 'continuer', 'encore'].some(word => low.includes(word));
+          if (wantsMore) {
+            askNextDeeperQuestion();
+          } else {
+            addMessage('bot', `<div class="space-y-3"><p>D'accord. Je transforme ce que nous avons déjà dégagé en <strong>boussole de compréhension</strong>.</p><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
+            state.step = 'done';
+          }
+          break;
+        }
+
+        case 'deep_pain':
+          state.data.obs.pain = cleanInput;
+          runAnalysis();
+          askNextDeeperQuestion();
+          break;
+
+        case 'deep_environment':
+          state.data.obs.environment = cleanInput;
+          runAnalysis();
+          askNextDeeperQuestion();
+          break;
+
+        case 'deep_social':
+          state.data.obs.social = cleanInput;
+          runAnalysis();
+          askNextDeeperQuestion();
           break;
       }
     }
@@ -823,8 +992,11 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
       const activeAxes = getActiveAxes();
       const activeMarkers = Object.entries(state.analysis.markers).filter(([, value]) => value).map(([key]) => markerNames[key]);
 
+      const pathologyImpact = state.analysis.matchedPathology ? getPathologyImpact(state.analysis.matchedPathology.name) : null;
+      const scoreExplanation = buildScoreExplanation();
+
       const pathologyBlock = state.analysis.matchedPathology
-        ? `<div class="bg-violet-50 border border-violet-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Repère lié au diagnostic connu</p><p class="font-bold text-slate-800">${state.analysis.matchedPathology.name}</p><p class="text-sm text-slate-600 mt-2">${state.analysis.matchedPathology.pedagogicalWarning}</p>${state.data.pathologyPermissionGranted ? `<div class="mt-4 bg-white border border-violet-100 rounded-2xl p-4 text-sm text-slate-700">${state.analysis.matchedPathology.documentation}</div>` : ''}</div>`
+        ? `<div class="bg-violet-50 border border-violet-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Repère lié au diagnostic connu</p><p class="font-bold text-slate-800">${state.analysis.matchedPathology.name}</p><p class="text-sm text-slate-600 mt-2">${state.analysis.matchedPathology.pedagogicalWarning}</p>${pathologyImpact ? `<div class="mt-4 grid md:grid-cols-3 gap-4"><div class="bg-white border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">En deux mots</p><p class="text-sm text-slate-700">${escapeHtml(pathologyImpact.shortDefinition)}</p></div><div class="bg-white border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Au quotidien</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.dailyImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div><div class="bg-white border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">À l’école</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.schoolImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div></div>` : ''}${state.data.pathologyPermissionGranted ? `<div class="mt-4 bg-white border border-violet-100 rounded-2xl p-4 text-sm text-slate-700">${state.analysis.matchedPathology.documentation}</div>` : ''}</div>`
         : `<div class="bg-slate-50 border border-slate-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-slate-600 mb-2">Cadre de prudence</p><p class="text-sm text-slate-600">Aucun raisonnement diagnostique n'est posé ici. La lecture ci-dessous repose uniquement sur les effets possibles observés dans le contexte scolaire.</p></div>`;
 
       document.getElementById('final-report').innerHTML = `
@@ -853,10 +1025,12 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
                 </div>
               </div>
               <div>
-                <p class="text-sm font-black uppercase tracking-widest text-slate-700 mb-4">Ressources énergétiques disponibles</p>
+                <p class="text-sm font-black uppercase tracking-widest text-slate-700 mb-4">Énergie que l’élève peut encore mobiliser pour la tâche scolaire</p>
                 <div class="meter mb-3"><div class="bg-rose-500" style="width:${budget}%"></div></div>
-                <p class="text-sm text-slate-600">Il resterait environ <strong>${budget}% de ressources énergétiques disponibles</strong> pour apprendre dans de bonnes conditions, au regard des contraintes décrites. Cette jauge est une image pédagogique, pas une mesure clinique.</p>
-                <p class="text-xs text-slate-500 mt-3">Indice de surcharge estimé : <strong>${state.analysis.surchargeScore}%</strong></p>
+                <p class="text-sm text-slate-600">SOAH estime qu’il resterait environ <strong>${budget}% d’énergie que l’élève peut encore mobiliser pour la tâche scolaire</strong>, au regard des contraintes décrites.</p>
+                <p class="text-xs text-slate-500 mt-2">Cette estimation n’est pas une mesure médicale. Elle est construite à partir des indices repérés dans l’échange : ${scoreExplanation.length ? scoreExplanation.join(', ') : 'peu d’indices suffisamment précis à ce stade'}.</p>
+                <p class="text-xs text-slate-500 mt-2">Plus ces indices s’accumulent, plus SOAH considère qu’une partie importante de l’énergie de l’élève est déjà utilisée avant même d’entrer pleinement dans la tâche scolaire.</p>
+                <p class="text-xs text-slate-500 mt-3">Indice de surcharge estimé : <strong>${state.analysis.surchargeScore}%</strong>. Plus cet indice est élevé, plus l’élève risque d’utiliser une grande partie de son énergie simplement pour participer aux activités scolaires.</p>
               </div>
             </div>
 
@@ -881,7 +1055,8 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             </div>
 
             <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
-              <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-5">Carte des charges invisibles</p>
+              <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-2">Carte des charges invisibles</p>
+              <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur l’élève dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite.</p>
               <div class="space-y-5">${state.analysis.invisibleLoads.map(c => `<div><div class="flex justify-between text-xs font-bold text-slate-600 uppercase mb-2"><span>${c.label}</span><span>${c.text}</span></div><div class="meter"><div class="${c.color}" style="width:${c.value}%"></div></div></div>`).join('')}</div>
             </div>
 
