@@ -914,25 +914,88 @@ const MARKERS = {
       return keywords.some(k => low.includes(k));
     }
 
-    function computeResourceBudgetFromMarkers(m) {
+    function countKeywordOccurrences(text, keyword) {
+      const source = normalizeText(text || '');
+      const needle = normalizeText(keyword || '');
+      if (!source || !needle) return 0;
+      let count = 0;
+      let index = 0;
+      while ((index = source.indexOf(needle, index)) !== -1) {
+        count += 1;
+        index += needle.length;
+      }
+      return count;
+    }
+
+    function buildMarkerEvidence(textParts) {
+      const parts = (textParts || []).map(part => part || '').filter(Boolean);
+      const evidence = {};
+      Object.entries(MARKERS).forEach(([key, words]) => {
+        let mentionCount = 0;
+        let sectionCount = 0;
+        parts.forEach(part => {
+          const partCount = words.reduce((sum, word) => sum + countKeywordOccurrences(part, word), 0);
+          if (partCount > 0) {
+            mentionCount += partCount;
+            sectionCount += 1;
+          }
+        });
+        const weightedCount = mentionCount + Math.max(0, sectionCount - 1) * 0.75;
+        evidence[key] = { mentionCount, sectionCount, weightedCount };
+      });
+      return evidence;
+    }
+
+    function markerImpact(evidence, key, base, extraPerStep = 0, stepSize = 2, maxExtraSteps = 3) {
+      const weighted = evidence?.[key]?.weightedCount || 0;
+      if (!weighted) return 0;
+      const extraSteps = Math.min(maxExtraSteps, Math.max(0, Math.floor((weighted - 1) / stepSize)));
+      return base + extraSteps * extraPerStep;
+    }
+
+    function computeResourceBudgetFromMarkers(m, evidence = {}) {
       let score = 78;
-      if (m.fatigue) score -= 18;
-      if (m.temporality) score -= 12;
-      if (m.posture) score -= 14;
-      if (m.mobility) score -= 10;
-      if (m.writing) score -= 8;
-      if (m.compensation) score -= 7;
-      if (m.autonomy) score -= 6;
-      if (m.pain) score -= 6;
+      score -= markerImpact(evidence, 'fatigue', 14, 3, 2, 3);
+      score -= markerImpact(evidence, 'temporality', 9, 2, 2, 2);
+      score -= markerImpact(evidence, 'posture', 10, 2, 2, 2);
+      score -= markerImpact(evidence, 'mobility', 8, 2, 2, 2);
+      score -= markerImpact(evidence, 'writing', 7, 2, 2, 2);
+      score -= markerImpact(evidence, 'compensation', 6, 2, 2, 2);
+      score -= markerImpact(evidence, 'autonomy', 4, 1, 2, 2);
+      score -= markerImpact(evidence, 'pain', 5, 1, 2, 2);
+      if (!Object.keys(evidence || {}).length) {
+        if (m.fatigue) score -= 14;
+        if (m.temporality) score -= 9;
+        if (m.posture) score -= 10;
+        if (m.mobility) score -= 8;
+        if (m.writing) score -= 7;
+        if (m.compensation) score -= 6;
+        if (m.autonomy) score -= 4;
+        if (m.pain) score -= 5;
+      }
       return Math.max(18, Math.min(92, score));
     }
 
-    function computeInvisibleLoads(markers) {
-      const motrice = 36 + (markers.writing ? 14 : 0) + (markers.mobility ? 14 : 0) + (markers.posture ? 12 : 0) + (markers.compensation ? 6 : 0);
-      const cognitive = 34 + (markers.planning ? 14 : 0) + (markers.compensation ? 12 : 0) + (markers.temporality ? 8 : 0) + (markers.pain ? 4 : 0);
-      const organisationnelle = 30 + (markers.planning ? 18 : 0) + (markers.mobility ? 8 : 0) + (markers.autonomy ? 8 : 0);
-      const sociale = 24 + (markers.social ? 22 : 0) + (markers.irritability ? 8 : 0) + (markers.autonomy ? 6 : 0);
-      const energetique = 100 - computeResourceBudgetFromMarkers(markers);
+    function computeInvisibleLoads(markers, evidence = {}) {
+      const motrice = 36
+        + markerImpact(evidence, 'writing', 8, 2, 2, 3)
+        + markerImpact(evidence, 'mobility', 8, 2, 2, 3)
+        + markerImpact(evidence, 'posture', 7, 2, 2, 2)
+        + markerImpact(evidence, 'compensation', 4, 1, 2, 2);
+      const cognitive = 34
+        + markerImpact(evidence, 'planning', 9, 2, 2, 3)
+        + markerImpact(evidence, 'compensation', 7, 2, 2, 2)
+        + markerImpact(evidence, 'temporality', 5, 1, 2, 2)
+        + markerImpact(evidence, 'pain', 3, 1, 2, 2);
+      const organisationnelle = 30
+        + markerImpact(evidence, 'planning', 12, 2, 2, 3)
+        + markerImpact(evidence, 'mobility', 5, 1, 2, 2)
+        + markerImpact(evidence, 'autonomy', 4, 1, 2, 2);
+      const sociale = 24
+        + markerImpact(evidence, 'social', 14, 2, 2, 3)
+        + markerImpact(evidence, 'irritability', 5, 1, 2, 2)
+        + markerImpact(evidence, 'autonomy', 3, 1, 2, 2);
+      const energetique = 100 - computeResourceBudgetFromMarkers(markers, evidence);
       return [
         { label: 'Charge motrice', value: Math.min(92, motrice), color: 'bg-indigo-500', text: motrice >= 75 ? 'Élevée' : motrice >= 55 ? 'Modérée à élevée' : 'Modérée' },
         { label: 'Charge cognitive', value: Math.min(90, cognitive), color: 'bg-pink-500', text: cognitive >= 72 ? 'Élevée' : cognitive >= 52 ? 'Modérée à élevée' : 'Modérée' },
@@ -951,9 +1014,11 @@ const MARKERS = {
     }
 
     function runAnalysis() {
-      const allText = [state.data.equipment, state.data.diagnosis, state.data.obs.story, state.data.obs.time, state.data.obs.compensation, state.data.obs.charges, state.data.obs.situations].join(' | ').toLowerCase();
+      const textParts = [state.data.equipment, state.data.diagnosis, state.data.obs.story, state.data.obs.time, state.data.obs.compensation, state.data.obs.charges, state.data.obs.situations];
+      const allText = textParts.join(' | ').toLowerCase();
+      const markerEvidence = buildMarkerEvidence(textParts);
       const markers = {};
-      Object.entries(MARKERS).forEach(([key, words]) => { markers[key] = hasKeyword(allText, words); });
+      Object.entries(MARKERS).forEach(([key, words]) => { markers[key] = (markerEvidence[key]?.weightedCount || 0) > 0 || hasKeyword(allText, words); });
       const pathologies = detectPathologies(state.data.diagnosis || '');
       const pathology = pathologies[0]?.match || null;
       const situations = Object.entries(SITUATION_MAP).filter(([, words]) => hasKeyword(allText, words)).map(([label]) => label);
@@ -974,11 +1039,11 @@ const MARKERS = {
       pathologies.forEach(item => item.match.mechanisms.forEach(m => { if (!mechanisms.includes(m)) mechanisms.push(m); }));
 
       const accommodations = ACCOMMODATION_RULES.filter(rule => rule.when.every(w => markers[w]) || rule.when.some(w => markers[w])).slice(0, 7);
-      const energyScore = computeResourceBudgetFromMarkers(markers);
-      const invisibleLoads = computeInvisibleLoads(markers);
+      const energyScore = computeResourceBudgetFromMarkers(markers, markerEvidence);
+      const invisibleLoads = computeInvisibleLoads(markers, markerEvidence);
       const surchargeScore = 100 - energyScore;
 
-      state.analysis = { markers, matchedPathology: pathology, matchedPathologies: pathologies.map(item => item.match), situations, inferredMechanisms: mechanisms, accommodations, surchargeScore, energyScore, invisibleLoads };
+      state.analysis = { markers, markerEvidence, matchedPathology: pathology, matchedPathologies: pathologies.map(item => item.match), situations, inferredMechanisms: mechanisms, accommodations, surchargeScore, energyScore, invisibleLoads };
     }
 
     function buildDoubleRegard() {
@@ -999,7 +1064,7 @@ const MARKERS = {
       };
     }
 
-    function getActiveAxesFromMarkers(markers = {}, energyScore = 75, matchedPathology = null, equipment = '') {
+    function getActiveAxesFromMarkers(markers = {}, energyScore = 75, matchedPathology = null, equipment = '', markerEvidence = {}) {
       const axes = [];
       const addAxis = (label) => { if (!axes.includes(label)) axes.push(label); };
 
@@ -1012,7 +1077,7 @@ const MARKERS = {
       if (markers.temporality) addAxis('temporalité de la journée');
       if (markers.compensation) addAxis('stratégies de compensation');
       if (markers.autonomy) addAxis('autonomie paradoxale / besoin d’aide humaine');
-      const previewLoads = computeInvisibleLoads(markers);
+      const previewLoads = computeInvisibleLoads(markers, markerEvidence);
       if (previewLoads?.some(load => load.value >= 55)) addAxis('charge scolaire cumulée');
 
       return axes.length ? axes : ['fatigue / coût énergétique'];
@@ -1023,7 +1088,8 @@ const MARKERS = {
         state.analysis.markers || {},
         state.analysis.energyScore || 75,
         state.analysis.matchedPathology || null,
-        state.data.equipment || ''
+        state.data.equipment || '',
+        state.analysis.markerEvidence || {}
       );
     }
 
@@ -1048,19 +1114,21 @@ const MARKERS = {
         situations: overrides.situations !== undefined ? overrides.situations : state.data.obs.situations
       };
 
-      const allText = [combined.equipment, combined.diagnosis, combined.story, combined.time, combined.compensation, combined.charges, combined.situations]
+      const textParts = [combined.equipment, combined.diagnosis, combined.story, combined.time, combined.compensation, combined.charges, combined.situations];
+      const allText = textParts
         .filter(Boolean)
         .join(' | ')
         .toLowerCase();
 
+      const markerEvidence = buildMarkerEvidence(textParts);
       const markers = {};
       Object.entries(MARKERS).forEach(([key, words]) => {
-        markers[key] = hasKeyword(allText, words);
+        markers[key] = (markerEvidence[key]?.weightedCount || 0) > 0 || hasKeyword(allText, words);
       });
 
       const matchedPathology = detectPathologies(combined.diagnosis || '')[0]?.match || null;
-      const energyScore = computeResourceBudgetFromMarkers(markers);
-      return getActiveAxesFromMarkers(markers, energyScore, matchedPathology, combined.equipment || '');
+      const energyScore = computeResourceBudgetFromMarkers(markers, markerEvidence);
+      return getActiveAxesFromMarkers(markers, energyScore, matchedPathology, combined.equipment || '', markerEvidence);
     }
 
     function buildAxesPreviewMessage(axes, intro = 'Je repère déjà') {
@@ -1083,7 +1151,7 @@ const MARKERS = {
       addMessage('bot', buildAxesPreviewMessage(axesToShow, intro), true);
     }
 
-    function computeResourceBudget() { return state.analysis.energyScore || 75; }
+    function computeResourceBudget() { return typeof state.analysis.energyScore === 'number' ? state.analysis.energyScore : 75; }
 
     function getMissingExplorationAreas() {
       const missing = [];
@@ -1452,10 +1520,11 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
                 <p class="text-sm text-slate-600">SOAH estime qu’il resterait environ <strong>${budget}% d’énergie que ${p.subject} peut encore mobiliser pour la tâche scolaire</strong>, au regard des contraintes décrites.</p>
                 <p class="text-xs text-slate-500 mt-2">Cette estimation n’est pas une mesure médicale. Elle est construite à partir des indices repérés dans l’échange : ${scoreExplanation.length ? scoreExplanation.join(', ') : 'peu d’indices suffisamment précis à ce stade'}.</p>
                 <p class="text-xs text-slate-500 mt-2">Plus ces indices s’accumulent, plus SOAH considère qu’une partie importante de l’énergie de ${p.object} est déjà utilisée avant même d’entrer pleinement dans la tâche scolaire.</p>
+                <p class="text-xs text-slate-500 mt-2">SOAH tient aussi compte de la répétition des signaux dans plusieurs réponses : une fatigue citée à plusieurs reprises ne pèse pas comme une mention isolée.</p>
                 <p class="text-xs text-slate-500 mt-3">Indice de surcharge estimé : <strong>${state.analysis.surchargeScore}%</strong>. Plus cet indice est élevé, plus ${p.subject} risque d’utiliser une grande partie de son énergie simplement pour participer aux activités scolaires.</p>
                 <div class="mt-4 bg-rose-50 border border-rose-200 rounded-2xl p-4">
                   <p class="text-[11px] font-black uppercase tracking-widest text-rose-700 mb-1">Repère méthodologique</p>
-                  <p class="text-xs text-slate-600">Cet indice est indicatif. Il repose sur des marqueurs repérés automatiquement dans l’échange et sur des pondérations fixes. Deux descriptions différentes peuvent donc produire un niveau proche, même si l’une contient plus de détails que l’autre. Il sert à visualiser une tendance pédagogique, pas à quantifier précisément la situation.</p>
+                  <p class="text-xs text-slate-600">Cet indice est indicatif. Il repose sur des marqueurs repérés automatiquement dans l’échange, avec une pondération qui tient désormais compte de la fréquence et de la répartition des mentions dans vos réponses. Il reflète donc mieux l’accumulation de signaux qu’une présence binaire, mais il reste une aide à la lecture pédagogique, pas une mesure clinique ou un score objectif de gravité.</p>
                 </div>
               </div>
             </div>
@@ -1483,7 +1552,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 
             <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
               <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-2">Carte des charges invisibles</p>
-              <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur ${p.object} dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite.</p>
+              <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur ${p.object} dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite. Une charge mentionnée à plusieurs reprises dans plusieurs réponses pèse davantage qu’un signal isolé, sans pour autant transformer ce graphique en mesure clinique.</p>
               <div class="space-y-5">${state.analysis.invisibleLoads.map(c => `<div><div class="flex justify-between text-xs font-bold text-slate-600 uppercase mb-2"><span>${c.label}</span><span>${c.text}</span></div><div class="meter"><div class="${c.color}" style="width:${c.value}%"></div></div><p class="text-xs text-slate-500 mt-2">${(loadReasons[c.label] && loadReasons[c.label].length) ? `Ce niveau est retenu notamment à partir de : ${loadReasons[c.label].join(', ')}.` : 'Ce niveau reste provisoire car peu d’indices spécifiques ont été relevés pour cette charge.'}</p></div>`).join('')}</div>
             </div>
 
