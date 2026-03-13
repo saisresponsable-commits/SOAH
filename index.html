@@ -503,6 +503,7 @@ const MARKERS = {
       const chatInterface = document.getElementById('chat-interface');
       chatInterface.classList.remove('hidden');
       chatInterface.classList.add('flex', 'flex-col');
+      refreshGenderIndicator();
       addMessage('bot', INTRO_SOAH);
       offerSkipChoices();
       state.step = 'pseudo';
@@ -535,14 +536,62 @@ const MARKERS = {
       return dp[m][n];
     }
 
+    const FEMININE_NAMES = ['emma','lea','léa','louise','julie','clara','sarah','zoe','zoé','anna','lina','manon','jade','ines','inès','camille','chloe','chloé','eva','eve','romane','alice','lucie','juliette','rose','ambre','jeanne','elise','élise','mila','lola','agathe','nina','margaux','charlotte','celia','célia','noemie','noémie','marie','victoria'];
+    const MASCULINE_NAMES = ['leo','léo','lucas','hugo','noah','noa','gabriel','arthur','jules','adam','nathan','tom','paul','mael','maël','enzo','louis','raphael','raphaël','theo','théo','mathis','matheo','mathéo','antoine','baptiste','maxime','sacha','valentin','alexandre','samuel','ethan','florian','quentin','yanis','clement','clément','marius','tiago','timeo','timéo'];
+
     function detectGenderFromText(text = '') {
       const low = normalizeText(text);
-      const feminineHints = [' elle ', ' elle est ', ' cette eleve ', ' cette enfant ', ' ma fille ', ' une fille '];
-      const masculineHints = [' il ', ' il est ', ' cet eleve ', ' cet enfant ', ' mon fils ', ' un garcon '];
+      if (!low) return { gender: 'unknown', confidence: 0, fScore: 0, mScore: 0 };
+
+      let fScore = 0;
+      let mScore = 0;
       const padded = ` ${low} `;
-      if (feminineHints.some(hint => padded.includes(hint))) return 'f';
-      if (masculineHints.some(hint => padded.includes(hint))) return 'm';
-      return 'unknown';
+
+      [' elle ', ' elle est ', ' elle semble ', ' elle parait '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 3; });
+      [' il ', ' il est ', ' il semble ', ' il parait '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 3; });
+
+      [' cette eleve ', ' cette enfant ', ' ma fille ', ' une fille ', ' la fille ', ' une eleve '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 2; });
+      [' cet eleve ', ' cet enfant ', ' mon fils ', ' un garcon ', ' le garcon ', ' un eleve '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 2; });
+
+      [' fille ', ' elevee ', ' adolescente ', ' jeune fille '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 2; });
+      [' garcon ', ' adolescent ', ' jeune homme '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 2; });
+
+      FEMININE_NAMES.forEach(name => { if (padded.includes(` ${normalizeText(name)} `)) fScore += 2; });
+      MASCULINE_NAMES.forEach(name => { if (padded.includes(` ${normalizeText(name)} `)) mScore += 2; });
+
+      ['fatiguee','agitee','tendue','essoufflee','epuisee','crispee','figee','ralentie'].forEach(word => { if (padded.includes(` ${word} `)) fScore += 1; });
+      ['fatigue','agite','tendu','essouffle','epuise','crispe','fige','ralenti'].forEach(word => { if (padded.includes(` ${word} `)) mScore += 1; });
+
+      if (fScore >= mScore + 2) return { gender: 'f', confidence: fScore - mScore, fScore, mScore };
+      if (mScore >= fScore + 2) return { gender: 'm', confidence: mScore - fScore, fScore, mScore };
+      return { gender: 'unknown', confidence: 0, fScore, mScore };
+    }
+
+    function refreshGenderIndicator() {
+      const status = document.getElementById('soa-status');
+      if (!status) return;
+      const base = '<span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span> Cheminement pédagogique';
+      if (state.data.gender === 'f') {
+        status.innerHTML = `${base} <span class="text-pink-500 normal-case font-semibold">· genre détecté : féminin</span>`;
+      } else if (state.data.gender === 'm') {
+        status.innerHTML = `${base} <span class="text-sky-500 normal-case font-semibold">· genre détecté : masculin</span>`;
+      } else {
+        status.innerHTML = base;
+      }
+    }
+
+    function updateGenderFromText(text = '') {
+      const detected = detectGenderFromText(text);
+      if (state.data.gender === 'unknown' && detected.gender !== 'unknown') {
+        state.data.gender = detected.gender;
+        refreshGenderIndicator();
+      }
+      return state.data.gender;
+    }
+
+    function maybeAskGenderClarification() {
+      const explored = [state.data.obs.story, state.data.obs.time, state.data.obs.compensation].filter(Boolean).length;
+      return state.data.gender === 'unknown' && explored >= 2;
     }
 
     function getPronouns() {
@@ -557,17 +606,40 @@ const MARKERS = {
         if (low.includes(normalizeText(key))) return { match: PATHOLOGY_DB[key], key, fuzzy: false };
       }
       if (!low) return null;
+
+      const inputTokens = low.split(' ').filter(Boolean);
       let best = null;
+      let bestDistance = Infinity;
       let bestRatio = Infinity;
+
       for (const key of Object.keys(PATHOLOGY_DB)) {
         const candidate = normalizeText(key);
-        const distance = levenshtein(low, candidate);
-        const ratio = distance / Math.max(low.length, candidate.length, 1);
-        if (ratio < 0.36 && ratio < bestRatio) {
-          bestRatio = ratio;
+        const candidateTokens = candidate.split(' ').filter(Boolean);
+
+        const fullDistance = levenshtein(low, candidate);
+        const fullRatio = fullDistance / Math.max(low.length, candidate.length, 1);
+        if (fullRatio < 0.36 && fullDistance < bestDistance) {
+          bestDistance = fullDistance;
+          bestRatio = fullRatio;
           best = key;
         }
+
+        for (const inputToken of inputTokens) {
+          for (const candidateToken of candidateTokens) {
+            const distance = levenshtein(inputToken, candidateToken);
+            const maxAllowed = candidateToken.length >= 8 ? 3 : 2;
+            const ratio = distance / Math.max(inputToken.length, candidateToken.length, 1);
+            if (distance <= maxAllowed && ratio < 0.34) {
+              if (distance < bestDistance || (distance === bestDistance && ratio < bestRatio)) {
+                bestDistance = distance;
+                bestRatio = ratio;
+                best = key;
+              }
+            }
+          }
+        }
       }
+
       return best ? { match: PATHOLOGY_DB[best], key: best, fuzzy: true } : null;
     }
 
@@ -851,6 +923,7 @@ const MARKERS = {
       switch (state.step) {
         case 'pseudo':
           state.data.pseudo = cleanInput || 'Élève';
+          updateGenderFromText(cleanInput);
           addMessage('bot', `Merci. Dans quel niveau scolaire se trouve ${state.data.pseudo} ?`);
           offerSkipChoices();
           state.step = 'level';
@@ -930,7 +1003,7 @@ const MARKERS = {
         }
         case 'obs_story': {
           state.data.obs.story = cleanInput;
-          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
+          updateGenderFromText(cleanInput);
           // On analyse ici l'entrée brute pour repérer immédiatement des signaux saillants dans la formulation spontanée de l'enseignant.
           const quick = detectQuickMarkers(input);
 
@@ -951,12 +1024,28 @@ const MARKERS = {
 
         case 'temporal': {
           state.data.obs.time = cleanInput;
-          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
+          updateGenderFromText(cleanInput);
 
           const temporalAxes = previewAxesFromPartialData({ time: cleanInput });
           maybeShowAxesPreview(temporalAxes, 'Avec ce que vous ajoutez, je vois plus nettement');
           addMessage('bot', `D'accord. Une autre question aide souvent à comprendre le coût invisible : avez-vous l'impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
 
+          if (maybeAskGenderClarification()) {
+            addMessage('bot', `Pour que je formule la suite de manière plus juste, parlez-vous d’un garçon ou d’une fille ? Si vous préférez, vous pouvez aussi passer cette question.`);
+            offerSkipChoices();
+            state.step = 'gender_clarification';
+          } else {
+            offerSkipChoices();
+            state.step = 'compensation';
+          }
+          break;
+        }
+
+        case 'gender_clarification': {
+          const low = cleanInput.toLowerCase();
+          if (low.includes('fille') || low.includes('elle')) state.data.gender = 'f';
+          else if (low.includes('garçon') || low.includes('garcon') || low.includes('il')) state.data.gender = 'm';
+          addMessage('bot', `Merci. Une autre question aide souvent à comprendre le coût invisible : avez-vous l'impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
           offerSkipChoices();
           state.step = 'compensation';
           break;
@@ -964,7 +1053,7 @@ const MARKERS = {
 
         case 'compensation': {
           state.data.obs.compensation = cleanInput;
-          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
+          updateGenderFromText(cleanInput);
 
           const compensationAxes = previewAxesFromPartialData({ compensation: cleanInput });
           maybeShowAxesPreview(compensationAxes, 'Votre description fait maintenant ressortir');
@@ -979,7 +1068,7 @@ const MARKERS = {
 
         case 'situations': {
           state.data.obs.situations = cleanInput;
-          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
+          updateGenderFromText(cleanInput);
 
           const situationAxes = previewAxesFromPartialData({ situations: cleanInput });
           maybeShowAxesPreview(situationAxes, 'À partir des situations que vous citez, je retiens surtout');
@@ -999,7 +1088,7 @@ const MARKERS = {
 
         case 'charges':
           state.data.obs.charges = cleanInput;
-          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
+          updateGenderFromText(cleanInput);
 
           addMessage('bot', `Merci pour ces éléments. Avant de proposer une synthèse, je reformule ce qui ressort de vos observations :
 
@@ -1078,7 +1167,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
         <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden report-card">
           <div class="soa-gradient text-white p-12">
             <h2 class="text-4xl font-bold tracking-tight">Boussole de compréhension</h2>
-            <p class="mt-4 text-xl opacity-90 italic">Ce que l'on voit n'est pas toujours le vrai coût payé par l'élève pour participer.</p>
+            <p class="mt-4 text-xl opacity-90 italic">Ce que l'on voit n'est pas toujours le vrai coût payé par ${state.data.gender === 'f' ? 'elle' : state.data.gender === 'm' ? 'lui' : 'l’élève'} pour participer.</p>
           </div>
 
           <div class="p-8 md:p-16 space-y-10">
@@ -1095,6 +1184,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
                 <p class="text-sm font-black uppercase tracking-widest text-slate-700 mb-4">Portrait rapide</p>
                 <div class="space-y-2 text-sm text-slate-700">
                   <p><strong>Élève :</strong> ${escapeHtml(state.data.pseudo || '—')}</p>
+                  <p><strong>Genre repéré :</strong> ${state.data.gender === 'f' ? 'Fille' : state.data.gender === 'm' ? 'Garçon' : 'Non précisé'}</p>
                   <p><strong>Niveau :</strong> ${escapeHtml(state.data.level || '—')}</p>
                   <p><strong>Appareillage / aides :</strong> ${escapeHtml(state.data.equipment || 'Non précisé')}</p>
                 </div>
@@ -1191,7 +1281,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
       chatInterface.classList.remove('hidden');
       chatInterface.classList.add('flex', 'flex-col');
       document.getElementById('input-ui').classList.add('hidden');
-      document.getElementById('soa-status').innerHTML = '<span class="w-1.5 h-1.5 bg-pink-400 rounded-full animate-pulse"></span> Simulation guidée approfondie';
+      document.getElementById('soa-status').innerHTML = '<span class="w-1.5 h-1.5 bg-pink-400 rounded-full animate-pulse"></span> Simulation guidée approfondie · genre détecté : masculin';
       clearChoices();
       chatEl.innerHTML = '';
 
