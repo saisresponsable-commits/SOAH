@@ -212,6 +212,14 @@ Comment souhaitez-vous appeler votre élève ?`;
     shortDefinition: 'Trouble du développement avec retentissement neurologique pouvant toucher le mouvement, l’expression ou l’endurance.',
     dailyImpact: ['difficulté à montrer ce qui est compris', 'effort moteur important', 'variabilité dans l’expression'],
     schoolImpact: ['écart entre compréhension et production visible', 'besoin d’interprétation prudente', 'importance des médiations adaptées']
+  },
+  'Trouble des apprentissages': {
+    mechanisms: ['effort cognitif caché', 'double tâche coûteuse', 'variabilité'],
+    pedagogicalWarning: 'Le niveau de compréhension globale ne se lit pas toujours dans la performance scolaire visible, surtout lorsque le coût cognitif devient important.',
+    documentation: 'Le trouble des apprentissages n’enlève pas l’envie d’apprendre ni l’intelligence. En revanche, certaines opérations scolaires peuvent demander beaucoup plus d’effort, de temps et d’étayage pour un résultat parfois inégal.',
+    shortDefinition: 'Trouble spécifique des apprentissages qui peut rendre certaines tâches scolaires beaucoup plus coûteuses malgré une compréhension parfois préservée.',
+    dailyImpact: ['fatigue cognitive lors des tâches ciblées', 'sentiment d’échec ou d’effort disproportionné', 'besoin d’appuis explicites et de procédures stables'],
+    schoolImpact: ['traitement plus lent de certaines tâches scolaires', 'double tâche souvent coûteuse', 'importance d’adaptations pédagogiques ciblées']
   }
 };
 
@@ -224,6 +232,7 @@ const PATHOLOGY_CATALOG = [
   ['traumatisme crânien','Traumatisme crânien','Atteinte neurologique acquise'],['tumeur cérébrale séquellaire','Séquelles de tumeur cérébrale','Atteinte neurologique acquise'],['hydrocéphalie séquellaire','Hydrocéphalie avec retentissement moteur','Atteinte neurologique acquise'],['méningite séquellaire','Séquelles de méningite','Atteinte neurologique acquise'],['abcès cérébral séquellaire','Séquelles d’abcès cérébral','Atteinte neurologique acquise'],['avc pédiatrique','AVC pédiatrique','Atteinte neurologique acquise'],['anoxie cérébrale séquellaire','Séquelles d’anoxie cérébrale','Atteinte neurologique acquise'],['encéphalopathie acquise','Encéphalopathie acquise','Atteinte neurologique acquise'],['lésion cérébelleuse acquise','Lésion cérébelleuse acquise','Atteinte neurologique acquise'],
   ['spina bifida','Spina bifida','Malformation neurologique'],['myéloméningocèle','Myéloméningocèle','Malformation neurologique'],['lipomyéloméningocèle','Lipomyéloméningocèle','Malformation neurologique'],['moelle attachée','Syndrome de moelle attachée','Malformation neurologique'],['malformation d’arnold-chiari','Malformation d’Arnold-Chiari','Malformation neurologique'],['agénésie partielle du corps calleux avec retentissement moteur','Agénésie partielle du corps calleux avec retentissement moteur','Malformation neurologique'],['malformation corticale avec retentissement moteur','Malformation corticale avec retentissement moteur','Malformation neurologique'],
   ['dystonie','Dystonie','Trouble du mouvement'],['dystonie généralisée','Dystonie généralisée','Trouble du mouvement'],['hémidystonie','Hémidystonie','Trouble du mouvement'],['chorée','Chorée','Trouble du mouvement'],['athétose','Athétose','Trouble du mouvement'],['ballisme','Ballisme','Trouble du mouvement'],['tremblement essentiel sévère','Tremblement essentiel sévère','Trouble du mouvement'],['syndrome cérébelleux','Syndrome cérébelleux','Trouble du mouvement'],['dyspraxie motrice sévère','Dyspraxie motrice sévère','Trouble du mouvement'],['trouble moteur fonctionnel','Trouble moteur fonctionnel','Trouble du mouvement'],
+  ['dyscalculie','Dyscalculie','Trouble des apprentissages'],
   ['maladie mitochondriale','Maladie mitochondriale','Maladie métabolique / mitochondriale'],['syndrome de leigh','Syndrome de Leigh','Maladie métabolique / mitochondriale'],['mélas','MELAS','Maladie métabolique / mitochondriale'],['merrf','MERRF','Maladie métabolique / mitochondriale'],['déficit multiple de la chaîne respiratoire','Déficit multiple de la chaîne respiratoire','Maladie métabolique / mitochondriale'],['glycogénose avec retentissement moteur','Glycogénose avec retentissement moteur','Maladie métabolique / mitochondriale'],['acidémie organique avec retentissement moteur','Acidémie organique avec retentissement moteur','Maladie métabolique / mitochondriale'],['déficit en pyruvate déshydrogénase','Déficit en pyruvate déshydrogénase','Maladie métabolique / mitochondriale'],
   ['paraplégie traumatique','Paraplégie traumatique','Atteinte médullaire / neuromusculaire acquise'],['tétraplégie traumatique','Tétraplégie traumatique','Atteinte médullaire / neuromusculaire acquise'],['lésion médullaire incomplète','Lésion médullaire incomplète','Atteinte médullaire / neuromusculaire acquise'],['compression médullaire séquellaire','Séquelles de compression médullaire','Atteinte médullaire / neuromusculaire acquise'],['syndrome post-polio','Syndrome post-polio','Atteinte médullaire / neuromusculaire acquise'],['poliomyélite séquellaire','Séquelles de poliomyélite','Atteinte médullaire / neuromusculaire acquise'],['plexopathie brachiale sévère','Plexopathie brachiale sévère','Atteinte médullaire / neuromusculaire acquise'],['syndrome de la queue de cheval séquellaire','Séquelles de syndrome de la queue de cheval','Atteinte médullaire / neuromusculaire acquise'],
   ['syndrome de rett','Syndrome de Rett','Trouble neurologique du développement'],['syndrome d’angelman avec retentissement moteur','Syndrome d’Angelman avec retentissement moteur','Trouble neurologique du développement'],['syndrome de phelan-mcdermid avec hypotonie','Syndrome de Phelan-McDermid avec hypotonie','Trouble neurologique du développement'],['syndrome de prader-willi avec retentissement moteur','Syndrome de Prader-Willi avec retentissement moteur','Trouble neurologique du développement'],['syndrome de williams avec retentissement moteur','Syndrome de Williams avec retentissement moteur','Trouble neurologique du développement'],['trisomie 21 avec retentissement moteur important','Trisomie 21 avec retentissement moteur important','Trouble neurologique du développement'],['syndrome de charge avec retentissement moteur','Syndrome CHARGE avec retentissement moteur','Trouble neurologique du développement'],['syndrome de kabuki avec hypotonie','Syndrome de Kabuki avec hypotonie','Trouble neurologique du développement'],['syndrome de joubert','Syndrome de Joubert','Trouble neurologique du développement'],['syndrome de deletion 22q11 avec retentissement moteur','Syndrome de délétion 22q11 avec retentissement moteur','Trouble neurologique du développement'],
@@ -283,6 +292,7 @@ const MARKERS = {
         equipment: '',
         diagnosis: '',
         gender: 'unknown',
+        genderSource: 'none',
         knownDiagnosis: false,
         pathologyPermissionAsked: false,
         pathologyPermissionGranted: false,
@@ -291,6 +301,7 @@ const MARKERS = {
       analysis: {
         markers: {},
         matchedPathology: null,
+        matchedPathologies: [],
         situations: [],
         inferredMechanisms: [],
         accommodations: [],
@@ -536,35 +547,58 @@ const MARKERS = {
       return dp[m][n];
     }
 
-    const FEMININE_NAMES = ['emma','lea','léa','louise','julie','clara','sarah','zoe','zoé','anna','lina','manon','jade','ines','inès','camille','chloe','chloé','eva','eve','romane','alice','lucie','juliette','rose','ambre','jeanne','elise','élise','mila','lola','agathe','nina','margaux','charlotte','celia','célia','noemie','noémie','marie','victoria'];
-    const MASCULINE_NAMES = ['leo','léo','lucas','hugo','noah','noa','gabriel','arthur','jules','adam','nathan','tom','paul','mael','maël','enzo','louis','raphael','raphaël','theo','théo','mathis','matheo','mathéo','antoine','baptiste','maxime','sacha','valentin','alexandre','samuel','ethan','florian','quentin','yanis','clement','clément','marius','tiago','timeo','timéo'];
+    const FEMININE_NAMES = ['emma','lea','léa','louise','julie','clara','sarah','zoe','zoé','anna','lina','manon','jade','ines','inès','camille','chloe','chloé','eva','eve','romane','alice','lucie','juliette','rose','ambre','jeanne','elise','élise','mila','lola','agathe','nina','margaux','charlotte','celia','célia','noemie','noémie','marie','victoria','sonia','sofia','sophia','amelie','amélie','nadia','yasmine','maya','maia','elodie','élodie','laura','laurie','anais','anaïs','helena','héléna','helene','hélène','aurelie','aurélie','valerie','valérie','caroline','pauline','marine','salome','salomé','sabrina','morgane','fanny','sophie','nora','louna','mya','aya','inesse','asma','leila','leïla','samira','farah','amal','nour','inesh','maelle','maëlle','oriane','anais','clémence','clemence','mathilde','adelaide','adélaïde','aude','elsa','gaelle','gaëlle','hanna','hannah','sana','sara','sabrina','estelle','lise','maud','melissa','mélissa','oceane','océane','noaemie'];
+    const MASCULINE_NAMES = ['leo','léo','lucas','hugo','noah','noa','gabriel','arthur','jules','adam','nathan','tom','paul','mael','maël','enzo','louis','raphael','raphaël','theo','théo','mathis','matheo','mathéo','antoine','baptiste','maxime','sacha','valentin','alexandre','samuel','ethan','florian','quentin','yanis','clement','clément','marius','tiago','timeo','timéo','sofiane','sofian','yassine','amine','mehdi','mehdi','mehdy','aymen','aymane','ilyes','ilyas','bilal','nassim','karim','walid','samy','sami','ismail','ismael','omar','adam','rayane','riyan','nolan','loan','matteo','mattéo','matéo','mohamed','mohammed','ibrahim','ali','youssef','jordan','kevin','kévin','dylan','logan','antoin','joris','damien','julien','loic','loïc','gaspard','aaron','gaetan','gaétan','thibault','thomas','benjamin','antoin','bastien','maelys'];
+
+    function detectExplicitGender(text = '') {
+      const low = normalizeText(text);
+      if (!low) return 'unknown';
+      const padded = ` ${low} `;
+
+      const feminineHints = [
+        ' c est une fille ', ' cest une fille ', ' c'est une fille ',
+        ' ma fille ', ' une fille ', ' la fille ', ' elle ', ' elle est ', ' elle a ', ' elle utilise ',
+        ' cette eleve ', ' cette enfant ', ' une eleve ', ' une enfant ', ' feminine ', ' feminin '
+      ].map(normalizeText);
+
+      const masculineHints = [
+        ' c est un garcon ', ' cest un garcon ', ' c'est un garcon ',
+        ' mon fils ', ' un garcon ', ' le garcon ', ' il ', ' il est ', ' il a ', ' il utilise ',
+        ' cet eleve ', ' cet enfant ', ' un eleve ', ' masculin ', ' masculine '
+      ].map(normalizeText);
+
+      if (feminineHints.some(hint => padded.includes(hint))) return 'f';
+      if (masculineHints.some(hint => padded.includes(hint))) return 'm';
+      return 'unknown';
+    }
 
     function detectGenderFromText(text = '') {
       const low = normalizeText(text);
-      if (!low) return { gender: 'unknown', confidence: 0, fScore: 0, mScore: 0 };
+      if (!low) return { gender: 'unknown', confidence: 0, fScore: 0, mScore: 0, fromName: false };
 
       let fScore = 0;
       let mScore = 0;
+      let fromName = false;
       const padded = ` ${low} `;
 
-      [' elle ', ' elle est ', ' elle semble ', ' elle parait '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 3; });
-      [' il ', ' il est ', ' il semble ', ' il parait '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 3; });
+      [' elle ', ' elle est ', ' elle semble ', ' elle parait ', ' elle a ', ' elle utilise '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 3; });
+      [' il ', ' il est ', ' il semble ', ' il parait ', ' il a ', ' il utilise '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 3; });
 
-      [' cette eleve ', ' cette enfant ', ' ma fille ', ' une fille ', ' la fille ', ' une eleve '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 2; });
-      [' cet eleve ', ' cet enfant ', ' mon fils ', ' un garcon ', ' le garcon ', ' un eleve '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 2; });
+      [' cette eleve ', ' cette enfant ', ' ma fille ', ' une fille ', ' la fille ', ' une eleve ', ' c est une fille ', ' cest une fille '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 4; });
+      [' cet eleve ', ' cet enfant ', ' mon fils ', ' un garcon ', ' le garcon ', ' un eleve ', ' c est un garcon ', ' cest un garcon '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 4; });
 
       [' fille ', ' elevee ', ' adolescente ', ' jeune fille '].forEach(hint => { if (padded.includes(normalizeText(hint))) fScore += 2; });
       [' garcon ', ' adolescent ', ' jeune homme '].forEach(hint => { if (padded.includes(normalizeText(hint))) mScore += 2; });
 
-      FEMININE_NAMES.forEach(name => { if (padded.includes(` ${normalizeText(name)} `)) fScore += 2; });
-      MASCULINE_NAMES.forEach(name => { if (padded.includes(` ${normalizeText(name)} `)) mScore += 2; });
+      FEMININE_NAMES.forEach(name => { if (padded.includes(` ${normalizeText(name)} `)) { fScore += 2; fromName = true; } });
+      MASCULINE_NAMES.forEach(name => { if (padded.includes(` ${normalizeText(name)} `)) { mScore += 2; fromName = true; } });
 
       ['fatiguee','agitee','tendue','essoufflee','epuisee','crispee','figee','ralentie'].forEach(word => { if (padded.includes(` ${word} `)) fScore += 1; });
       ['fatigue','agite','tendu','essouffle','epuise','crispe','fige','ralenti'].forEach(word => { if (padded.includes(` ${word} `)) mScore += 1; });
 
-      if (fScore >= mScore + 2) return { gender: 'f', confidence: fScore - mScore, fScore, mScore };
-      if (mScore >= fScore + 2) return { gender: 'm', confidence: mScore - fScore, fScore, mScore };
-      return { gender: 'unknown', confidence: 0, fScore, mScore };
+      if (fScore >= mScore + 2) return { gender: 'f', confidence: fScore - mScore, fScore, mScore, fromName };
+      if (mScore >= fScore + 2) return { gender: 'm', confidence: mScore - fScore, fScore, mScore, fromName };
+      return { gender: 'unknown', confidence: 0, fScore, mScore, fromName };
     }
 
     function refreshGenderIndicator() {
@@ -581,9 +615,30 @@ const MARKERS = {
     }
 
     function updateGenderFromText(text = '') {
+      const explicit = detectExplicitGender(text);
+      const priorities = { none: 0, inferred: 1, name: 2, explicit: 3 };
+      const currentSource = state.data.genderSource || 'none';
+
+      if (explicit !== 'unknown') {
+        state.data.gender = explicit;
+        state.data.genderSource = 'explicit';
+        refreshGenderIndicator();
+        return state.data.gender;
+      }
+
+      if (currentSource === 'explicit') {
+        return state.data.gender;
+      }
+
       const detected = detectGenderFromText(text);
-      if (state.data.gender === 'unknown' && detected.gender !== 'unknown') {
+      if (detected.gender === 'unknown') {
+        return state.data.gender;
+      }
+
+      const nextSource = detected.fromName ? 'name' : 'inferred';
+      if (priorities[nextSource] >= priorities[currentSource]) {
         state.data.gender = detected.gender;
+        state.data.genderSource = nextSource;
         refreshGenderIndicator();
       }
       return state.data.gender;
@@ -633,47 +688,137 @@ const MARKERS = {
       return subject.charAt(0).toUpperCase() + subject.slice(1);
     }
 
-    function detectPathology(text) {
-      const low = normalizeText(text);
-      for (const key of Object.keys(PATHOLOGY_DB)) {
-        if (low.includes(normalizeText(key))) return { match: PATHOLOGY_DB[key], key, fuzzy: false };
+    function detectGenderFromPseudo(pseudo = '') {
+      const normalized = normalizeText((pseudo || '').split(/\s+/)[0] || '');
+      if (!normalized) return 'unknown';
+
+      const feminine = FEMININE_NAMES.map(normalizeText);
+      const masculine = MASCULINE_NAMES.map(normalizeText);
+
+      if (feminine.includes(normalized)) return 'f';
+      if (masculine.includes(normalized)) return 'm';
+      return 'unknown';
+    }
+
+    function getUsesQuestion() {
+      return state.data.gender === 'f' ? 'utilise-t-elle' : state.data.gender === 'm' ? 'utilise-t-il' : 'utilise-t-il ou utilise-t-elle';
+    }
+
+    function scoreCandidateAgainstInput(input, candidate) {
+      const normalizedInput = normalizeText(input);
+      const normalizedCandidate = normalizeText(candidate);
+      if (!normalizedInput || !normalizedCandidate) return Infinity;
+      if (normalizedInput === normalizedCandidate) return 0;
+      if (normalizedCandidate.includes(normalizedInput)) return Math.max(0.02, (normalizedCandidate.length - normalizedInput.length) / Math.max(normalizedCandidate.length * 6, 1));
+      if (normalizedInput.includes(normalizedCandidate)) return Math.max(0.03, (normalizedInput.length - normalizedCandidate.length) / Math.max(normalizedInput.length * 5, 1));
+
+      const inputTokens = normalizedInput.split(' ').filter(Boolean);
+      const candidateTokens = normalizedCandidate.split(' ').filter(Boolean);
+      const shortInput = inputTokens.length <= 2;
+
+      const bestRatios = inputTokens.map(token => {
+        let best = Infinity;
+        for (const candidateToken of candidateTokens) {
+          const distance = levenshtein(token, candidateToken);
+          const ratio = distance / Math.max(token.length, candidateToken.length, 1);
+          if (ratio < best) best = ratio;
+        }
+        return best;
+      });
+
+      const avgInputRatio = bestRatios.reduce((sum, ratio) => sum + ratio, 0) / Math.max(bestRatios.length, 1);
+
+      if (shortInput) {
+        const fullDistance = levenshtein(normalizedInput, normalizedCandidate);
+        const fullRatio = fullDistance / Math.max(normalizedInput.length, normalizedCandidate.length, 1);
+        return Math.min(avgInputRatio, fullRatio * 0.9);
       }
+
+      const candidateCoverage = candidateTokens.filter(candidateToken => {
+        return inputTokens.some(token => {
+          const distance = levenshtein(token, candidateToken);
+          const ratio = distance / Math.max(token.length, candidateToken.length, 1);
+          return ratio <= 0.34;
+        });
+      }).length / Math.max(candidateTokens.length, 1);
+
+      const fullDistance = levenshtein(normalizedInput, normalizedCandidate);
+      const fullRatio = fullDistance / Math.max(normalizedInput.length, normalizedCandidate.length, 1);
+      const coveragePenalty = candidateCoverage < 0.5 ? (0.5 - candidateCoverage) * 0.9 : 0;
+      const lengthPenalty = Math.abs(inputTokens.length - candidateTokens.length) * 0.03;
+
+      return Math.min(
+        fullRatio * 0.75 + avgInputRatio * 0.25 + coveragePenalty + lengthPenalty,
+        avgInputRatio + coveragePenalty + lengthPenalty
+      );
+    }
+
+    function detectBestPathologyCandidate(text = '') {
+      const low = normalizeText(text);
       if (!low) return null;
 
-      const inputTokens = low.split(' ').filter(Boolean);
-      let best = null;
-      let bestDistance = Infinity;
-      let bestRatio = Infinity;
-
       for (const key of Object.keys(PATHOLOGY_DB)) {
-        const candidate = normalizeText(key);
-        const candidateTokens = candidate.split(' ').filter(Boolean);
-
-        const fullDistance = levenshtein(low, candidate);
-        const fullRatio = fullDistance / Math.max(low.length, candidate.length, 1);
-        if (fullRatio < 0.36 && fullDistance < bestDistance) {
-          bestDistance = fullDistance;
-          bestRatio = fullRatio;
-          best = key;
-        }
-
-        for (const inputToken of inputTokens) {
-          for (const candidateToken of candidateTokens) {
-            const distance = levenshtein(inputToken, candidateToken);
-            const maxAllowed = candidateToken.length >= 8 ? 3 : 2;
-            const ratio = distance / Math.max(inputToken.length, candidateToken.length, 1);
-            if (distance <= maxAllowed && ratio < 0.34) {
-              if (distance < bestDistance || (distance === bestDistance && ratio < bestRatio)) {
-                bestDistance = distance;
-                bestRatio = ratio;
-                best = key;
-              }
-            }
-          }
+        const normalizedKey = normalizeText(key);
+        if (low === normalizedKey || low.includes(normalizedKey)) {
+          return { match: PATHOLOGY_DB[key], key, fuzzy: false, input: text };
         }
       }
 
-      return best ? { match: PATHOLOGY_DB[best], key: best, fuzzy: true } : null;
+      const inputTokens = low.split(' ').filter(Boolean);
+      const threshold = inputTokens.length <= 2 ? 0.20 : 0.32;
+      let best = null;
+      let bestScore = Infinity;
+
+      for (const key of Object.keys(PATHOLOGY_DB)) {
+        const score = scoreCandidateAgainstInput(low, key);
+        if (score < bestScore) {
+          bestScore = score;
+          best = key;
+        }
+      }
+
+      if (!best || bestScore > threshold) return null;
+      return { match: PATHOLOGY_DB[best], key: best, fuzzy: true, score: bestScore, input: text };
+    }
+
+    function splitDiagnosisEntries(text = '') {
+      return (text || '')
+        .split(/\b(?:et|avec|associee? a|associée? à|plus)\b|[,;\/\n+]/i)
+        .map(part => part.trim())
+        .filter(Boolean);
+    }
+
+    function detectPathologies(text = '') {
+      const low = normalizeText(text);
+      if (!low) return [];
+
+      const detections = [];
+      const seen = new Set();
+
+      for (const key of Object.keys(PATHOLOGY_DB)) {
+        const normalizedKey = normalizeText(key);
+        if (normalizedKey && low.includes(normalizedKey) && !seen.has(key)) {
+          detections.push({ match: PATHOLOGY_DB[key], key, fuzzy: false, input: text });
+          seen.add(key);
+        }
+      }
+
+      const segments = splitDiagnosisEntries(text);
+      const candidates = segments.length ? segments : [text];
+
+      for (const segment of candidates) {
+        const detection = detectBestPathologyCandidate(segment);
+        if (detection && !seen.has(detection.key)) {
+          detections.push(detection);
+          seen.add(detection.key);
+        }
+      }
+
+      return detections;
+    }
+
+    function detectPathology(text) {
+      return detectPathologies(text)[0] || null;
     }
 
     function getPathologyImpact(pathologyName = '') {
@@ -769,7 +914,8 @@ const MARKERS = {
       const allText = [state.data.equipment, state.data.diagnosis, state.data.obs.story, state.data.obs.time, state.data.obs.compensation, state.data.obs.charges, state.data.obs.situations].join(' | ').toLowerCase();
       const markers = {};
       Object.entries(MARKERS).forEach(([key, words]) => { markers[key] = hasKeyword(allText, words); });
-      const pathology = detectPathology(state.data.diagnosis)?.match || null;
+      const pathologies = detectPathologies(state.data.diagnosis || '');
+      const pathology = pathologies[0]?.match || null;
       const situations = Object.entries(SITUATION_MAP).filter(([, words]) => hasKeyword(allText, words)).map(([label]) => label);
 
       const mechanisms = [];
@@ -785,14 +931,14 @@ const MARKERS = {
       if (markers.irritability) mechanisms.push('risque de mésinterprétation du comportement en signe d’épuisement');
       if (markers.autonomy) mechanisms.push('autonomie apparente possiblement coûteuse');
       if (markers.slowness) mechanisms.push('ralentissement pouvant traduire un effort de contrôle ou une surcharge');
-      if (pathology) pathology.mechanisms.forEach(m => { if (!mechanisms.includes(m)) mechanisms.push(m); });
+      pathologies.forEach(item => item.match.mechanisms.forEach(m => { if (!mechanisms.includes(m)) mechanisms.push(m); }));
 
       const accommodations = ACCOMMODATION_RULES.filter(rule => rule.when.every(w => markers[w]) || rule.when.some(w => markers[w])).slice(0, 7);
       const energyScore = computeResourceBudgetFromMarkers(markers);
       const invisibleLoads = computeInvisibleLoads(markers);
       const surchargeScore = 100 - energyScore;
 
-      state.analysis = { markers, matchedPathology: pathology, situations, inferredMechanisms: mechanisms, accommodations, surchargeScore, energyScore, invisibleLoads };
+      state.analysis = { markers, matchedPathology: pathology, matchedPathologies: pathologies.map(item => item.match), situations, inferredMechanisms: mechanisms, accommodations, surchargeScore, energyScore, invisibleLoads };
     }
 
     function buildDoubleRegard() {
@@ -872,7 +1018,7 @@ const MARKERS = {
         markers[key] = hasKeyword(allText, words);
       });
 
-      const matchedPathology = detectPathology(combined.diagnosis || '')?.match || null;
+      const matchedPathology = detectPathologies(combined.diagnosis || '')[0]?.match || null;
       const energyScore = computeResourceBudgetFromMarkers(markers);
       return getActiveAxesFromMarkers(markers, energyScore, matchedPathology, combined.equipment || '');
     }
@@ -953,17 +1099,28 @@ const MARKERS = {
 
     function processStep(input) {
       const cleanInput = sanitizeStepInput(input);
+      if (state.step !== 'pseudo') {
+        updateGenderFromText(cleanInput);
+      }
       switch (state.step) {
         case 'pseudo':
           state.data.pseudo = cleanInput || 'Élève';
-          updateGenderFromText(cleanInput);
+          const pseudoGender = detectGenderFromPseudo(cleanInput);
+          if (pseudoGender !== 'unknown') {
+            state.data.gender = pseudoGender;
+            state.data.genderSource = 'name';
+            refreshGenderIndicator();
+          } else {
+            updateGenderFromText(cleanInput);
+          }
           addMessage('bot', `Merci. Dans quel niveau scolaire se trouve ${state.data.pseudo} ?`);
           offerSkipChoices();
           state.step = 'level';
           break;
         case 'level':
           state.data.level = cleanInput;
-          addMessage('bot', `D'accord. ${state.data.pseudo} utilise-t-il un appareillage ou des aides techniques particulières (fauteuil, attelles, cadre de marche, ordinateur, autre) ?`);
+          updateGenderFromText(cleanInput);
+          addMessage('bot', `D'accord. ${state.data.pseudo} ${getUsesQuestion()} un appareillage ou des aides techniques particulières (fauteuil, attelles, cadre de marche, ordinateur, autre) ?`);
           offerSkipChoices();
           state.step = 'equipment';
           break;
@@ -976,15 +1133,29 @@ const MARKERS = {
         case 'diagnosis': {
           state.data.diagnosis = cleanInput;
           state.data.knownDiagnosis = !!cleanInput && !cleanInput.toLowerCase().includes('pas') && !cleanInput.toLowerCase().includes('aucun') && !cleanInput.toLowerCase().includes('observation') && !cleanInput.toLowerCase().includes('non');
-          const detection = detectPathology(cleanInput);
-          if (detection && state.data.knownDiagnosis) {
-            if (detection.fuzzy) {
-              state.data.diagnosis = detection.match.name;
+
+          const detections = detectPathologies(cleanInput);
+          const parts = splitDiagnosisEntries(cleanInput);
+          const unresolvedParts = parts.filter(part => !detectBestPathologyCandidate(part));
+          const shouldAskSingleConfirmation = state.data.knownDiagnosis && detections.length === 1 && parts.length <= 1 && detections[0].fuzzy;
+
+          if (detections.length && state.data.knownDiagnosis) {
+            state.data.diagnosis = detections.map(item => item.match.name).join(' ; ');
+
+            if (shouldAskSingleConfirmation) {
+              const detection = detections[0];
               addMessage('bot', `Je pense reconnaître cette pathologie malgré l’orthographe saisie. Voulez-vous dire <strong>${detection.match.name}</strong> ? Si oui, je pourrai ensuite vous proposer une reformulation pédagogique.`, true);
               offerSkipChoices();
               state.step = 'diagnosis_confirmation';
             } else {
-              addMessage('bot', `Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que ${detection.match.name} peut impliquer dans le quotidien scolaire de ${state.data.pseudo} ?`);
+              const names = detections.map(item => item.match.name);
+              const intro = names.length > 1
+                ? `Merci. J’ai repéré plusieurs diagnostics mentionnés : <strong>${names.join('</strong>, <strong>')}</strong>.`
+                : `Merci. J’ai repéré le diagnostic suivant : <strong>${names[0]}</strong>.`;
+              const unresolvedNote = unresolvedParts.length
+                ? `<p class="mt-2 text-xs text-slate-500">Je n’ai pas identifié avec assez de certitude : ${unresolvedParts.map(part => `<em>${escapeHtml(part)}</em>`).join(', ')}.</p>`
+                : '';
+              addMessage('bot', `${intro}<p class="mt-2">Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que ${names.length > 1 ? 'ces diagnostics' : names[0]} peuvent impliquer dans le quotidien scolaire de ${state.data.pseudo} ?</p>${unresolvedNote}`, true);
               offerSkipChoices();
               state.step = 'diagnosis_permission';
             }
@@ -1000,9 +1171,10 @@ const MARKERS = {
           const low = cleanInput.toLowerCase();
           const confirmed = ['oui', 'ok', 'd’accord', 'daccord', 'exact', 'volontiers', 'oui c’est ça', 'oui c est ca', 'c est ca'].some(word => low.includes(word));
           if (confirmed) {
-            const detection = detectPathology(state.data.diagnosis);
-            if (detection?.match) {
-              addMessage('bot', `Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que ${detection.match.name} peut impliquer dans le quotidien scolaire de ${state.data.pseudo} ?`);
+            const detections = detectPathologies(state.data.diagnosis);
+            if (detections.length) {
+              const names = detections.map(item => item.match.name);
+              addMessage('bot', `Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que ${names.length > 1 ? 'ces diagnostics' : names[0]} peuvent impliquer dans le quotidien scolaire de ${state.data.pseudo} ?`);
               offerSkipChoices();
               state.step = 'diagnosis_permission';
             } else {
@@ -1023,9 +1195,16 @@ const MARKERS = {
           const low = cleanInput.toLowerCase();
           const granted = ['oui', 'ok', 'd’accord', 'daccord', 'volontiers', 'pourquoi pas', 'vas-y', 'allez'].some(word => low.includes(word));
           state.data.pathologyPermissionGranted = granted;
-          const matched = detectPathology(state.data.diagnosis)?.match;
-          if (granted && matched) {
-            addMessage('bot', `<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d'appui de vulgarisation</p><p><strong>${matched.name}</strong> — ${matched.family}</p><p class="text-sm italic text-slate-600">${matched.pedagogicalWarning}</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">${matched.documentation}</div><p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>`, true);
+          const matchedPathologies = detectPathologies(state.data.diagnosis).map(item => item.match);
+          if (granted && matchedPathologies.length) {
+            const cards = matchedPathologies.map(matched => `
+              <div class="bg-white/80 border border-indigo-100 rounded-2xl p-4">
+                <p><strong>${matched.name}</strong> — ${matched.family}</p>
+                <p class="text-sm italic text-slate-600 mt-2">${matched.pedagogicalWarning}</p>
+                <div class="mt-3 bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">${matched.documentation}</div>
+              </div>
+            `).join('');
+            addMessage('bot', `<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d'appui de vulgarisation</p>${cards}<p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>`, true);
           } else {
             addMessage('bot', `D'accord. Je reste donc strictement centré sur les observations scolaires et leurs conséquences possibles dans sa journée.`);
           }
@@ -1190,11 +1369,14 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
       const loadReasons = buildLoadReasons();
       const axisReasons = buildAxisReasons(activeAxes);
 
-      const pathologyImpact = state.analysis.matchedPathology ? getPathologyImpact(state.analysis.matchedPathology.name) : null;
+      const matchedPathologies = state.analysis.matchedPathologies || (state.analysis.matchedPathology ? [state.analysis.matchedPathology] : []);
       const scoreExplanation = buildScoreExplanation();
 
-      const pathologyBlock = state.analysis.matchedPathology
-        ? `<div class="bg-violet-50 border border-violet-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Repère lié au diagnostic connu</p><p class="font-bold text-slate-800">${state.analysis.matchedPathology.name}</p><p class="text-sm text-slate-600 mt-2">${state.analysis.matchedPathology.pedagogicalWarning}</p>${pathologyImpact ? `<div class="mt-4 grid md:grid-cols-3 gap-4"><div class="bg-white border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">En deux mots</p><p class="text-sm text-slate-700">${escapeHtml(pathologyImpact.shortDefinition)}</p></div><div class="bg-white border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Au quotidien</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.dailyImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div><div class="bg-white border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">À l’école</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.schoolImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div></div>` : ''}${state.data.pathologyPermissionGranted ? `<div class="mt-4 bg-white border border-violet-100 rounded-2xl p-4 text-sm text-slate-700">${state.analysis.matchedPathology.documentation}</div>` : ''}</div>`
+      const pathologyBlock = matchedPathologies.length
+        ? `<div class="bg-violet-50 border border-violet-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-4">Repère lié au diagnostic connu</p><div class="space-y-4">${matchedPathologies.map(matched => {
+            const pathologyImpact = getPathologyImpact(matched.name);
+            return `<div class="bg-white border border-violet-100 rounded-2xl p-5"><p class="font-bold text-slate-800">${escapeHtml(matched.name)}</p><p class="text-sm text-slate-600 mt-2">${escapeHtml(matched.pedagogicalWarning)}</p>${pathologyImpact ? `<div class="mt-4 grid md:grid-cols-3 gap-4"><div class="bg-violet-50 border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">En deux mots</p><p class="text-sm text-slate-700">${escapeHtml(pathologyImpact.shortDefinition)}</p></div><div class="bg-violet-50 border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Au quotidien</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.dailyImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div><div class="bg-violet-50 border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">À l’école</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.schoolImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div></div>` : ''}${state.data.pathologyPermissionGranted ? `<div class="mt-4 bg-violet-50 border border-violet-100 rounded-2xl p-4 text-sm text-slate-700">${escapeHtml(matched.documentation)}</div>` : ''}</div>`;
+          }).join('')}</div></div>`
         : `<div class="bg-slate-50 border border-slate-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-slate-600 mb-2">Cadre de prudence</p><p class="text-sm text-slate-600">Aucun raisonnement diagnostique n'est posé ici. La lecture ci-dessous repose uniquement sur les effets possibles observés dans le contexte scolaire.</p></div>`;
 
       document.getElementById('final-report').innerHTML = `
@@ -1405,5 +1587,5 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 </body>
 </html>
 
-</html>
+
 
