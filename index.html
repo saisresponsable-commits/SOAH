@@ -124,172 +124,123 @@ Pour préserver le secret médical, je vous invite à utiliser un pseudonyme pou
 
 Comment souhaitez-vous appeler votre élève ?`;
 
-    const PATHOLOGY_DB = {
-      'myopathie de duchenne': {
-        name: 'Myopathie de Duchenne',
-        family: 'Neuromusculaire génétique',
-        mechanisms: ['fatigabilité', 'faiblesse musculaire', 'coût postural', 'effort respiratoire'],
-        pedagogicalWarning: 'Le coût postural et la fatigabilité peuvent majorer rapidement les difficultés d’écriture, de maintien et de participation prolongée.',
-        documentation: 'Dans cette pathologie, la force musculaire diminue progressivement. Des actions qui paraissent simples, comme tenir son buste, respirer avec aisance, se stabiliser ou écrire, peuvent déjà mobiliser une grande partie de l’énergie disponible. La difficulté n’est donc pas seulement la tâche scolaire elle-même, mais tout ce qu’il faut déjà dépenser pour être présent et disponible.'
-      },
-      'paralysie cérébrale': {
-        name: 'Paralysie cérébrale',
-        family: 'Atteinte neurologique motrice',
-        mechanisms: ['spasticité', 'coordination altérée', 'double tâche coûteuse', 'variabilité'],
-        pedagogicalWarning: 'La précision du geste, les transitions motrices et la gestion simultanée consigne + action peuvent être particulièrement coûteuses.',
-        documentation: 'Certains gestes nécessitent un contrôle beaucoup plus volontaire que chez d’autres élèves. Le corps peut être plus raide, moins fluide ou demander davantage de concentration. En classe, cela peut faire paraître l’élève lent ou peu disponible, alors qu’il fournit en réalité un effort important pour exécuter ce qui est attendu.'
-      },
-      'imc': {
-        name: 'Infirmité motrice cérébrale',
-        family: 'Atteinte neurologique motrice',
-        mechanisms: ['spasticité', 'coordination altérée', 'double tâche coûteuse', 'variabilité'],
-        pedagogicalWarning: 'La précision du geste, les transitions motrices et la gestion simultanée consigne + action peuvent être particulièrement coûteuses.',
-        documentation: 'Les mouvements peuvent demander plus de précision, plus de contrôle et plus d’énergie. Les performances peuvent aussi varier au fil de la journée ou selon l’environnement. Une réussite ponctuelle ne signifie donc pas forcément que la difficulté a disparu.'
-      },
-      'amyotrophie spinale': {
-        name: 'Amyotrophie spinale',
-        family: 'Neuromusculaire génétique',
-        mechanisms: ['faiblesse musculaire', 'fatigabilité', 'coût postural'],
-        pedagogicalWarning: 'Le maintien, les transferts, l’endurance posturale et la manipulation fine peuvent devenir très coûteux.',
-        documentation: 'Même lorsque les capacités intellectuelles sont pleinement présentes, le corps peut exiger un effort important pour tenir la posture, manipuler du matériel ou maintenir une activité sur la durée. L’enjeu scolaire est souvent moins de comprendre que de pouvoir faire dans de bonnes conditions.'
-      },
-      'ataxie de friedreich': {
-        name: 'Ataxie de Friedreich',
-        family: 'Maladie neurodégénérative',
-        mechanisms: ['équilibre instable', 'coordination altérée', 'fatigabilité'],
-        pedagogicalWarning: 'Les déplacements, les gestes de précision et la stabilité posturale peuvent être marqués par une grande variabilité.',
-        documentation: 'La coordination peut être fluctuante, les mouvements moins précis et l’équilibre plus fragile. À l’école, cela peut rendre les transitions, la motricité fine et la vitesse d’exécution particulièrement coûteuses.'
-      },
-      'sclérose en plaques': {
-        name: 'Sclérose en plaques',
-        family: 'Neurologique inflammatoire',
-        mechanisms: ['fatigabilité', 'variabilité', 'troubles moteurs possibles'],
-        pedagogicalWarning: 'La fatigue et la variabilité peuvent être majeures, y compris chez un élève paraissant parfois très compétent.',
-        documentation: 'L’élève peut avoir des jours ou des moments où tout semble possible, puis d’autres où la fatigue et le coût de l’action deviennent très importants. Cette variabilité est souvent difficile à comprendre pour les adultes si elle n’est pas explicitée.'
-      },
-      'maladie de charcot-marie-tooth': {
-        name: 'Maladie de Charcot-Marie-Tooth',
-        family: 'Neuropathie périphérique héréditaire',
-        mechanisms: ['faiblesse distale', 'fatigabilité', 'difficultés de marche'],
-        pedagogicalWarning: 'La marche, l’équilibre, la manipulation fine et l’endurance peuvent être touchés.',
-        documentation: 'Le coût ne se voit pas toujours immédiatement. L’élève peut sembler fonctionner de façon relativement ordinaire, mais payer cher les déplacements, les changements de position ou certaines tâches de précision.'
-      },
-      'leucodystrophie': {
-        name: 'Leucodystrophie',
-        family: 'Maladie neurologique évolutive',
-        mechanisms: ['variabilité', 'fatigabilité', 'atteintes motrices possibles'],
-        pedagogicalWarning: 'Les conséquences scolaires peuvent évoluer et demander des réajustements réguliers.',
-        documentation: 'Le fonctionnement n’est pas toujours stable dans le temps. L’équipe éducative peut donc avoir besoin de réinterroger régulièrement ce qui est encore accessible, ce qui devient plus coûteux et ce qui nécessite de nouveaux appuis.'
-      },
-      'traumatisme crânien': {
-        name: 'Traumatisme crânien',
-        family: 'Atteinte neurologique acquise',
-        mechanisms: ['fatigabilité', 'effort cognitif caché', 'variabilité'],
-        pedagogicalWarning: 'L’élève peut présenter un grand décalage entre compétences apparentes et coût réel de la mobilisation.',
-        documentation: 'Après un traumatisme crânien, l’élève peut sembler “aller bien” de l’extérieur, tout en mobilisant énormément d’énergie pour s’organiser, inhiber, suivre une consigne ou enchaîner des tâches. Le coût cognitif caché est souvent majeur.'
-      },
-      'spina bifida': {
-        name: 'Spina bifida',
-        family: 'Malformation neurologique',
-        mechanisms: ['atteinte motrice variable', 'coût des déplacements', 'fatigabilité'],
-        pedagogicalWarning: 'Le poids des déplacements, de l’installation et de la gestion corporelle peut déjà absorber une partie des ressources.',
-        documentation: 'L’élève peut devoir consacrer beaucoup d’énergie à se déplacer, à s’installer ou à gérer son corps dans l’environnement scolaire, avant même de commencer l’activité demandée.'
-      },
-      'dystonie': {
-        name: 'Dystonie',
-        family: 'Trouble du mouvement',
-        mechanisms: ['mouvements involontaires', 'coût postural', 'variabilité'],
-        pedagogicalWarning: 'Le geste intentionnel peut être parasité par des mouvements involontaires très coûteux.',
-        documentation: 'Ce n’est pas un manque de volonté ni un défaut d’attention : le geste peut être réellement perturbé par des contractions involontaires. Cela rend parfois l’écriture, la posture ou certaines manipulations extrêmement coûteuses.'
-      },
-      'syndrome de rett': {
-        name: 'Syndrome de Rett',
-        family: 'Trouble neurologique du développement',
-        mechanisms: ['variabilité', 'troubles moteurs', 'effort cognitif caché'],
-        pedagogicalWarning: 'L’expression motrice observée ne reflète pas toujours fidèlement le potentiel de compréhension.',
-        documentation: 'L’enjeu pédagogique est souvent de distinguer ce que l’élève comprend de ce qu’il parvient à montrer. Le corps peut limiter fortement l’expression, sans que cela signifie une absence de compréhension ou d’intention.'
-      }
-    };
-
-    const PATHOLOGY_IMPACT_DB = {
-  'myopathie de duchenne': {
-    shortDefinition: 'Maladie neuromusculaire évolutive qui réduit progressivement la force musculaire.',
+    const FAMILY_TEMPLATES = {
+  'Atteinte neurologique motrice': {
+    mechanisms: ['spasticité', 'coordination altérée', 'double tâche coûteuse', 'variabilité'],
+    pedagogicalWarning: 'La précision du geste, les transitions motrices et la gestion simultanée consigne + action peuvent être particulièrement coûteuses.',
+    documentation: 'Le corps peut demander un contrôle beaucoup plus volontaire que chez d’autres élèves. Les mouvements peuvent être moins fluides, plus lents ou plus coûteux, surtout quand plusieurs choses doivent être gérées en même temps.',
+    shortDefinition: 'Atteinte neurologique influençant le tonus, la posture, la coordination et parfois l’endurance motrice.',
+    dailyImpact: ['coût moteur élevé', 'mouvements moins fluides ou plus lents', 'contrôle corporel plus exigeant'],
+    schoolImpact: ['écriture ou manipulation plus coûteuses', 'transitions plus longues', 'fatigue qui augmente au fil de la journée']
+  },
+  'Neuromusculaire génétique': {
+    mechanisms: ['fatigabilité', 'faiblesse musculaire', 'coût postural', 'effort respiratoire'],
+    pedagogicalWarning: 'Le coût postural et la fatigabilité peuvent majorer rapidement les difficultés d’écriture, de maintien et de participation prolongée.',
+    documentation: 'La force musculaire et l’endurance peuvent être limitées. Des actions simples comme tenir son corps, se stabiliser, manipuler ou se déplacer peuvent déjà consommer une grande partie de l’énergie disponible.',
+    shortDefinition: 'Maladie touchant les muscles ou leur commande, avec faiblesse et fatigabilité variables selon la pathologie.',
     dailyImpact: ['fatigue physique importante', 'coût élevé pour tenir la posture', 'déplacements et gestes plus coûteux'],
     schoolImpact: ['écriture fatigante', 'endurance réduite dans les tâches longues', 'accumulation rapide de fatigue dans la journée']
   },
-  'paralysie cérébrale': {
-    shortDefinition: 'Atteinte neurologique précoce qui peut toucher le tonus, la posture et la coordination.',
-    dailyImpact: ['mouvements moins fluides', 'posture ou équilibre coûteux', 'double tâche plus difficile'],
-    schoolImpact: ['geste scolaire ralenti', 'installation et transitions plus longues', 'effort plus important pour écrire ou manipuler']
-  },
-  'imc': {
-    shortDefinition: 'Atteinte motrice d’origine cérébrale pouvant modifier le tonus, la coordination et l’endurance.',
-    dailyImpact: ['coût moteur élevé', 'variabilité selon la fatigue', 'contrôle corporel plus exigeant'],
-    schoolImpact: ['écriture ou manipulation plus lentes', 'fatigue qui augmente au fil de la journée', 'besoin d’environnement plus ajusté']
-  },
-  'amyotrophie spinale': {
-    shortDefinition: 'Maladie neuromusculaire entraînant une faiblesse musculaire et une endurance réduite.',
-    dailyImpact: ['maintien du corps coûteux', 'fatigabilité importante', 'gestes du quotidien plus exigeants'],
-    schoolImpact: ['coût postural élevé en classe', 'manipulation du matériel plus difficile', 'besoin d’économie d’énergie']
-  },
-  'ataxie de friedreich': {
-    shortDefinition: 'Maladie neurologique qui altère progressivement l’équilibre et la coordination.',
-    dailyImpact: ['équilibre fragile', 'gestes moins précis', 'déplacements plus coûteux'],
-    schoolImpact: ['transitions délicates', 'motricité fine ralentie', 'fatigue liée à la coordination']
-  },
-  'sclérose en plaques': {
-    shortDefinition: 'Maladie neurologique inflammatoire pouvant entraîner une forte variabilité du fonctionnement.',
-    dailyImpact: ['fatigue fluctuante', 'jours avec ressources très variables', 'effort imprévisible selon le moment'],
-    schoolImpact: ['performance variable dans la journée', 'décalage entre potentiel et disponibilité réelle', 'besoin de modulation du rythme']
-  },
-  'maladie de charcot-marie-tooth': {
-    shortDefinition: 'Neuropathie périphérique héréditaire touchant la force et la sensibilité, surtout aux extrémités.',
-    dailyImpact: ['marche plus fatigante', 'équilibre parfois fragile', 'gestes fins plus coûteux'],
-    schoolImpact: ['déplacements et manipulations à surveiller', 'fatigue motrice discrète mais réelle', 'endurance scolaire diminuée']
-  },
-  'leucodystrophie': {
-    shortDefinition: 'Maladie neurologique évolutive pouvant modifier progressivement le fonctionnement moteur et cognitif.',
+  'Maladie neurodégénérative': {
+    mechanisms: ['variabilité', 'fatigabilité', 'coordination altérée'],
+    pedagogicalWarning: 'Les conséquences scolaires peuvent évoluer et demander des réajustements réguliers.',
+    documentation: 'Le fonctionnement peut évoluer dans le temps. Certaines capacités restent présentes mais deviennent plus coûteuses ou plus variables, ce qui oblige souvent à réinterroger régulièrement les appuis nécessaires.',
+    shortDefinition: 'Maladie neurologique évolutive pouvant modifier progressivement le mouvement, l’endurance et parfois d’autres fonctions.',
     dailyImpact: ['variabilité importante', 'évolution possible des capacités', 'besoin de réajustements réguliers'],
     schoolImpact: ['ce qui était possible hier peut devenir coûteux', 'adaptations à réévaluer', 'vigilance sur la fatigue et les transitions']
   },
-  'traumatisme crânien': {
-    shortDefinition: 'Atteinte neurologique acquise pouvant laisser des difficultés invisibles malgré une apparence préservée.',
+  'Neuropathie périphérique héréditaire': {
+    mechanisms: ['faiblesse distale', 'fatigabilité', 'difficultés de marche'],
+    pedagogicalWarning: 'La marche, l’équilibre, la manipulation fine et l’endurance peuvent être touchés.',
+    documentation: 'Le coût ne se voit pas toujours immédiatement. L’élève peut sembler fonctionner relativement bien tout en payant très cher les déplacements, les changements de position ou certaines tâches de précision.',
+    shortDefinition: 'Atteinte des nerfs périphériques influençant la force, la sensibilité et parfois l’équilibre.',
+    dailyImpact: ['marche plus fatigante', 'équilibre parfois fragile', 'gestes fins plus coûteux'],
+    schoolImpact: ['déplacements et manipulations à surveiller', 'fatigue motrice discrète mais réelle', 'endurance scolaire diminuée']
+  },
+  'Atteinte neurologique acquise': {
+    mechanisms: ['fatigabilité', 'effort cognitif caché', 'variabilité'],
+    pedagogicalWarning: 'L’élève peut présenter un grand décalage entre compétences apparentes et coût réel de la mobilisation.',
+    documentation: 'Après une atteinte acquise, l’élève peut sembler « aller bien » de l’extérieur tout en mobilisant énormément d’énergie pour s’organiser, inhiber, suivre une consigne ou coordonner son corps.',
+    shortDefinition: 'Atteinte neurologique survenue après une période de développement déjà engagée, avec retentissement fonctionnel variable.',
     dailyImpact: ['fatigue cognitive forte', 'coût élevé de l’organisation', 'décalage entre apparence et effort réel'],
     schoolImpact: ['consignes plus coûteuses à traiter', 'enchaînement des tâches plus fatigant', 'besoin de ralentir et structurer']
   },
-  'spina bifida': {
-    shortDefinition: 'Malformation neurologique pouvant entraîner des conséquences motrices et fonctionnelles variables.',
+  'Malformation neurologique': {
+    mechanisms: ['atteinte motrice variable', 'coût des déplacements', 'fatigabilité'],
+    pedagogicalWarning: 'Le poids des déplacements, de l’installation et de la gestion corporelle peut déjà absorber une partie des ressources.',
+    documentation: 'L’élève peut devoir consacrer beaucoup d’énergie à se déplacer, à s’installer ou à gérer son corps dans l’environnement scolaire avant même de commencer l’activité demandée.',
+    shortDefinition: 'Anomalie du développement neurologique pouvant avoir un retentissement moteur et fonctionnel variable.',
     dailyImpact: ['déplacements coûteux', 'gestion corporelle plus exigeante', 'installation plus longue'],
     schoolImpact: ['énergie déjà mobilisée avant la tâche scolaire', 'importance de l’environnement matériel', 'fatigue liée aux transitions']
   },
-  'dystonie': {
-    shortDefinition: 'Trouble du mouvement où des contractions involontaires perturbent le geste volontaire.',
-    dailyImpact: ['mouvements parasites', 'coût postural élevé', 'grande variabilité du geste'],
+  'Trouble du mouvement': {
+    mechanisms: ['mouvements involontaires', 'coût postural', 'variabilité'],
+    pedagogicalWarning: 'Le geste intentionnel peut être parasité par des mouvements involontaires très coûteux.',
+    documentation: 'Ce n’est pas un manque de volonté ni un défaut d’attention : le geste peut être réellement perturbé par des mouvements involontaires ou une régulation motrice instable, rendant certaines actions très coûteuses.',
+    shortDefinition: 'Trouble neurologique affectant la qualité du mouvement volontaire et le contrôle moteur.',
+    dailyImpact: ['mouvements parasites ou instables', 'coût postural élevé', 'grande variabilité du geste'],
     schoolImpact: ['écriture ou manipulation très coûteuses', 'geste intentionnel perturbé', 'fatigue rapide lors des tâches fines']
   },
-  'syndrome de rett': {
-    shortDefinition: 'Trouble neurologique du développement où l’expression motrice peut être très limitée malgré des intentions présentes.',
+  'Neurologique inflammatoire': {
+    mechanisms: ['fatigabilité', 'variabilité', 'troubles moteurs possibles'],
+    pedagogicalWarning: 'La fatigue et la variabilité peuvent être majeures, y compris chez un élève paraissant parfois très compétent.',
+    documentation: 'L’élève peut avoir des moments où tout semble possible puis d’autres où le coût de l’action devient très important. Cette variabilité est souvent difficile à comprendre pour les adultes si elle n’est pas explicitée.',
+    shortDefinition: 'Atteinte neurologique liée à des mécanismes inflammatoires, avec retentissement moteur et attentionnel variable.',
+    dailyImpact: ['fatigue fluctuante', 'jours avec ressources très variables', 'effort imprévisible selon le moment'],
+    schoolImpact: ['performance variable dans la journée', 'décalage entre potentiel et disponibilité réelle', 'besoin de modulation du rythme']
+  },
+  'Maladie métabolique / mitochondriale': {
+    mechanisms: ['fatigabilité', 'variabilité', 'effort énergétique élevé'],
+    pedagogicalWarning: 'L’effort peut coûter très cher sur le plan énergétique, avec des fluctuations importantes selon l’état général.',
+    documentation: 'Quand la production d’énergie corporelle est moins efficace, l’élève peut mobiliser beaucoup d’efforts pour des tâches ordinaires. La fatigue peut être profonde, parfois peu visible mais très réelle.',
+    shortDefinition: 'Trouble métabolique ou mitochondrial pouvant diminuer l’efficacité énergétique du corps et majorer la fatigabilité.',
+    dailyImpact: ['fatigue profonde', 'effort physique rapidement coûteux', 'variabilité selon l’état général'],
+    schoolImpact: ['endurance réduite', 'nécessité d’économiser l’énergie', 'variabilité de disponibilité en classe']
+  },
+  'Atteinte médullaire / neuromusculaire acquise': {
+    mechanisms: ['coût des transferts', 'fatigabilité', 'atteinte motrice variable'],
+    pedagogicalWarning: 'Les transferts, l’installation, les déplacements et la gestion corporelle peuvent absorber une part importante des ressources disponibles.',
+    documentation: 'Le corps peut nécessiter davantage d’anticipation, de matériel ou d’aide humaine. Une partie de l’énergie est déjà mobilisée pour s’installer et se déplacer, avant même l’entrée dans la tâche scolaire.',
+    shortDefinition: 'Atteinte de la moelle ou du système neuromusculaire acquise, avec retentissement moteur et fonctionnel variable.',
+    dailyImpact: ['transferts et déplacements coûteux', 'gestion corporelle plus exigeante', 'besoin d’organisation matérielle'],
+    schoolImpact: ['temps d’installation allongé', 'fatigue avant la tâche', 'importance d’un environnement bien pensé']
+  },
+  'Trouble neurologique du développement': {
+    mechanisms: ['variabilité', 'troubles moteurs', 'effort cognitif caché'],
+    pedagogicalWarning: 'L’expression motrice observée ne reflète pas toujours fidèlement le potentiel de compréhension.',
+    documentation: 'Le corps peut limiter fortement ce que l’élève montre, sans que cela signifie une absence de compréhension ou d’intention. L’enjeu est souvent de distinguer ce qui est compris de ce qui peut être exprimé.',
+    shortDefinition: 'Trouble du développement avec retentissement neurologique pouvant toucher le mouvement, l’expression ou l’endurance.',
     dailyImpact: ['difficulté à montrer ce qui est compris', 'effort moteur important', 'variabilité dans l’expression'],
     schoolImpact: ['écart entre compréhension et production visible', 'besoin d’interprétation prudente', 'importance des médiations adaptées']
   }
 };
 
-// Liste conceptuelle des axes pédagogiques possibles.
-// Les axes réellement affichés dans le rapport sont filtrés dynamiquement via getActiveAxes().
-const AXES = [
-  'fatigue / coût énergétique',
-  'douleur / inconfort',
-  'effort cognitif caché',
-  'variabilité des performances',
-  'environnement scolaire',
-  'vécu subjectif',
-  'temporalité de la journée',
-  'stratégies de compensation',
-  'charge scolaire cumulée',
-  'autonomie paradoxale / besoin d’aide humaine'
+const PATHOLOGY_CATALOG = [
+  ['myopathie de duchenne','Myopathie de Duchenne','Neuromusculaire génétique'],['myopathie de becker','Myopathie de Becker','Neuromusculaire génétique'],['amyotrophie spinale','Amyotrophie spinale','Neuromusculaire génétique'],['myopathie congénitale','Myopathie congénitale','Neuromusculaire génétique'],['myopathie centronucléaire','Myopathie centronucléaire','Neuromusculaire génétique'],['myopathie nemaline','Myopathie némaline','Neuromusculaire génétique'],['dystrophie musculaire congénitale','Dystrophie musculaire congénitale','Neuromusculaire génétique'],['dystrophie musculaire des ceintures','Dystrophie musculaire des ceintures','Neuromusculaire génétique'],['fshd','Dystrophie facio-scapulo-humérale','Neuromusculaire génétique'],['maladie de pompe','Maladie de Pompe','Neuromusculaire génétique'],['myasthénie congénitale','Myasthénie congénitale','Neuromusculaire génétique'],['myasthénie auto-immune','Myasthénie auto-immune','Neuromusculaire génétique'],
+  ['paralysie cérébrale','Paralysie cérébrale','Atteinte neurologique motrice'],['imc','Infirmité motrice cérébrale','Atteinte neurologique motrice'],['paralysie cérébrale spastique','Paralysie cérébrale spastique','Atteinte neurologique motrice'],['paralysie cérébrale dyskinétique','Paralysie cérébrale dyskinétique','Atteinte neurologique motrice'],['paralysie cérébrale ataxique','Paralysie cérébrale ataxique','Atteinte neurologique motrice'],['hémiplégie cérébrale infantile','Hémiplégie cérébrale infantile','Atteinte neurologique motrice'],['diplégie spastique','Diplégie spastique','Atteinte neurologique motrice'],['quadriplégie spastique','Quadriplégie spastique','Atteinte neurologique motrice'],['séquelles d’avc pédiatrique','Séquelles d’AVC pédiatrique','Atteinte neurologique motrice'],['séquelles d’anoxie cérébrale','Séquelles d’anoxie cérébrale','Atteinte neurologique motrice'],['leucomalacie périventriculaire','Leucomalacie périventriculaire','Atteinte neurologique motrice'],['syndrome pyramidal','Syndrome pyramidal','Atteinte neurologique motrice'],
+  ['ataxie de friedreich','Ataxie de Friedreich','Maladie neurodégénérative'],['ataxie télangiectasie','Ataxie télangiectasie','Maladie neurodégénérative'],['maladie de wilson','Maladie de Wilson','Maladie neurodégénérative'],['maladie de huntington juvénile','Maladie de Huntington juvénile','Maladie neurodégénérative'],['adrénoleucodystrophie','Adrénoleucodystrophie','Maladie neurodégénérative'],['leucodystrophie','Leucodystrophie','Maladie neurodégénérative'],['leucodystrophie métachromatique','Leucodystrophie métachromatique','Maladie neurodégénérative'],['maladie de krabbe','Maladie de Krabbe','Maladie neurodégénérative'],['ataxie spino-cérébelleuse','Ataxie spino-cérébelleuse','Maladie neurodégénérative'],['paraparésie spastique héréditaire','Paraparésie spastique héréditaire','Maladie neurodégénérative'],['syndrome de pelizaeus-merzbacher','Syndrome de Pelizaeus-Merzbacher','Maladie neurodégénérative'],['neurodégénérescence associée à pantothénate kinase','Neurodégénérescence associée à la pantothénate kinase','Maladie neurodégénérative'],
+  ['maladie de charcot-marie-tooth','Maladie de Charcot-Marie-Tooth','Neuropathie périphérique héréditaire'],['neuropathie héréditaire sensitive et motrice','Neuropathie héréditaire sensitive et motrice','Neuropathie périphérique héréditaire'],['neuropathie héréditaire avec paralysies par pression','Neuropathie héréditaire avec paralysies par pression','Neuropathie périphérique héréditaire'],['neuropathie périphérique idiopathique','Neuropathie périphérique idiopathique','Neuropathie périphérique héréditaire'],['neuropathie périphérique inflammatoire chronique','Neuropathie périphérique inflammatoire chronique','Neuropathie périphérique héréditaire'],['guillain-barré séquellaire','Séquelles de syndrome de Guillain-Barré','Neuropathie périphérique héréditaire'],['neuropathie axonale géante','Neuropathie axonale géante','Neuropathie périphérique héréditaire'],
+  ['sclérose en plaques','Sclérose en plaques','Neurologique inflammatoire'],['neuromyélite optique','Neuromyélite optique','Neurologique inflammatoire'],['encéphalomyélite aiguë disséminée séquellaire','Séquelles d’encéphalomyélite aiguë disséminée','Neurologique inflammatoire'],['myélite transverse','Myélite transverse','Neurologique inflammatoire'],['encéphalite auto-immune séquellaire','Séquelles d’encéphalite auto-immune','Neurologique inflammatoire'],['encéphalite infectieuse séquellaire','Séquelles d’encéphalite infectieuse','Neurologique inflammatoire'],['vasculite cérébrale séquellaire','Séquelles de vasculite cérébrale','Neurologique inflammatoire'],
+  ['traumatisme crânien','Traumatisme crânien','Atteinte neurologique acquise'],['tumeur cérébrale séquellaire','Séquelles de tumeur cérébrale','Atteinte neurologique acquise'],['hydrocéphalie séquellaire','Hydrocéphalie avec retentissement moteur','Atteinte neurologique acquise'],['méningite séquellaire','Séquelles de méningite','Atteinte neurologique acquise'],['abcès cérébral séquellaire','Séquelles d’abcès cérébral','Atteinte neurologique acquise'],['avc pédiatrique','AVC pédiatrique','Atteinte neurologique acquise'],['anoxie cérébrale séquellaire','Séquelles d’anoxie cérébrale','Atteinte neurologique acquise'],['encéphalopathie acquise','Encéphalopathie acquise','Atteinte neurologique acquise'],['lésion cérébelleuse acquise','Lésion cérébelleuse acquise','Atteinte neurologique acquise'],
+  ['spina bifida','Spina bifida','Malformation neurologique'],['myéloméningocèle','Myéloméningocèle','Malformation neurologique'],['lipomyéloméningocèle','Lipomyéloméningocèle','Malformation neurologique'],['moelle attachée','Syndrome de moelle attachée','Malformation neurologique'],['malformation d’arnold-chiari','Malformation d’Arnold-Chiari','Malformation neurologique'],['agénésie partielle du corps calleux avec retentissement moteur','Agénésie partielle du corps calleux avec retentissement moteur','Malformation neurologique'],['malformation corticale avec retentissement moteur','Malformation corticale avec retentissement moteur','Malformation neurologique'],
+  ['dystonie','Dystonie','Trouble du mouvement'],['dystonie généralisée','Dystonie généralisée','Trouble du mouvement'],['hémidystonie','Hémidystonie','Trouble du mouvement'],['chorée','Chorée','Trouble du mouvement'],['athétose','Athétose','Trouble du mouvement'],['ballisme','Ballisme','Trouble du mouvement'],['tremblement essentiel sévère','Tremblement essentiel sévère','Trouble du mouvement'],['syndrome cérébelleux','Syndrome cérébelleux','Trouble du mouvement'],['dyspraxie motrice sévère','Dyspraxie motrice sévère','Trouble du mouvement'],['trouble moteur fonctionnel','Trouble moteur fonctionnel','Trouble du mouvement'],
+  ['maladie mitochondriale','Maladie mitochondriale','Maladie métabolique / mitochondriale'],['syndrome de leigh','Syndrome de Leigh','Maladie métabolique / mitochondriale'],['mélas','MELAS','Maladie métabolique / mitochondriale'],['merrf','MERRF','Maladie métabolique / mitochondriale'],['déficit multiple de la chaîne respiratoire','Déficit multiple de la chaîne respiratoire','Maladie métabolique / mitochondriale'],['glycogénose avec retentissement moteur','Glycogénose avec retentissement moteur','Maladie métabolique / mitochondriale'],['acidémie organique avec retentissement moteur','Acidémie organique avec retentissement moteur','Maladie métabolique / mitochondriale'],['déficit en pyruvate déshydrogénase','Déficit en pyruvate déshydrogénase','Maladie métabolique / mitochondriale'],
+  ['paraplégie traumatique','Paraplégie traumatique','Atteinte médullaire / neuromusculaire acquise'],['tétraplégie traumatique','Tétraplégie traumatique','Atteinte médullaire / neuromusculaire acquise'],['lésion médullaire incomplète','Lésion médullaire incomplète','Atteinte médullaire / neuromusculaire acquise'],['compression médullaire séquellaire','Séquelles de compression médullaire','Atteinte médullaire / neuromusculaire acquise'],['syndrome post-polio','Syndrome post-polio','Atteinte médullaire / neuromusculaire acquise'],['poliomyélite séquellaire','Séquelles de poliomyélite','Atteinte médullaire / neuromusculaire acquise'],['plexopathie brachiale sévère','Plexopathie brachiale sévère','Atteinte médullaire / neuromusculaire acquise'],['syndrome de la queue de cheval séquellaire','Séquelles de syndrome de la queue de cheval','Atteinte médullaire / neuromusculaire acquise'],
+  ['syndrome de rett','Syndrome de Rett','Trouble neurologique du développement'],['syndrome d’angelman avec retentissement moteur','Syndrome d’Angelman avec retentissement moteur','Trouble neurologique du développement'],['syndrome de phelan-mcdermid avec hypotonie','Syndrome de Phelan-McDermid avec hypotonie','Trouble neurologique du développement'],['syndrome de prader-willi avec retentissement moteur','Syndrome de Prader-Willi avec retentissement moteur','Trouble neurologique du développement'],['syndrome de williams avec retentissement moteur','Syndrome de Williams avec retentissement moteur','Trouble neurologique du développement'],['trisomie 21 avec retentissement moteur important','Trisomie 21 avec retentissement moteur important','Trouble neurologique du développement'],['syndrome de charge avec retentissement moteur','Syndrome CHARGE avec retentissement moteur','Trouble neurologique du développement'],['syndrome de kabuki avec hypotonie','Syndrome de Kabuki avec hypotonie','Trouble neurologique du développement'],['syndrome de joubert','Syndrome de Joubert','Trouble neurologique du développement'],['syndrome de deletion 22q11 avec retentissement moteur','Syndrome de délétion 22q11 avec retentissement moteur','Trouble neurologique du développement'],
+  ['achondroplasie avec retentissement fonctionnel','Achondroplasie avec retentissement fonctionnel','Malformation neurologique'],['ostéogenèse imparfaite avec retentissement moteur','Ostéogenèse imparfaite avec retentissement moteur','Malformation neurologique'],['arthrogrypose','Arthrogrypose','Malformation neurologique'],['amyoplasie congénitale','Amyoplasie congénitale','Malformation neurologique'],['hémimélie avec retentissement fonctionnel','Hémimélie avec retentissement fonctionnel','Malformation neurologique'],['agénésie de membre avec retentissement scolaire','Agénésie de membre avec retentissement scolaire','Malformation neurologique'],['séquelles d’amputation avec appareillage','Séquelles d’amputation avec appareillage','Atteinte médullaire / neuromusculaire acquise'],['sclérose latérale primaire juvénile','Sclérose latérale primaire juvénile','Maladie neurodégénérative'],['leucodystrophie d’alexander','Leucodystrophie d’Alexander','Maladie neurodégénérative'],['maladie de canavan','Maladie de Canavan','Maladie neurodégénérative'],['syndrome de mecp2 duplication avec retentissement moteur','Syndrome de duplication MECP2 avec retentissement moteur','Trouble neurologique du développement'],['x fragile avec hypotonie et dyspraxie sévère','X fragile avec hypotonie et dyspraxie sévère','Trouble neurologique du développement'],['maladie de sandhoff avec retentissement moteur','Maladie de Sandhoff avec retentissement moteur','Maladie métabolique / mitochondriale'],['maladie de tay-sachs avec retentissement moteur','Maladie de Tay-Sachs avec retentissement moteur','Maladie métabolique / mitochondriale'],['déficit en glutaric acidurie type 1 avec retentissement moteur','Glutaric acidurie type 1 avec retentissement moteur','Maladie métabolique / mitochondriale'],['encéphalopathie épileptique avec retentissement moteur','Encéphalopathie épileptique avec retentissement moteur','Trouble neurologique du développement'],['hémiplégie alternante de l’enfance','Hémiplégie alternante de l’enfance','Trouble du mouvement'],['syndrome dravet avec retentissement moteur','Syndrome de Dravet avec retentissement moteur','Trouble neurologique du développement'],['syndrome lennox-gastaut avec retentissement moteur','Syndrome de Lennox-Gastaut avec retentissement moteur','Trouble neurologique du développement'],['paralysie supranucléaire progressive juvénile','Paralysie supranucléaire progressive juvénile','Maladie neurodégénérative'],['dyskinésie paroxystique','Dyskinésie paroxystique','Trouble du mouvement'],['ataxie épisodique','Ataxie épisodique','Trouble du mouvement'],['maladie de moya-moya séquellaire','Séquelles de maladie de Moya-Moya','Atteinte neurologique acquise'],['syndrome de west avec retentissement moteur','Syndrome de West avec retentissement moteur','Trouble neurologique du développement'],['dysplasie septo-optique avec hypotonie','Dysplasie septo-optique avec hypotonie','Trouble neurologique du développement'],['agénésie cérébelleuse partielle','Agénésie cérébelleuse partielle','Malformation neurologique'],['syndrome d’ehlers-danlos hypermobile avec retentissement moteur','Syndrome d’Ehlers-Danlos hypermobile avec retentissement moteur','Malformation neurologique'],['maladie osseuse avec fatigabilité majeure','Maladie osseuse avec fatigabilité majeure','Malformation neurologique']
 ];
 
-    const MARKERS = {
+const PATHOLOGY_DB = Object.fromEntries(PATHOLOGY_CATALOG.map(([key, name, family]) => {
+  const tpl = FAMILY_TEMPLATES[family];
+  return [key, { name, family, mechanisms: [...tpl.mechanisms], pedagogicalWarning: tpl.pedagogicalWarning, documentation: `${tpl.documentation} ${name} peut donc demander une lecture attentive de la fatigabilité, du coût moteur, de la variabilité et des besoins d’appui dans la vie quotidienne comme à l’école.` }];
+}));
+
+const PATHOLOGY_IMPACT_DB = Object.fromEntries(PATHOLOGY_CATALOG.map(([key, name, family]) => {
+  const tpl = FAMILY_TEMPLATES[family];
+  return [key, { shortDefinition: `${name} : ${tpl.shortDefinition}`, dailyImpact: [...tpl.dailyImpact], schoolImpact: [...tpl.schoolImpact] }];
+}));
+
+const MARKERS = {
       fatigue: ['fatigue', 'fatigué', 'épuisé', 'épuisement', 'à bout', 'essoufflé', 'vide', 'lessivé'],
       slowness: ['lent', 'lenteur', 'ralenti', 'prend du temps'],
       pain: ['douleur', 'mal', 'inconfort', 'se plaint', 'grimace'],
@@ -331,6 +282,7 @@ const AXES = [
         level: '',
         equipment: '',
         diagnosis: '',
+        gender: 'unknown',
         knownDiagnosis: false,
         pathologyPermissionAsked: false,
         pathologyPermissionGranted: false,
@@ -556,14 +508,71 @@ const AXES = [
       state.step = 'pseudo';
     }
 
+    function normalizeText(text = '') {
+      const normalized = (text || '').toLowerCase().normalize('NFD');
+      let out = '';
+      for (const ch of normalized) {
+        const code = ch.charCodeAt(0);
+        const isDiacritic = code >= 768 && code <= 879;
+        const isAlphaNum = (code >= 97 && code <= 122) || (code >= 48 && code <= 57);
+        if (isDiacritic) continue;
+        out += isAlphaNum || ch === ' ' || ch === '-' ? ch : ' ';
+      }
+      return out.split(' ').filter(Boolean).join(' ').trim();
+    }
+
+    function levenshtein(a = '', b = '') {
+      const m = a.length, n = b.length;
+      const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+        }
+      }
+      return dp[m][n];
+    }
+
+    function detectGenderFromText(text = '') {
+      const low = normalizeText(text);
+      const feminineHints = [' elle ', ' elle est ', ' cette eleve ', ' cette enfant ', ' ma fille ', ' une fille '];
+      const masculineHints = [' il ', ' il est ', ' cet eleve ', ' cet enfant ', ' mon fils ', ' un garcon '];
+      const padded = ` ${low} `;
+      if (feminineHints.some(hint => padded.includes(hint))) return 'f';
+      if (masculineHints.some(hint => padded.includes(hint))) return 'm';
+      return 'unknown';
+    }
+
+    function getPronouns() {
+      return state.data.gender === 'f'
+        ? { subject: 'elle', object: 'la', article: 'l’élève' }
+        : { subject: 'il', object: 'le', article: 'l’élève' };
+    }
+
     function detectPathology(text) {
-      const low = text.toLowerCase().trim();
-      for (const key of Object.keys(PATHOLOGY_DB)) if (low.includes(key)) return PATHOLOGY_DB[key];
-      return null;
+      const low = normalizeText(text);
+      for (const key of Object.keys(PATHOLOGY_DB)) {
+        if (low.includes(normalizeText(key))) return { match: PATHOLOGY_DB[key], key, fuzzy: false };
+      }
+      if (!low) return null;
+      let best = null;
+      let bestRatio = Infinity;
+      for (const key of Object.keys(PATHOLOGY_DB)) {
+        const candidate = normalizeText(key);
+        const distance = levenshtein(low, candidate);
+        const ratio = distance / Math.max(low.length, candidate.length, 1);
+        if (ratio < 0.36 && ratio < bestRatio) {
+          bestRatio = ratio;
+          best = key;
+        }
+      }
+      return best ? { match: PATHOLOGY_DB[best], key: best, fuzzy: true } : null;
     }
 
     function getPathologyImpact(pathologyName = '') {
-      const key = (pathologyName || '').toLowerCase().trim();
+      const key = normalizeText(pathologyName || '');
       return PATHOLOGY_IMPACT_DB[key] || null;
     }
 
@@ -580,6 +589,34 @@ const AXES = [
       if (m.pain) explanations.push('signes de douleur ou d’inconfort');
       if (m.social) explanations.push('poids du regard des autres ou du groupe');
       return explanations;
+    }
+
+    function buildLoadReasons() {
+      const m = state.analysis.markers || {};
+      return {
+        'Charge motrice': [m.writing && 'écriture / geste fin', m.mobility && 'déplacements / transitions', m.posture && 'coût postural', m.compensation && 'efforts corporels pour tenir'].filter(Boolean),
+        'Charge cognitive': [m.planning && 'organisation / consignes', m.compensation && 'contrôle volontaire pour compenser', m.temporality && 'variabilité à anticiper', m.pain && 'douleur ou inconfort à gérer'].filter(Boolean),
+        'Charge organisationnelle': [m.planning && 'gestion du matériel ou des étapes', m.mobility && 'anticipation des déplacements', m.autonomy && 'nécessité d’ajuster l’aide sans épuiser l’élève'].filter(Boolean),
+        'Charge sociale': [m.social && 'regard des autres / groupe', m.irritability && 'risque de mésinterprétation du comportement', m.autonomy && 'coût du fait de vouloir rester autonome devant les pairs'].filter(Boolean),
+        'Charge énergétique globale': buildScoreExplanation()
+      };
+    }
+
+    function buildAxisReasons(activeAxes) {
+      const m = state.analysis.markers || {};
+      const reasons = {
+        'fatigue / coût énergétique': [m.fatigue && 'fatigue ou essoufflement', m.posture && 'effort pour tenir le corps', m.mobility && 'déplacements coûteux', m.writing && 'coût de l’écriture'].filter(Boolean),
+        'douleur / inconfort': [m.pain && 'signes de douleur, gêne ou évitement'].filter(Boolean),
+        'effort cognitif caché': [m.planning && 'organisation / consignes', m.compensation && 'contrôle volontaire pour tenir', state.analysis.matchedPathology?.mechanisms?.includes('double tâche coûteuse') && 'double tâche coûteuse liée à la pathologie'].filter(Boolean),
+        'variabilité des performances': [m.temporality && 'différences selon le moment de la journée', state.analysis.matchedPathology?.mechanisms?.includes('variabilité') && 'variabilité décrite dans les repères de pathologie'].filter(Boolean),
+        'environnement scolaire': [m.mobility && 'déplacements / transitions', m.posture && 'installation ou maintien coûteux', state.data.equipment && 'présence d’un appareillage ou d’aides techniques'].filter(Boolean),
+        'vécu subjectif': [m.irritability && 'irritabilité ou refus', m.social && 'poids du groupe ou du regard des autres', m.compensation && 'effort pour masquer la difficulté', m.autonomy && 'coût du fait de vouloir rester autonome'].filter(Boolean),
+        'temporalité de la journée': [m.temporality && 'différences entre début et fin de journée'].filter(Boolean),
+        'stratégies de compensation': [m.compensation && 'fige, se crispe, surcompense, tient malgré la difficulté'].filter(Boolean),
+        'charge scolaire cumulée': buildScoreExplanation(),
+        'autonomie paradoxale / besoin d’aide humaine': [m.autonomy && 'l’élève veut faire seul ou refuse l’aide malgré le coût'].filter(Boolean)
+      };
+      return Object.fromEntries(activeAxes.map(axis => [axis, reasons[axis] || []]));
     }
 
     function hasKeyword(text, keywords) {
@@ -627,7 +664,7 @@ const AXES = [
       const allText = [state.data.equipment, state.data.diagnosis, state.data.obs.story, state.data.obs.time, state.data.obs.compensation, state.data.obs.charges, state.data.obs.situations].join(' | ').toLowerCase();
       const markers = {};
       Object.entries(MARKERS).forEach(([key, words]) => { markers[key] = hasKeyword(allText, words); });
-      const pathology = detectPathology(state.data.diagnosis);
+      const pathology = detectPathology(state.data.diagnosis)?.match || null;
       const situations = Object.entries(SITUATION_MAP).filter(([, words]) => hasKeyword(allText, words)).map(([label]) => label);
 
       const mechanisms = [];
@@ -730,7 +767,7 @@ const AXES = [
         markers[key] = hasKeyword(allText, words);
       });
 
-      const matchedPathology = detectPathology(combined.diagnosis || '');
+      const matchedPathology = detectPathology(combined.diagnosis || '')?.match || null;
       const energyScore = computeResourceBudgetFromMarkers(markers);
       return getActiveAxesFromMarkers(markers, energyScore, matchedPathology, combined.equipment || '');
     }
@@ -833,13 +870,44 @@ const AXES = [
         case 'diagnosis': {
           state.data.diagnosis = cleanInput;
           state.data.knownDiagnosis = !!cleanInput && !cleanInput.toLowerCase().includes('pas') && !cleanInput.toLowerCase().includes('aucun') && !cleanInput.toLowerCase().includes('observation') && !cleanInput.toLowerCase().includes('non');
-          const matched = detectPathology(cleanInput);
-          if (matched && state.data.knownDiagnosis) {
-            addMessage('bot', `Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que ${matched.name} peut impliquer dans le quotidien scolaire de ${state.data.pseudo} ?`);
-            offerSkipChoices();
-            state.step = 'diagnosis_permission';
+          const detection = detectPathology(cleanInput);
+          if (detection && state.data.knownDiagnosis) {
+            if (detection.fuzzy) {
+              state.data.diagnosis = detection.match.name;
+              addMessage('bot', `Je pense reconnaître cette pathologie malgré l’orthographe saisie. Voulez-vous dire <strong>${detection.match.name}</strong> ? Si oui, je pourrai ensuite vous proposer une reformulation pédagogique.`, true);
+              offerSkipChoices();
+              state.step = 'diagnosis_confirmation';
+            } else {
+              addMessage('bot', `Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que ${detection.match.name} peut impliquer dans le quotidien scolaire de ${state.data.pseudo} ?`);
+              offerSkipChoices();
+              state.step = 'diagnosis_permission';
+            }
           } else {
-            addMessage('bot', `D'accord. Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour lui ?`);
+            addMessage('bot', `D'accord. Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
+            offerSkipChoices();
+            state.step = 'obs_story';
+          }
+          break;
+        }
+
+        case 'diagnosis_confirmation': {
+          const low = cleanInput.toLowerCase();
+          const confirmed = ['oui', 'ok', 'd’accord', 'daccord', 'exact', 'volontiers', 'oui c’est ça', 'oui c est ca', 'c est ca'].some(word => low.includes(word));
+          if (confirmed) {
+            const detection = detectPathology(state.data.diagnosis);
+            if (detection?.match) {
+              addMessage('bot', `Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que ${detection.match.name} peut impliquer dans le quotidien scolaire de ${state.data.pseudo} ?`);
+              offerSkipChoices();
+              state.step = 'diagnosis_permission';
+            } else {
+              addMessage('bot', `D'accord. Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
+              offerSkipChoices();
+              state.step = 'obs_story';
+            }
+          } else {
+            state.data.diagnosis = cleanInput;
+            addMessage('bot', `D'accord. Je reste donc centré sur les observations du quotidien scolaire sans m'appuyer sur une pathologie identifiée.`);
+            addMessage('bot', `Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
             offerSkipChoices();
             state.step = 'obs_story';
           }
@@ -849,19 +917,20 @@ const AXES = [
           const low = cleanInput.toLowerCase();
           const granted = ['oui', 'ok', 'd’accord', 'daccord', 'volontiers', 'pourquoi pas', 'vas-y', 'allez'].some(word => low.includes(word));
           state.data.pathologyPermissionGranted = granted;
-          const matched = detectPathology(state.data.diagnosis);
+          const matched = detectPathology(state.data.diagnosis)?.match;
           if (granted && matched) {
             addMessage('bot', `<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d'appui de vulgarisation</p><p><strong>${matched.name}</strong> — ${matched.family}</p><p class="text-sm italic text-slate-600">${matched.pedagogicalWarning}</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">${matched.documentation}</div><p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>`, true);
           } else {
             addMessage('bot', `D'accord. Je reste donc strictement centré sur les observations scolaires et leurs conséquences possibles dans la journée de ${state.data.pseudo}.`);
           }
-          addMessage('bot', `Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour lui ?`);
+          addMessage('bot', `Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
           offerSkipChoices();
           state.step = 'obs_story';
           break;
         }
         case 'obs_story': {
           state.data.obs.story = cleanInput;
+          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
           // On analyse ici l'entrée brute pour repérer immédiatement des signaux saillants dans la formulation spontanée de l'enseignant.
           const quick = detectQuickMarkers(input);
 
@@ -882,6 +951,7 @@ const AXES = [
 
         case 'temporal': {
           state.data.obs.time = cleanInput;
+          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
 
           const temporalAxes = previewAxesFromPartialData({ time: cleanInput });
           maybeShowAxesPreview(temporalAxes, 'Avec ce que vous ajoutez, je vois plus nettement');
@@ -894,6 +964,7 @@ const AXES = [
 
         case 'compensation': {
           state.data.obs.compensation = cleanInput;
+          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
 
           const compensationAxes = previewAxesFromPartialData({ compensation: cleanInput });
           maybeShowAxesPreview(compensationAxes, 'Votre description fait maintenant ressortir');
@@ -908,6 +979,7 @@ const AXES = [
 
         case 'situations': {
           state.data.obs.situations = cleanInput;
+          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
 
           const situationAxes = previewAxesFromPartialData({ situations: cleanInput });
           maybeShowAxesPreview(situationAxes, 'À partir des situations que vous citez, je retiens surtout');
@@ -927,12 +999,13 @@ const AXES = [
 
         case 'charges':
           state.data.obs.charges = cleanInput;
+          if (state.data.gender === 'unknown') state.data.gender = detectGenderFromText(cleanInput);
 
           addMessage('bot', `Merci pour ces éléments. Avant de proposer une synthèse, je reformule ce qui ressort de vos observations :
 
 • certaines situations scolaires semblent plus coûteuses
 • la fatigue ou l'accumulation au fil de la journée joue probablement un rôle
-• l'élève semble parfois devoir <strong>compenser</strong> pour tenir
+• ${getPronouns().article} semble parfois devoir <strong>compenser</strong> pour tenir
 
 C'est souvent dans cette accumulation de petites contraintes que se construit la difficulté visible.`, true);
 
@@ -991,6 +1064,8 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
       const markerNames = markerLabelMap();
       const activeAxes = getActiveAxes();
       const activeMarkers = Object.entries(state.analysis.markers).filter(([, value]) => value).map(([key]) => markerNames[key]);
+      const loadReasons = buildLoadReasons();
+      const axisReasons = buildAxisReasons(activeAxes);
 
       const pathologyImpact = state.analysis.matchedPathology ? getPathologyImpact(state.analysis.matchedPathology.name) : null;
       const scoreExplanation = buildScoreExplanation();
@@ -1057,7 +1132,12 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
               <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-2">Carte des charges invisibles</p>
               <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur l’élève dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite.</p>
-              <div class="space-y-5">${state.analysis.invisibleLoads.map(c => `<div><div class="flex justify-between text-xs font-bold text-slate-600 uppercase mb-2"><span>${c.label}</span><span>${c.text}</span></div><div class="meter"><div class="${c.color}" style="width:${c.value}%"></div></div></div>`).join('')}</div>
+              <div class="space-y-5">${state.analysis.invisibleLoads.map(c => `<div><div class="flex justify-between text-xs font-bold text-slate-600 uppercase mb-2"><span>${c.label}</span><span>${c.text}</span></div><div class="meter"><div class="${c.color}" style="width:${c.value}%"></div></div><p class="text-xs text-slate-500 mt-2">${(loadReasons[c.label] && loadReasons[c.label].length) ? `Ce niveau est retenu notamment à partir de : ${loadReasons[c.label].join(', ')}.` : 'Ce niveau reste provisoire car peu d’indices spécifiques ont été relevés pour cette charge.'}</p></div>`).join('')}</div>
+            </div>
+
+            <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
+              <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Pourquoi SOAH retient ces axes ?</p>
+              <div class="space-y-4">${activeAxes.map(axis => `<div class="border border-slate-100 rounded-2xl p-4"><p class="font-bold text-slate-800">${escapeHtml(axis)}</p><p class="text-sm text-slate-600 mt-2">${(axisReasons[axis] && axisReasons[axis].length) ? `Retenu à partir de : ${axisReasons[axis].join(', ')}.` : 'Retenu à titre de prudence pédagogique dans la lecture globale de la situation.'}</p></div>`).join('')}</div>
             </div>
 
             <div class="grid md:grid-cols-2 gap-10">
@@ -1129,7 +1209,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
         { s: 'bot', t: 'Merci. Souhaitez-vous que je reformule brièvement, dans un langage pédagogique, ce que la myopathie de Duchenne peut impliquer dans le quotidien scolaire de Léo ?' },
         { s: 'user', t: 'Oui, volontiers.' },
         { s: 'bot', html: true, t: '<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d’appui de vulgarisation</p><p><strong>Myopathie de Duchenne</strong> — Neuromusculaire génétique</p><p class="text-sm italic text-slate-600">Le coût postural et la fatigabilité peuvent majorer rapidement les difficultés d’écriture, de maintien et de participation prolongée.</p><div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">Dans cette pathologie, la force musculaire diminue progressivement. Des actions qui paraissent simples, comme tenir son buste, respirer avec aisance, se stabiliser ou écrire, peuvent déjà mobiliser une grande partie de l’énergie disponible. La difficulté n’est donc pas seulement la tâche scolaire elle-même, mais tout ce qu’il faut déjà dépenser pour être présent et disponible.</div><p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>' },
-        { s: 'bot', t: 'Dans le quotidien scolaire, qu’est-ce qui vous interpelle le plus chez Léo ? Qu’est-ce qui vous semble coûteux pour lui ?' },
+        { s: 'bot', t: 'Dans le quotidien scolaire, qu’est-ce qui vous interpelle le plus chez Léo ? Qu’est-ce qui vous semble coûteux pour ${getPronouns().subject} ?' },
         { s: 'user', t: 'Il peut très bien commencer sa matinée, puis en fin de matinée il refuse d’écrire, s’agace vite, et semble parfois ne plus rien vouloir faire.' },
         { s: 'bot', html: true, t: '<div class="space-y-3"><p>C’est typiquement le genre de situation où le regard de l’adulte peut basculer très vite vers <em>"il ne veut plus"</em>.</p><p>Mais votre description invite déjà à une autre hypothèse : non pas un manque de volonté, mais peut-être un <strong>épuisement progressif</strong>.</p></div>' },
         { s: 'bot', t: 'Quand un comportement change comme cela, il est souvent utile de regarder la temporalité. Voyez-vous une différence entre le début de journée et la fin de matinée, ou après certains temps comme la cour, un déplacement, un changement de local ?' },
@@ -1158,6 +1238,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
 
       state.data = {
         pseudo: 'Léo',
+        gender: 'm',
         level: 'Primaire, 10 ans',
         equipment: 'Fauteuil roulant électrique',
         diagnosis: 'Myopathie de Duchenne',
