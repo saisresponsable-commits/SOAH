@@ -76,8 +76,8 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-6 justify-center">
-        <button id="start-btn" type="button" class="soa-gradient text-white font-bold px-12 py-5 rounded-[2rem] text-lg shadow-xl hover:scale-105 transition-all">Commencer la discussion</button>
-        <button id="simulate-btn" type="button" class="bg-white border-2 border-slate-100 text-slate-500 hover:border-indigo-200 hover:text-indigo-600 font-bold px-10 py-5 rounded-[2rem] transition-all">Simulation guidée</button>
+        <button type="button" onclick="startAnalysis()" class="soa-gradient text-white font-bold px-12 py-5 rounded-[2rem] text-lg shadow-xl hover:scale-105 transition-all">Commencer la discussion</button>
+        <button type="button" onclick="simulateDemo()" class="bg-white border-2 border-slate-100 text-slate-500 hover:border-indigo-200 hover:text-indigo-600 font-bold px-10 py-5 rounded-[2rem] transition-all">Simulation guidée</button>
       </div>
     </section>
 
@@ -327,10 +327,7 @@ const MARKERS = {
     async function exportReportPDF() {
       const report = document.querySelector('#final-report .report-card');
       const exportBtn = document.getElementById('export-pdf-btn');
-      if (!report) {
-        alert("La boussole n'est pas encore disponible. Ouvrez d'abord le rapport avant de lancer l'export PDF.");
-        return;
-      }
+      if (!report) return;
 
       const originalBtnHtml = exportBtn ? exportBtn.innerHTML : '';
       if (exportBtn) {
@@ -345,7 +342,7 @@ const MARKERS = {
 
         // Méthode plus fiable que html2pdf dans ce prototype : on ouvre une fenêtre dédiée
         // avec une version imprimable de la boussole, puis on laisse le navigateur gérer
-        // l'enregistrement en PDF. Cela évite les PDF blancs observés avec html2canvas.
+        // l’enregistrement en PDF. Cela évite les PDF blancs observés avec html2canvas.
         const printWindow = window.open('', '_blank', 'width=1100,height=900');
         if (!printWindow) {
           alert('Le navigateur a bloqué l’ouverture de la fenêtre d’impression. Autorisez les pop-ups pour ce site.');
@@ -463,9 +460,6 @@ const MARKERS = {
         printWindow.document.open();
         printWindow.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${printTitle}</title><link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">${styles}</head><body>${reportHtml}<script>window.onload = function(){ setTimeout(function(){ window.focus(); window.print(); }, 300); };<\/script></body></html>`);
         printWindow.document.close();
-      } catch (error) {
-        console.error('Erreur export PDF :', error);
-        alert("L'export PDF n'a pas pu être lancé correctement. Vérifiez que les pop-ups ne sont pas bloqués puis réessayez.");
       } finally {
         if (exportBtn) {
           exportBtn.disabled = false;
@@ -562,13 +556,13 @@ const MARKERS = {
       const padded = ` ${low} `;
 
       const feminineHints = [
-        ' c est une fille ', ' cest une fille ', ' c'est une fille ',
+        ' c est une fille ', ' cest une fille ', ' c’est une fille ',
         ' ma fille ', ' une fille ', ' la fille ', ' elle ', ' elle est ', ' elle a ', ' elle utilise ',
         ' cette eleve ', ' cette enfant ', ' une eleve ', ' une enfant ', ' feminine ', ' feminin '
       ].map(normalizeText);
 
       const masculineHints = [
-        ' c est un garcon ', ' cest un garcon ', ' c'est un garcon ',
+        ' c est un garcon ', ' cest un garcon ', ' c’est un garcon ',
         ' mon fils ', ' un garcon ', ' le garcon ', ' il ', ' il est ', ' il a ', ' il utilise ',
         ' cet eleve ', ' cet enfant ', ' un eleve ', ' masculin ', ' masculine '
       ].map(normalizeText);
@@ -679,10 +673,10 @@ const MARKERS = {
       }
 
       return {
-        subject: "l'élève",
-        object: "l'élève",
+        subject: "l’élève",
+        object: "l’élève",
         possessive: 'son',
-        article: "l'élève",
+        article: "l’élève",
         tired: 'fatigué·e',
         concerned: 'concerné·e'
       };
@@ -692,40 +686,6 @@ const MARKERS = {
       const subject = getPronouns().subject;
       if (!capitalize) return subject;
       return subject.charAt(0).toUpperCase() + subject.slice(1);
-    }
-
-    function getGenderAgreement() {
-      if (state.data.gender === 'f') {
-        return {
-          solicited: 'sollicitée',
-          concerned: 'concernée',
-          available: 'disponible',
-          tired: 'fatiguée'
-        };
-      }
-      if (state.data.gender === 'm') {
-        return {
-          solicited: 'sollicité',
-          concerned: 'concerné',
-          available: 'disponible',
-          tired: 'fatigué'
-        };
-      }
-      return {
-        solicited: 'sollicité·e',
-        concerned: 'concerné·e',
-        available: 'disponible',
-        tired: 'fatigué·e'
-      };
-    }
-
-    function mechanismToReportSentence(mechanism) {
-      const p = getPronouns();
-      return `${subjectLabel(true)} pourrait présenter ${mechanism}. Cela peut peser sur la manière dont ${p.subject} entre dans la tâche, s'y maintient et y reste ${getGenderAgreement().available}.`;
-    }
-
-    function situationToReportSentence(situation) {
-      return `${subjectLabel(true)} semble particulièrement ${getGenderAgreement().concerned} dans les moments suivants : ${situation}.`;
     }
 
     function detectGenderFromPseudo(pseudo = '') {
@@ -914,88 +874,25 @@ const MARKERS = {
       return keywords.some(k => low.includes(k));
     }
 
-    function countKeywordOccurrences(text, keyword) {
-      const source = normalizeText(text || '');
-      const needle = normalizeText(keyword || '');
-      if (!source || !needle) return 0;
-      let count = 0;
-      let index = 0;
-      while ((index = source.indexOf(needle, index)) !== -1) {
-        count += 1;
-        index += needle.length;
-      }
-      return count;
-    }
-
-    function buildMarkerEvidence(textParts) {
-      const parts = (textParts || []).map(part => part || '').filter(Boolean);
-      const evidence = {};
-      Object.entries(MARKERS).forEach(([key, words]) => {
-        let mentionCount = 0;
-        let sectionCount = 0;
-        parts.forEach(part => {
-          const partCount = words.reduce((sum, word) => sum + countKeywordOccurrences(part, word), 0);
-          if (partCount > 0) {
-            mentionCount += partCount;
-            sectionCount += 1;
-          }
-        });
-        const weightedCount = mentionCount + Math.max(0, sectionCount - 1) * 0.75;
-        evidence[key] = { mentionCount, sectionCount, weightedCount };
-      });
-      return evidence;
-    }
-
-    function markerImpact(evidence, key, base, extraPerStep = 0, stepSize = 2, maxExtraSteps = 3) {
-      const weighted = evidence?.[key]?.weightedCount || 0;
-      if (!weighted) return 0;
-      const extraSteps = Math.min(maxExtraSteps, Math.max(0, Math.floor((weighted - 1) / stepSize)));
-      return base + extraSteps * extraPerStep;
-    }
-
-    function computeResourceBudgetFromMarkers(m, evidence = {}) {
+    function computeResourceBudgetFromMarkers(m) {
       let score = 78;
-      score -= markerImpact(evidence, 'fatigue', 14, 3, 2, 3);
-      score -= markerImpact(evidence, 'temporality', 9, 2, 2, 2);
-      score -= markerImpact(evidence, 'posture', 10, 2, 2, 2);
-      score -= markerImpact(evidence, 'mobility', 8, 2, 2, 2);
-      score -= markerImpact(evidence, 'writing', 7, 2, 2, 2);
-      score -= markerImpact(evidence, 'compensation', 6, 2, 2, 2);
-      score -= markerImpact(evidence, 'autonomy', 4, 1, 2, 2);
-      score -= markerImpact(evidence, 'pain', 5, 1, 2, 2);
-      if (!Object.keys(evidence || {}).length) {
-        if (m.fatigue) score -= 14;
-        if (m.temporality) score -= 9;
-        if (m.posture) score -= 10;
-        if (m.mobility) score -= 8;
-        if (m.writing) score -= 7;
-        if (m.compensation) score -= 6;
-        if (m.autonomy) score -= 4;
-        if (m.pain) score -= 5;
-      }
+      if (m.fatigue) score -= 18;
+      if (m.temporality) score -= 12;
+      if (m.posture) score -= 14;
+      if (m.mobility) score -= 10;
+      if (m.writing) score -= 8;
+      if (m.compensation) score -= 7;
+      if (m.autonomy) score -= 6;
+      if (m.pain) score -= 6;
       return Math.max(18, Math.min(92, score));
     }
 
-    function computeInvisibleLoads(markers, evidence = {}) {
-      const motrice = 36
-        + markerImpact(evidence, 'writing', 8, 2, 2, 3)
-        + markerImpact(evidence, 'mobility', 8, 2, 2, 3)
-        + markerImpact(evidence, 'posture', 7, 2, 2, 2)
-        + markerImpact(evidence, 'compensation', 4, 1, 2, 2);
-      const cognitive = 34
-        + markerImpact(evidence, 'planning', 9, 2, 2, 3)
-        + markerImpact(evidence, 'compensation', 7, 2, 2, 2)
-        + markerImpact(evidence, 'temporality', 5, 1, 2, 2)
-        + markerImpact(evidence, 'pain', 3, 1, 2, 2);
-      const organisationnelle = 30
-        + markerImpact(evidence, 'planning', 12, 2, 2, 3)
-        + markerImpact(evidence, 'mobility', 5, 1, 2, 2)
-        + markerImpact(evidence, 'autonomy', 4, 1, 2, 2);
-      const sociale = 24
-        + markerImpact(evidence, 'social', 14, 2, 2, 3)
-        + markerImpact(evidence, 'irritability', 5, 1, 2, 2)
-        + markerImpact(evidence, 'autonomy', 3, 1, 2, 2);
-      const energetique = 100 - computeResourceBudgetFromMarkers(markers, evidence);
+    function computeInvisibleLoads(markers) {
+      const motrice = 36 + (markers.writing ? 14 : 0) + (markers.mobility ? 14 : 0) + (markers.posture ? 12 : 0) + (markers.compensation ? 6 : 0);
+      const cognitive = 34 + (markers.planning ? 14 : 0) + (markers.compensation ? 12 : 0) + (markers.temporality ? 8 : 0) + (markers.pain ? 4 : 0);
+      const organisationnelle = 30 + (markers.planning ? 18 : 0) + (markers.mobility ? 8 : 0) + (markers.autonomy ? 8 : 0);
+      const sociale = 24 + (markers.social ? 22 : 0) + (markers.irritability ? 8 : 0) + (markers.autonomy ? 6 : 0);
+      const energetique = 100 - computeResourceBudgetFromMarkers(markers);
       return [
         { label: 'Charge motrice', value: Math.min(92, motrice), color: 'bg-indigo-500', text: motrice >= 75 ? 'Élevée' : motrice >= 55 ? 'Modérée à élevée' : 'Modérée' },
         { label: 'Charge cognitive', value: Math.min(90, cognitive), color: 'bg-pink-500', text: cognitive >= 72 ? 'Élevée' : cognitive >= 52 ? 'Modérée à élevée' : 'Modérée' },
@@ -1014,11 +911,9 @@ const MARKERS = {
     }
 
     function runAnalysis() {
-      const textParts = [state.data.equipment, state.data.diagnosis, state.data.obs.story, state.data.obs.time, state.data.obs.compensation, state.data.obs.charges, state.data.obs.situations];
-      const allText = textParts.join(' | ').toLowerCase();
-      const markerEvidence = buildMarkerEvidence(textParts);
+      const allText = [state.data.equipment, state.data.diagnosis, state.data.obs.story, state.data.obs.time, state.data.obs.compensation, state.data.obs.charges, state.data.obs.situations].join(' | ').toLowerCase();
       const markers = {};
-      Object.entries(MARKERS).forEach(([key, words]) => { markers[key] = (markerEvidence[key]?.weightedCount || 0) > 0 || hasKeyword(allText, words); });
+      Object.entries(MARKERS).forEach(([key, words]) => { markers[key] = hasKeyword(allText, words); });
       const pathologies = detectPathologies(state.data.diagnosis || '');
       const pathology = pathologies[0]?.match || null;
       const situations = Object.entries(SITUATION_MAP).filter(([, words]) => hasKeyword(allText, words)).map(([label]) => label);
@@ -1039,11 +934,11 @@ const MARKERS = {
       pathologies.forEach(item => item.match.mechanisms.forEach(m => { if (!mechanisms.includes(m)) mechanisms.push(m); }));
 
       const accommodations = ACCOMMODATION_RULES.filter(rule => rule.when.every(w => markers[w]) || rule.when.some(w => markers[w])).slice(0, 7);
-      const energyScore = computeResourceBudgetFromMarkers(markers, markerEvidence);
-      const invisibleLoads = computeInvisibleLoads(markers, markerEvidence);
+      const energyScore = computeResourceBudgetFromMarkers(markers);
+      const invisibleLoads = computeInvisibleLoads(markers);
       const surchargeScore = 100 - energyScore;
 
-      state.analysis = { markers, markerEvidence, matchedPathology: pathology, matchedPathologies: pathologies.map(item => item.match), situations, inferredMechanisms: mechanisms, accommodations, surchargeScore, energyScore, invisibleLoads };
+      state.analysis = { markers, matchedPathology: pathology, matchedPathologies: pathologies.map(item => item.match), situations, inferredMechanisms: mechanisms, accommodations, surchargeScore, energyScore, invisibleLoads };
     }
 
     function buildDoubleRegard() {
@@ -1064,7 +959,7 @@ const MARKERS = {
       };
     }
 
-    function getActiveAxesFromMarkers(markers = {}, energyScore = 75, matchedPathology = null, equipment = '', markerEvidence = {}) {
+    function getActiveAxesFromMarkers(markers = {}, energyScore = 75, matchedPathology = null, equipment = '') {
       const axes = [];
       const addAxis = (label) => { if (!axes.includes(label)) axes.push(label); };
 
@@ -1077,7 +972,7 @@ const MARKERS = {
       if (markers.temporality) addAxis('temporalité de la journée');
       if (markers.compensation) addAxis('stratégies de compensation');
       if (markers.autonomy) addAxis('autonomie paradoxale / besoin d’aide humaine');
-      const previewLoads = computeInvisibleLoads(markers, markerEvidence);
+      const previewLoads = computeInvisibleLoads(markers);
       if (previewLoads?.some(load => load.value >= 55)) addAxis('charge scolaire cumulée');
 
       return axes.length ? axes : ['fatigue / coût énergétique'];
@@ -1088,20 +983,19 @@ const MARKERS = {
         state.analysis.markers || {},
         state.analysis.energyScore || 75,
         state.analysis.matchedPathology || null,
-        state.data.equipment || '',
-        state.analysis.markerEvidence || {}
+        state.data.equipment || ''
       );
     }
 
     // NOTE CONCEPTUELLE : cette fonction est appelée dans les étapes du dialogue
-    // avec un "override" partiel (ex: { story: cleanInput }). L'idée est de
-    // combiner l'entrée fraîche de l'utilisateur avec les données déjà
+    // avec un "override" partiel (ex: { story: cleanInput }). L’idée est de
+    // combiner l’entrée fraîche de l’utilisateur avec les données déjà
     // stockées dans state.data pour estimer les axes émergents.
     // IMPORTANT : dans le flux actuel, la donnée est toujours sauvegardée
-    // dans state.data juste AVANT l'appel à cette fonction (ex: state.data.obs.story = cleanInput).
-    // Si l'ordre du flux conversationnel était modifié à l'avenir, il faudrait
-    // vérifier que la donnée pertinente est bien déjà écrite dans l'état ou
-    // fournie explicitement dans l'objet overrides pour éviter des previews
+    // dans state.data juste AVANT l’appel à cette fonction (ex: state.data.obs.story = cleanInput).
+    // Si l’ordre du flux conversationnel était modifié à l’avenir, il faudrait
+    // vérifier que la donnée pertinente est bien déjà écrite dans l’état ou
+    // fournie explicitement dans l’objet overrides pour éviter des previews
     // incohérentes.
     function previewAxesFromPartialData(overrides = {}) {
       const combined = {
@@ -1114,21 +1008,19 @@ const MARKERS = {
         situations: overrides.situations !== undefined ? overrides.situations : state.data.obs.situations
       };
 
-      const textParts = [combined.equipment, combined.diagnosis, combined.story, combined.time, combined.compensation, combined.charges, combined.situations];
-      const allText = textParts
+      const allText = [combined.equipment, combined.diagnosis, combined.story, combined.time, combined.compensation, combined.charges, combined.situations]
         .filter(Boolean)
         .join(' | ')
         .toLowerCase();
 
-      const markerEvidence = buildMarkerEvidence(textParts);
       const markers = {};
       Object.entries(MARKERS).forEach(([key, words]) => {
-        markers[key] = (markerEvidence[key]?.weightedCount || 0) > 0 || hasKeyword(allText, words);
+        markers[key] = hasKeyword(allText, words);
       });
 
       const matchedPathology = detectPathologies(combined.diagnosis || '')[0]?.match || null;
-      const energyScore = computeResourceBudgetFromMarkers(markers, markerEvidence);
-      return getActiveAxesFromMarkers(markers, energyScore, matchedPathology, combined.equipment || '', markerEvidence);
+      const energyScore = computeResourceBudgetFromMarkers(markers);
+      return getActiveAxesFromMarkers(markers, energyScore, matchedPathology, combined.equipment || '');
     }
 
     function buildAxesPreviewMessage(axes, intro = 'Je repère déjà') {
@@ -1151,7 +1043,7 @@ const MARKERS = {
       addMessage('bot', buildAxesPreviewMessage(axesToShow, intro), true);
     }
 
-    function computeResourceBudget() { return typeof state.analysis.energyScore === 'number' ? state.analysis.energyScore : 75; }
+    function computeResourceBudget() { return state.analysis.energyScore || 75; }
 
     function getMissingExplorationAreas() {
       const missing = [];
@@ -1169,7 +1061,7 @@ const MARKERS = {
 
     function renderContinueOptions(missing) {
       const labels = missing.slice(0, 3).map(item => `<li>${escapeHtml(item)}</li>`).join('');
-      return `<div class="space-y-3"><p>Nous pouvons déjà produire une boussole, mais certains angles restent encore peu explorés.</p><p class="text-sm text-slate-600">Si vous le souhaitez, nous pouvons approfondir avant la synthèse, par exemple sur :</p><ul class="list-disc pl-5 text-sm space-y-1">${labels}</ul><div class="flex flex-wrap gap-2 pt-2"><button onclick="continueDeeper('oui')" class="btn-choice">Poursuivre l'échange</button><button onclick="continueDeeper('non')" class="btn-choice">Aller à la boussole</button></div></div>`;
+      return `<div class="space-y-3"><p>Nous pouvons déjà produire une boussole, mais certains angles restent encore peu explorés.</p><p class="text-sm text-slate-600">Si vous le souhaitez, nous pouvons approfondir avant la synthèse, par exemple sur :</p><ul class="list-disc pl-5 text-sm space-y-1">${labels}</ul><div class="flex flex-wrap gap-2 pt-2"><button onclick="continueDeeper('oui')" class="btn-choice">Poursuivre l’échange</button><button onclick="continueDeeper('non')" class="btn-choice">Aller à la boussole</button></div></div>`;
     }
 
     function continueDeeper(choice) {
@@ -1228,7 +1120,7 @@ const MARKERS = {
         case 'level':
           state.data.level = cleanInput;
           updateGenderFromText(cleanInput);
-          addMessage('bot', `D'accord. ${state.data.pseudo} ${getUsesQuestion()} un appareillage ou des aides techniques particulières (fauteuil, attelles, cadre de marche, ordinateur, autre) ?`);
+          addMessage('bot', `D’accord. ${state.data.pseudo} ${getUsesQuestion()} un appareillage ou des aides techniques particulières (fauteuil, attelles, cadre de marche, ordinateur, autre) ?`);
           offerSkipChoices();
           state.step = 'equipment';
           break;
@@ -1268,7 +1160,7 @@ const MARKERS = {
               state.step = 'diagnosis_permission';
             }
           } else {
-            addMessage('bot', `D'accord. Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
+            addMessage('bot', `D’accord. Partagez-moi vos observations marquantes. Qu’est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
             offerSkipChoices();
             state.step = 'obs_story';
           }
@@ -1286,14 +1178,14 @@ const MARKERS = {
               offerSkipChoices();
               state.step = 'diagnosis_permission';
             } else {
-              addMessage('bot', `D'accord. Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
+              addMessage('bot', `D’accord. Partagez-moi vos observations marquantes. Qu’est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
               offerSkipChoices();
               state.step = 'obs_story';
             }
           } else {
             state.data.diagnosis = cleanInput;
-            addMessage('bot', `D'accord. Je reste donc centré sur les observations du quotidien scolaire sans m'appuyer sur une pathologie identifiée.`);
-            addMessage('bot', `Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
+            addMessage('bot', `D’accord. Je reste donc centré sur les observations du quotidien scolaire sans m’appuyer sur une pathologie identifiée.`);
+            addMessage('bot', `Partagez-moi vos observations marquantes. Qu’est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
             offerSkipChoices();
             state.step = 'obs_story';
           }
@@ -1312,11 +1204,11 @@ const MARKERS = {
                 <div class="mt-3 bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm text-slate-700">${matched.documentation}</div>
               </div>
             `).join('');
-            addMessage('bot', `<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d'appui de vulgarisation</p>${cards}<p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>`, true);
+            addMessage('bot', `<div class="space-y-3"><p class="text-xs uppercase tracking-widest font-black text-indigo-500">Point d’appui de vulgarisation</p>${cards}<p class="text-xs text-slate-500">Cette reformulation est une vulgarisation pédagogique destinée aux équipes éducatives. Elle ne remplace jamais les informations médicales ou paramédicales.</p></div>`, true);
           } else {
-            addMessage('bot', `D'accord. Je reste donc strictement centré sur les observations scolaires et leurs conséquences possibles dans sa journée.`);
+            addMessage('bot', `D’accord. Je reste donc strictement centré sur les observations scolaires et leurs conséquences possibles dans sa journée.`);
           }
-          addMessage('bot', `Partagez-moi vos observations marquantes. Qu'est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
+          addMessage('bot', `Partagez-moi vos observations marquantes. Qu’est-ce qui, dans le comportement de ${state.data.pseudo}, vous interpelle ou vous semble coûteux pour ${getPronouns().subject} ?`);
           offerSkipChoices();
           state.step = 'obs_story';
           break;
@@ -1324,7 +1216,7 @@ const MARKERS = {
         case 'obs_story': {
           state.data.obs.story = cleanInput;
           updateGenderFromText(cleanInput);
-          // On analyse ici l'entrée brute pour repérer immédiatement des signaux saillants dans la formulation spontanée de l'enseignant.
+          // On analyse ici l’entrée brute pour repérer immédiatement des signaux saillants dans la formulation spontanée de l’enseignant.
           const quick = detectQuickMarkers(input);
 
           const previewAxes = previewAxesFromPartialData({ story: cleanInput });
@@ -1348,7 +1240,7 @@ const MARKERS = {
 
           const temporalAxes = previewAxesFromPartialData({ time: cleanInput });
           maybeShowAxesPreview(temporalAxes, 'Avec ce que vous ajoutez, je vois plus nettement');
-          addMessage('bot', `D'accord. Une autre question aide souvent à comprendre le coût invisible : avez-vous l'impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
+          addMessage('bot', `D’accord. Une autre question aide souvent à comprendre le coût invisible : avez-vous l’impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
 
           if (maybeAskGenderClarification()) {
             addMessage('bot', `Pour que je formule la suite de manière plus juste, parlez-vous d’un garçon ou d’une fille ? Si vous préférez, vous pouvez aussi passer cette question.`);
@@ -1365,7 +1257,7 @@ const MARKERS = {
           const low = cleanInput.toLowerCase();
           if (low.includes('fille') || low.includes('elle')) state.data.gender = 'f';
           else if (low.includes('garçon') || low.includes('garcon') || low.includes('il')) state.data.gender = 'm';
-          addMessage('bot', `Merci. Une autre question aide souvent à comprendre le coût invisible : avez-vous l'impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
+          addMessage('bot', `Merci. Une autre question aide souvent à comprendre le coût invisible : avez-vous l’impression que ${state.data.pseudo} <strong>fait beaucoup d’efforts pour tenir</strong>, par exemple en se figeant, en se concentrant très fortement ou en essayant de ne pas montrer que c’est difficile ?`, true);
           offerSkipChoices();
           state.step = 'compensation';
           break;
@@ -1395,8 +1287,8 @@ const MARKERS = {
           addMessage('bot', `On commence à voir apparaître plusieurs contraintes possibles (plusieurs coûts semblent s’additionner). Pour aller plus loin : quand cela devient difficile, qu’est‑ce qui vous semble le plus lourd pour ${state.data.pseudo} ?
 
 • le geste moteur
-• l'organisation
-• la gestion de l'attention
+• l’organisation
+• la gestion de l’attention
 • la fatigue physique
 • le regard des autres
 • ou le fait de vouloir rester autonome ?`, true);
@@ -1413,10 +1305,10 @@ const MARKERS = {
           addMessage('bot', `Merci pour ces éléments. Avant de proposer une synthèse, je reformule ce qui ressort de vos observations :
 
 • certaines situations scolaires semblent plus coûteuses
-• la fatigue ou l'accumulation au fil de la journée joue probablement un rôle
+• la fatigue ou l’accumulation au fil de la journée joue probablement un rôle
 • ${subjectLabel(true)} semble parfois devoir <strong>compenser</strong> pour tenir
 
-C'est souvent dans cette accumulation de petites contraintes que se construit la difficulté visible.`, true);
+C’est souvent dans cette accumulation de petites contraintes que se construit la difficulté visible.`, true);
 
           runAnalysis();
 
@@ -1424,7 +1316,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             addMessage('bot', renderContinueOptions(getMissingExplorationAreas()), true);
             state.step = 'deeper_choice';
           } else {
-            addMessage('bot', `<div class="space-y-3"><p>Si vous le souhaitez, je peux maintenant transformer cet échange en une <strong>boussole de compréhension</strong> qui mettra en évidence :</p><ul class="list-disc pl-5 text-sm space-y-1"><li>les mécanismes fonctionnels possibles</li><li>les situations scolaires sensibles</li><li>la carte des charges invisibles</li><li>des pistes d'ajustement pédagogique</li></ul><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
+            addMessage('bot', `<div class="space-y-3"><p>Si vous le souhaitez, je peux maintenant transformer cet échange en une <strong>boussole de compréhension</strong> qui mettra en évidence :</p><ul class="list-disc pl-5 text-sm space-y-1"><li>les mécanismes fonctionnels possibles</li><li>les situations scolaires sensibles</li><li>la carte des charges invisibles</li><li>des pistes d’ajustement pédagogique</li></ul><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
             state.step = 'done';
           }
           break;
@@ -1435,7 +1327,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
           if (wantsMore) {
             askNextDeeperQuestion();
           } else {
-            addMessage('bot', `<div class="space-y-3"><p>D'accord. Je transforme ce que nous avons déjà dégagé en <strong>boussole de compréhension</strong>.</p><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
+            addMessage('bot', `<div class="space-y-3"><p>D’accord. Je transforme ce que nous avons déjà dégagé en <strong>boussole de compréhension</strong>.</p><button onclick="showFinalReport()" class="soa-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-3">Consulter la boussole</button></div>`, true);
             state.step = 'done';
           }
           break;
@@ -1467,9 +1359,283 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
       setTimeout(() => document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 
+
+    // ─── Timeline d’énergie sur la journée ────────────────────────────────────
+    function buildEnergyTimeline() {
+      const m = state.analysis.markers || {};
+      const p = getPronouns();
+      const pseudo = state.data.pseudo || "l’élève";
+
+      // 4 moments : début matinée / récré / fin matinée / après-midi
+      // Chaque moment a un niveau d’énergie de base, modulé par les marqueurs
+
+      // Niveau de base : 100 au départ, on soustrait selon les marqueurs actifs
+      const baseStart = 100;
+
+      // Coût de chaque marqueur par moment
+      // [débutMatin, récré, finMatin, aprèsMidi]
+      const costs = {
+        posture:       [12, 4,  8,  10],  // coût continu dès l’arrivée
+        fatigue:       [6,  10, 16, 18],  // s’accumule au fil du temps
+        mobility:      [4,  18, 8,  12],  // pic aux transitions (récré)
+        writing:       [8,  0,  14, 10],  // fort sur les plages d’écriture
+        compensation:  [6,  4,  14, 12],  // effort puis effondrement
+        planning:      [10, 2,  8,  10],  // coût cognitif en début de séquence
+        pain:          [8,  6,  10, 12],  // facteur aggravant constant
+        temporality:   [2,  6,  14, 16],  // variabilité marquée en fin de matinée
+        social:        [4,  14, 6,  8],   // récré = exposition sociale forte
+        autonomy:      [6,  2,  10, 8],   // sur-effort pour paraître autonome
+        irritability:  [2,  4,  12, 14],  // refus = signal de saturation tardive
+        slowness:      [4,  2,  10, 12],
+      };
+
+      // Calcul des niveaux à chaque moment
+      let levels = [baseStart, baseStart, baseStart, baseStart];
+      for (const [marker, costArr] of Object.entries(costs)) {
+        if (m[marker]) {
+          levels = levels.map((lvl, i) => lvl - costArr[i]);
+        }
+      }
+      // Cascade : chaque moment part du résultat du précédent
+      // (l’énergie ne se régénère pas entre les moments, sauf légèrement à la récré)
+      const recoveryAtBreak = m.fatigue ? 2 : (m.posture ? 3 : 6); // récré = peu de récup si fatigue
+      levels[1] = Math.min(levels[0] - (costs.mobility[0] || 0), levels[1]);
+      levels[2] = Math.min(levels[1] + recoveryAtBreak, levels[2]);
+      levels[3] = Math.min(levels[2] - 8, levels[3]); // après repas = légère baisse systématique
+      levels = levels.map(l => Math.max(8, Math.min(98, Math.round(l))));
+
+      // Phrases SOAH par moment — factuelles, sans interprétation
+      const moments = [
+        {
+          label: 'Début de matinée',
+          time: '8h30',
+          icon: 'fa-sun',
+          iconColor: 'text-amber-400',
+          level: levels[0],
+          phrase: buildMomentPhrase(0, levels[0], m, p, pseudo),
+          situations: buildMomentSituations(0, m),
+        },
+        {
+          label: 'Récréation',
+          time: '10h15',
+          icon: 'fa-person-running',
+          iconColor: 'text-sky-400',
+          level: levels[1],
+          phrase: buildMomentPhrase(1, levels[1], m, p, pseudo),
+          situations: buildMomentSituations(1, m),
+        },
+        {
+          label: 'Fin de matinée',
+          time: '11h30',
+          icon: 'fa-clock',
+          iconColor: 'text-orange-400',
+          level: levels[2],
+          phrase: buildMomentPhrase(2, levels[2], m, p, pseudo),
+          situations: buildMomentSituations(2, m),
+        },
+        {
+          label: 'Après-midi',
+          time: '14h–16h',
+          icon: 'fa-moon',
+          iconColor: 'text-indigo-400',
+          level: levels[3],
+          phrase: buildMomentPhrase(3, levels[3], m, p, pseudo),
+          situations: buildMomentSituations(3, m),
+        },
+      ];
+
+      return moments;
+    }
+
+    function buildMomentPhrase(momentIdx, level, m, p, pseudo) {
+      // Phrases construites à partir des marqueurs + niveau, non interprétatives
+      const subject = p.subject;
+      const S = subject.charAt(0).toUpperCase() + subject.slice(1);
+
+      const phrases = {
+        0: [ // Début de matinée
+          level >= 75
+            ? `Les ressources semblent encore disponibles à l’arrivée.`
+            : m.posture
+              ? `Le maintien postural mobilise déjà une partie des ressources dès l’installation.`
+              : `Des contraintes semblent déjà présentes dès le début de la journée.`,
+          m.planning ? `La mise en route et la compréhension des consignes peuvent représenter un coût précoce.` : '',
+          m.pain ? `Si une gêne physique est présente, elle peut alourdir le démarrage dès le matin.` : '',
+        ],
+        1: [ // Récréation
+          m.mobility
+            ? `Les déplacements et la gestion de l’espace extérieur peuvent représenter un coût élevé.`
+            : `La récréation peut être un moment de dépense plutôt que de récupération.`,
+          m.social ? `L’exposition au groupe et les interactions peuvent aussi mobiliser des ressources.` : '',
+          level < 50 ? `Le niveau d’énergie disponible au retour de récréation peut déjà être significativement réduit.` : '',
+        ],
+        2: [ // Fin de matinée
+          level < 45
+            ? `C’est souvent à ce moment que la fatigue cumulée devient visible dans le comportement ou la participation.`
+            : level < 65
+              ? `Les ressources disponibles peuvent être réduites, rendant les tâches exigeantes plus difficiles d’accès.`
+              : `Les ressources semblent encore présentes, mais certaines situations peuvent devenir plus coûteuses.`,
+          m.writing ? `Les tâches d’écriture ou de copie à ce moment peuvent mobiliser un effort accru.` : '',
+          m.compensation ? `Si ${subject} compense pour tenir, l’effondrement peut survenir soudainement à ce stade.` : '',
+        ],
+        3: [ // Après-midi
+          level < 35
+            ? `L’après-midi démarre avec un capital énergétique fortement entamé.`
+            : level < 55
+              ? `Les ressources disponibles l’après-midi peuvent être sensiblement inférieures à celles du matin.`
+              : `Des ressources semblent encore mobilisables l’après-midi, bien qu’en diminution.`,
+          m.fatigue ? `La fatigue accumulée depuis le matin peut amplifier les difficultés de participation.` : '',
+          m.temporality ? `La variabilité des performances peut être particulièrement marquée à cette période.` : '',
+        ],
+      };
+
+      return phrases[momentIdx].filter(Boolean).slice(0, 2).join(' ');
+    }
+
+    function buildMomentSituations(momentIdx, m) {
+      const all = [
+        // Début matinée
+        [
+          m.posture && 'Installation et maintien postural',
+          m.planning && 'Mise en route, consignes',
+          m.writing && 'Premières tâches d’écriture',
+        ],
+        // Récréation
+        [
+          m.mobility && 'Déplacements, transitions',
+          m.social && 'Interactions de groupe',
+          m.posture && 'Gestion de l’espace extérieur',
+        ],
+        // Fin matinée
+        [
+          m.writing && 'Écriture, copie, dictée',
+          m.compensation && 'Maintien de l’effort',
+          m.planning && 'Tâches complexes ou longues',
+        ],
+        // Après-midi
+        [
+          m.fatigue && 'Fatigue cumulée',
+          m.temporality && 'Variabilité des ressources',
+          m.mobility && 'Transitions, changements de local',
+        ],
+      ];
+      return all[momentIdx].filter(Boolean);
+    }
+
+    function getLevelColor(level) {
+      if (level >= 70) return { bar: '#22c55e', bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-700', label: 'Disponible' };
+      if (level >= 45) return { bar: '#f59e0b', bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700', label: 'Réduit' };
+      return { bar: '#ef4444', bg: 'bg-rose-50', border: 'border-rose-100', text: 'text-rose-700', label: 'Fortement entamé' };
+    }
+
+    function renderEnergyTimeline() {
+      const moments = buildEnergyTimeline();
+      const p = getPronouns();
+
+      // Courbe SVG
+      const svgW = 600, svgH = 120, pad = 40;
+      const xStep = (svgW - pad * 2) / 3;
+      const points = moments.map((m, i) => ({
+        x: pad + i * xStep,
+        y: pad + (1 - m.level / 100) * (svgH - pad * 2),
+        level: m.level,
+      }));
+
+      // Smooth curve via cubic bezier
+      let pathD = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const cp1x = points[i].x + xStep * 0.45;
+        const cp1y = points[i].y;
+        const cp2x = points[i + 1].x - xStep * 0.45;
+        const cp2y = points[i + 1].y;
+        pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${points[i+1].x} ${points[i+1].y}`;
+      }
+
+      // Fill area under curve
+      const fillD = pathD + ` L ${points[points.length-1].x} ${svgH - pad} L ${points[0].x} ${svgH - pad} Z`;
+
+      const svgDots = points.map((pt, i) => {
+        const col = getLevelColor(pt.level);
+        return `<circle cx="${pt.x}" cy="${pt.y}" r="6" fill="${col.bar}" stroke="white" stroke-width="2"/>
+                <text x="${pt.x}" y="${pt.y - 12}" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">${pt.level}%</text>`;
+      }).join('');
+
+      // Zone labels under SVG
+      const zoneLabels = moments.map((mt, i) => {
+        const x = points[i].x;
+        return `<text x="${x}" y="${svgH - 4}" text-anchor="middle" font-size="10" fill="#94a3b8">${mt.time}</text>`;
+      }).join('');
+
+      const svgHtml = `
+        <svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" class="w-full" style="max-height:130px">
+          <defs>
+            <linearGradient id="energyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6366f1" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#6366f1" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <!-- Zone verte -->
+          <rect x="${pad}" y="${pad}" width="${svgW - pad*2}" height="${(svgH - pad*2) * 0.30}" fill="#dcfce7" opacity="0.4" rx="4"/>
+          <!-- Zone orange -->
+          <rect x="${pad}" y="${pad + (svgH - pad*2) * 0.30}" width="${svgW - pad*2}" height="${(svgH - pad*2) * 0.30}" fill="#fef3c7" opacity="0.4" rx="4"/>
+          <!-- Zone rouge -->
+          <rect x="${pad}" y="${pad + (svgH - pad*2) * 0.60}" width="${svgW - pad*2}" height="${(svgH - pad*2) * 0.40}" fill="#fee2e2" opacity="0.4" rx="4"/>
+          <path d="${fillD}" fill="url(#energyGrad)"/>
+          <path d="${pathD}" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          ${svgDots}
+          ${zoneLabels}
+        </svg>`;
+
+      // Légende zones
+      const legendHtml = `
+        <div class="flex gap-4 text-xs font-semibold mt-1 mb-4 flex-wrap">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-400 inline-block"></span>Disponible (≥70%)</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>Réduit (45–69%)</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-400 inline-block"></span>Fortement entamé (&lt;45%)</span>
+        </div>`;
+
+      // Cards pour chaque moment
+      const cardsHtml = moments.map((mt, i) => {
+        const col = getLevelColor(mt.level);
+        const situationsHtml = mt.situations.length
+          ? `<ul class="mt-2 space-y-1">${mt.situations.map(s => `<li class="text-xs text-slate-500 flex items-start gap-1.5"><i class="fas fa-circle text-[5px] mt-1.5 opacity-40"></i>${s}</li>`).join('')}</ul>`
+          : '';
+        return `
+          <div class="rounded-2xl border ${col.border} ${col.bg} p-4 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas ${mt.icon} ${col.text} text-sm"></i>
+                <span class="text-xs font-black uppercase tracking-widest ${col.text}">${mt.label}</span>
+              </div>
+              <span class="text-xs font-bold ${col.text} opacity-80">${mt.time}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex-1 h-2 rounded-full bg-white/60 overflow-hidden">
+                <div class="h-2 rounded-full transition-all" style="width:${mt.level}%;background:${col.bar}"></div>
+              </div>
+              <span class="text-xs font-black ${col.text} w-8 text-right">${mt.level}%</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">${mt.phrase}</p>
+            ${situationsHtml}
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
+          <div class="flex items-start justify-between mb-1">
+            <p class="text-sm font-black uppercase tracking-widest text-slate-800">Carte des ressources dans la journée</p>
+          </div>
+          <p class="text-xs text-slate-500 mb-5">Estimation pédagogique construite à partir des observations recueillies. Cette représentation n’est pas une mesure médicale — elle varie selon les jours, les contextes et l’état général de ${p.object}. Elle vise à rendre visible une dynamique, pas à fixer un niveau.</p>
+          ${svgHtml}
+          ${legendHtml}
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+            ${cardsHtml}
+          </div>
+        </div>`;
+    }
+
     function generateReport() {
       const p = getPronouns();
-      const g = getGenderAgreement();
       const budget = computeResourceBudget();
       const doubleRegard = buildDoubleRegard();
       const markerNames = markerLabelMap();
@@ -1486,13 +1652,13 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             const pathologyImpact = getPathologyImpact(matched.name);
             return `<div class="bg-white border border-violet-100 rounded-2xl p-5"><p class="font-bold text-slate-800">${escapeHtml(matched.name)}</p><p class="text-sm text-slate-600 mt-2">${escapeHtml(matched.pedagogicalWarning)}</p>${pathologyImpact ? `<div class="mt-4 grid md:grid-cols-3 gap-4"><div class="bg-violet-50 border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">En deux mots</p><p class="text-sm text-slate-700">${escapeHtml(pathologyImpact.shortDefinition)}</p></div><div class="bg-violet-50 border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Au quotidien</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.dailyImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div><div class="bg-violet-50 border border-violet-100 rounded-2xl p-4"><p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">À l’école</p><ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">${pathologyImpact.schoolImpact.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div></div>` : ''}${state.data.pathologyPermissionGranted ? `<div class="mt-4 bg-violet-50 border border-violet-100 rounded-2xl p-4 text-sm text-slate-700">${escapeHtml(matched.documentation)}</div>` : ''}</div>`;
           }).join('')}</div></div>`
-        : `<div class="bg-slate-50 border border-slate-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-slate-600 mb-2">Cadre de prudence</p><p class="text-sm text-slate-600">Aucun raisonnement diagnostique n'est posé ici. La lecture ci-dessous repose uniquement sur les effets possibles observés dans le contexte scolaire.</p></div>`;
+        : `<div class="bg-slate-50 border border-slate-200 rounded-3xl p-6"><p class="text-xs font-black uppercase tracking-widest text-slate-600 mb-2">Cadre de prudence</p><p class="text-sm text-slate-600">Aucun raisonnement diagnostique n’est posé ici. La lecture ci-dessous repose uniquement sur les effets possibles observés dans le contexte scolaire.</p></div>`;
 
       document.getElementById('final-report').innerHTML = `
         <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden report-card">
           <div class="soa-gradient text-white p-12">
             <h2 class="text-4xl font-bold tracking-tight">Boussole de compréhension</h2>
-            <p class="mt-4 text-xl opacity-90 italic">Ce que l'on voit n'est pas toujours le vrai coût payé par ${p.object} pour participer.</p>
+            <p class="mt-4 text-xl opacity-90 italic">Ce que l’on voit n’est pas toujours le vrai coût payé par ${p.object} pour participer.</p>
           </div>
 
           <div class="p-8 md:p-16 space-y-10">
@@ -1500,7 +1666,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
               <i class="fas fa-shield-halved text-amber-500 text-xl mt-1"></i>
               <div>
                 <p class="text-xs font-black text-amber-800 uppercase mb-1">Cadre institutionnel</p>
-                <p class="text-sm text-amber-700 italic">Hypothèses pédagogiques destinées aux équipes éducatives. Ce document n'a pas de valeur diagnostique.</p>
+                <p class="text-sm text-amber-700 italic">Hypothèses pédagogiques destinées aux équipes éducatives. Ce document n’a pas de valeur diagnostique.</p>
               </div>
             </div>
 
@@ -1520,12 +1686,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
                 <p class="text-sm text-slate-600">SOAH estime qu’il resterait environ <strong>${budget}% d’énergie que ${p.subject} peut encore mobiliser pour la tâche scolaire</strong>, au regard des contraintes décrites.</p>
                 <p class="text-xs text-slate-500 mt-2">Cette estimation n’est pas une mesure médicale. Elle est construite à partir des indices repérés dans l’échange : ${scoreExplanation.length ? scoreExplanation.join(', ') : 'peu d’indices suffisamment précis à ce stade'}.</p>
                 <p class="text-xs text-slate-500 mt-2">Plus ces indices s’accumulent, plus SOAH considère qu’une partie importante de l’énergie de ${p.object} est déjà utilisée avant même d’entrer pleinement dans la tâche scolaire.</p>
-                <p class="text-xs text-slate-500 mt-2">SOAH tient aussi compte de la répétition des signaux dans plusieurs réponses : une fatigue citée à plusieurs reprises ne pèse pas comme une mention isolée.</p>
                 <p class="text-xs text-slate-500 mt-3">Indice de surcharge estimé : <strong>${state.analysis.surchargeScore}%</strong>. Plus cet indice est élevé, plus ${p.subject} risque d’utiliser une grande partie de son énergie simplement pour participer aux activités scolaires.</p>
-                <div class="mt-4 bg-rose-50 border border-rose-200 rounded-2xl p-4">
-                  <p class="text-[11px] font-black uppercase tracking-widest text-rose-700 mb-1">Repère méthodologique</p>
-                  <p class="text-xs text-slate-600">Cet indice est indicatif. Il repose sur des marqueurs repérés automatiquement dans l’échange, avec une pondération qui tient désormais compte de la fréquence et de la répartition des mentions dans vos réponses. Il reflète donc mieux l’accumulation de signaux qu’une présence binaire, mais il reste une aide à la lecture pédagogique, pas une mesure clinique ou un score objectif de gravité.</p>
-                </div>
               </div>
             </div>
 
@@ -1545,16 +1706,17 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
               </div>
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Mécanismes fonctionnels possibles</p>
-                <p class="text-xs text-slate-500 mb-4">Dans la situation décrite, voici ce que SOAH retient plus spécifiquement pour ${p.object}.</p>
-                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.inferredMechanisms.length ? state.analysis.inferredMechanisms.map(m => `<li>${escapeHtml(mechanismToReportSentence(m))}</li>`).join('') : `<li>Aucun mécanisme saillant n’a été dégagé automatiquement pour ${p.object}.</li>`}</ul>
+                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.inferredMechanisms.length ? state.analysis.inferredMechanisms.map(m => `<li>${escapeHtml(m)}</li>`).join('') : '<li>Aucun mécanisme saillant n’a été dégagé automatiquement.</li>'}</ul>
               </div>
             </div>
 
             <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
               <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-2">Carte des charges invisibles</p>
-              <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur ${p.object} dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite. Une charge mentionnée à plusieurs reprises dans plusieurs réponses pèse davantage qu’un signal isolé, sans pour autant transformer ce graphique en mesure clinique.</p>
+              <p class="text-xs text-slate-500 mb-5">Cette carte représente les différents types de contraintes susceptibles de peser sur ${p.object} dans une journée scolaire. Les niveaux sont estimés à partir des mots-clés et situations mentionnés dans l’échange (écriture, fatigue, organisation, regard des autres, déplacements, etc.). Les pourcentages ne sont pas des mesures objectives : ils servent à visualiser quelles charges semblent plus présentes que d’autres dans la situation décrite.</p>
               <div class="space-y-5">${state.analysis.invisibleLoads.map(c => `<div><div class="flex justify-between text-xs font-bold text-slate-600 uppercase mb-2"><span>${c.label}</span><span>${c.text}</span></div><div class="meter"><div class="${c.color}" style="width:${c.value}%"></div></div><p class="text-xs text-slate-500 mt-2">${(loadReasons[c.label] && loadReasons[c.label].length) ? `Ce niveau est retenu notamment à partir de : ${loadReasons[c.label].join(', ')}.` : 'Ce niveau reste provisoire car peu d’indices spécifiques ont été relevés pour cette charge.'}</p></div>`).join('')}</div>
             </div>
+
+            ${renderEnergyTimeline()}
 
             <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
               <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Pourquoi SOAH retient ces axes ?</p>
@@ -1564,8 +1726,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             <div class="grid md:grid-cols-2 gap-10">
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Situations scolaires à surveiller</p>
-                <p class="text-xs text-slate-500 mb-4">Les situations ci-dessous semblent être celles où ${p.subject} pourrait être le plus rapidement ${g.solicited}.</p>
-                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.situations.length ? state.analysis.situations.map(s => `<li>${escapeHtml(situationToReportSentence(s))}</li>`).join('') : `<li>À préciser : situations de classe ou de transition où ${p.subject} paraît le plus ${g.concerned}.</li>`}</ul>
+                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">${state.analysis.situations.length ? state.analysis.situations.map(s => `<li>${escapeHtml(s)}</li>`).join('') : '<li>À préciser : situations de classe ou de transition les plus coûteuses.</li>'}</ul>
               </div>
               <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
                 <p class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4">Observation de départ</p>
@@ -1579,16 +1740,15 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
             </div>
 
             <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-8">
-              <p class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-4">Pistes d'aménagement à explorer</p>
-              <p class="text-xs text-slate-600 mb-4">Ces ajustements sont à explorer pour aider ${p.object} à participer sans que tout repose sur la compensation, la fatigue ou le sur-effort.</p>
-              <div class="space-y-4">${state.analysis.accommodations.length ? state.analysis.accommodations.map(item => `<div class="bg-white border border-emerald-100 rounded-2xl p-5"><p class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-2">${escapeHtml(item.type)}</p><p class="font-bold text-slate-800">${escapeHtml(item.title)}</p><p class="text-sm text-slate-600 mt-2">${escapeHtml(item.description)}</p></div>`).join('') : `<p class="text-sm text-slate-600">Aucune recommandation n’a été générée automatiquement pour ${p.object}. Une analyse plus guidée peut être nécessaire.</p>`}</div>
+              <p class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-4">Pistes d’aménagement à explorer</p>
+              <div class="space-y-4">${state.analysis.accommodations.length ? state.analysis.accommodations.map(item => `<div class="bg-white border border-emerald-100 rounded-2xl p-5"><p class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-2">${escapeHtml(item.type)}</p><p class="font-bold text-slate-800">${escapeHtml(item.title)}</p><p class="text-sm text-slate-600 mt-2">${escapeHtml(item.description)}</p></div>`).join('') : '<p class="text-sm text-slate-600">Aucune recommandation n’a été générée automatiquement. Une analyse plus guidée peut être nécessaire.</p>'}</div>
             </div>
 
             <div class="bg-sky-50 border border-sky-200 rounded-3xl p-8">
-              <p class="text-sm font-black uppercase tracking-widest text-sky-800 mb-4">Points de vigilance pour l'équipe</p>
+              <p class="text-sm font-black uppercase tracking-widest text-sky-800 mb-4">Points de vigilance pour l’équipe</p>
               <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">
-                <li>Une réussite ponctuelle n'efface pas la présence possible d'un sur-effort invisible.</li>
-                <li>Un refus, une lenteur ou une irritabilité peuvent être la forme visible d'une surcharge et non d'un manque de volonté.</li>
+                <li>Une réussite ponctuelle n’efface pas la présence possible d’un sur-effort invisible.</li>
+                <li>Un refus, une lenteur ou une irritabilité peuvent être la forme visible d’une surcharge et non d’un manque de volonté.</li>
                 <li>Une autonomie apparente peut parfois reposer sur des stratégies de compensation coûteuses.</li>
                 <li>Les aménagements se pensent à partir des situations scolaires concrètes, pas uniquement à partir du diagnostic.</li>
                 <li>Le corps peut parfois limiter l’expression visible d’une compétence sans annuler la compréhension réelle.</li>
@@ -1694,14 +1854,7 @@ C'est souvent dans cette accumulation de petites contraintes que se construit la
     sendBtn.onclick = handleInput;
     inputEl.addEventListener('keypress', e => { if (e.key === 'Enter') handleInput(); });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const startBtn = document.getElementById('start-btn');
-      const simulateBtn = document.getElementById('simulate-btn');
-      if (startBtn) startBtn.addEventListener('click', startAnalysis);
-      if (simulateBtn) simulateBtn.addEventListener('click', simulateDemo);
-    });
+
   </script>
 </body>
 </html>
-
-
