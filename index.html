@@ -1126,6 +1126,9 @@ const MARKERS = {
     }
 
     function continueDeeper(choice) {
+      if (state.isSimulating) return;
+      saveUndoSnapshot();
+      clearChoices();
       addMessage('user', choice === 'oui' ? 'Poursuivre l’échange' : 'Aller à la boussole');
       processStep(choice);
     }
