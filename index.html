@@ -102,6 +102,9 @@
         <div id="input-container" class="flex gap-4">
           <input type="text" id="user-input" placeholder="Partagez vos observations..."
                  class="flex-1 px-8 py-5 rounded-[2rem] bg-slate-50 border-none focus:ring-2 focus:ring-indigo-300 transition-all text-sm outline-none font-medium text-slate-600 placeholder:text-slate-400">
+          <button id="undo-btn" type="button" title="Annuler la dernière réponse" aria-label="Annuler la dernière réponse" class="bg-white border-2 border-slate-100 text-slate-400 w-16 rounded-[1.5rem] transition-all flex items-center justify-center shadow-sm disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+            <i class="fas fa-arrow-rotate-left text-lg"></i>
+          </button>
           <button id="send-btn" class="soa-gradient text-white w-16 rounded-[1.5rem] hover:opacity-90 transition-all flex items-center justify-center shadow-lg">
             <i class="fas fa-paper-plane text-xl"></i>
           </button>
@@ -315,8 +318,64 @@ const MARKERS = {
     const chatEl = document.getElementById('chat-messages');
     const inputEl = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
+    const undoBtn = document.getElementById('undo-btn');
     const choicesEl = document.getElementById('quick-choices');
     const inputContainer = document.getElementById('input-container');
+    const finalReportEl = document.getElementById('final-report');
+    const inputUiEl = document.getElementById('input-ui');
+
+    let undoStack = [];
+
+    function cloneStateSnapshot() {
+      return JSON.parse(JSON.stringify(state));
+    }
+
+    function shouldShowSkipChoices(step = state.step) {
+      return ['pseudo', 'level', 'equipment', 'diagnosis', 'diagnosis_confirmation', 'pathology_permission', 'story', 'time', 'compensation', 'situations', 'charges', 'deep_pain', 'deep_environment', 'deep_social'].includes(step);
+    }
+
+    function updateUndoButton() {
+      if (!undoBtn) return;
+      undoBtn.disabled = !undoStack.length || state.isSimulating;
+      undoBtn.classList.toggle('hover:border-indigo-200', !undoBtn.disabled);
+      undoBtn.classList.toggle('hover:text-indigo-600', !undoBtn.disabled);
+      undoBtn.classList.toggle('hover:bg-slate-50', !undoBtn.disabled);
+    }
+
+    function saveUndoSnapshot() {
+      undoStack.push({
+        state: cloneStateSnapshot(),
+        chatHtml: chatEl.innerHTML,
+        reportHtml: finalReportEl.innerHTML,
+        reportHidden: finalReportEl.classList.contains('hidden'),
+        inputHidden: inputUiEl.classList.contains('hidden')
+      });
+      if (undoStack.length > 25) undoStack.shift();
+      updateUndoButton();
+    }
+
+    function restoreQuickChoices() {
+      if (shouldShowSkipChoices()) {
+        offerSkipChoices();
+      } else {
+        clearChoices();
+      }
+    }
+
+    function undoLastResponse() {
+      if (!undoStack.length || state.isSimulating) return;
+      const snapshot = undoStack.pop();
+      state = snapshot.state;
+      chatEl.innerHTML = snapshot.chatHtml;
+      finalReportEl.innerHTML = snapshot.reportHtml;
+      finalReportEl.classList.toggle('hidden', snapshot.reportHidden);
+      inputUiEl.classList.toggle('hidden', snapshot.inputHidden);
+      inputEl.value = '';
+      restoreQuickChoices();
+      refreshGenderIndicator();
+      updateUndoButton();
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
 
     function escapeHtml(str = '') {
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -510,6 +569,8 @@ const MARKERS = {
     }
 
     function startAnalysis() {
+      undoStack = [];
+      updateUndoButton();
       document.getElementById('welcome-screen').classList.add('hidden');
       const chatInterface = document.getElementById('chat-interface');
       chatInterface.classList.remove('hidden');
@@ -1768,6 +1829,8 @@ C’est souvent dans cette accumulation de petites contraintes que se construit 
     }
 
     async function simulateDemo() {
+      undoStack = [];
+      updateUndoButton();
       state.isSimulating = true;
       document.getElementById('welcome-screen').classList.add('hidden');
       const chatInterface = document.getElementById('chat-interface');
@@ -1845,6 +1908,7 @@ C’est souvent dans cette accumulation de petites contraintes que se construit 
     function handleInput() {
       const value = inputEl.value.trim();
       if (!value || state.isSimulating) return;
+      saveUndoSnapshot();
       clearChoices();
       addMessage('user', value);
       inputEl.value = '';
@@ -1852,7 +1916,9 @@ C’est souvent dans cette accumulation de petites contraintes que se construit 
     }
 
     sendBtn.onclick = handleInput;
+    undoBtn.onclick = undoLastResponse;
     inputEl.addEventListener('keypress', e => { if (e.key === 'Enter') handleInput(); });
+    updateUndoButton();
 
 
   </script>
